@@ -10,18 +10,18 @@ class MigrationController extends Controller
 {
     public function index(Request $request)
     {
-        $this->ensureLocalRequest($request);
+        $accessMode = $this->ensureAccessibleRequest($request);
 
-        return view('migrate', $this->pageData());
+        return view('migrate', $this->pageData($accessMode));
     }
 
     public function run(Request $request)
     {
-        $this->ensureLocalRequest($request);
+        $accessMode = $this->ensureAccessibleRequest($request);
 
-        if (! $this->isConfigured()) {
-            return response()->view('migrate', $this->pageData([
-                'message' => 'Konfigurasi PIN atau APP_KEY belum tersedia. Atur MIGRATE_ADMIN_PIN dan APP_KEY di .env.',
+        if (! $this->isConfigured($accessMode)) {
+            return response()->view('migrate', $this->pageData($accessMode, [
+                'message' => 'Konfigurasi kredensial atau APP_KEY belum tersedia.',
                 'success' => false,
             ]), 503);
         }
@@ -35,18 +35,20 @@ class MigrationController extends Controller
             || ! is_string($token)
             || ! hash_equals($this->tokenFor($timestamp), $token)
         ) {
-            return response()->view('migrate', $this->pageData([
+            return response()->view('migrate', $this->pageData($accessMode, [
                 'message' => 'Form kedaluwarsa atau tidak valid. Muat ulang halaman lalu coba lagi.',
                 'success' => false,
             ]), 419);
         }
 
-        $pin = $request->input('pin');
-        $configuredPin = (string) config('migration.admin_pin');
+        $credential = $request->input('credential');
+        $configuredCredential = (string) config(
+            $accessMode === 'remote' ? 'migration.admin_secret' : 'migration.admin_pin'
+        );
 
-        if (! is_string($pin) || ! hash_equals($configuredPin, $pin)) {
-            return response()->view('migrate', $this->pageData([
-                'message' => 'PIN admin tidak sesuai.',
+        if (! is_string($credential) || ! hash_equals($configuredCredential, $credential)) {
+            return response()->view('migrate', $this->pageData($accessMode, [
+                'message' => 'Kredensial admin tidak sesuai.',
                 'success' => false,
             ]), 403);
         }
@@ -55,7 +57,7 @@ class MigrationController extends Controller
             $exitCode = Artisan::call('migrate', ['--force' => true]);
             $output = Artisan::output();
 
-            return response()->view('migrate', $this->pageData([
+            return response()->view('migrate', $this->pageData($accessMode, [
                 'message' => $exitCode === 0 ? 'Migrasi berhasil dijalankan.' : 'Migrasi gagal. Periksa output di bawah.',
                 'output' => $output,
                 'success' => $exitCode === 0,
@@ -63,7 +65,7 @@ class MigrationController extends Controller
         } catch (Throwable $exception) {
             report($exception);
 
-            return response()->view('migrate', $this->pageData([
+            return response()->view('migrate', $this->pageData($accessMode, [
                 'message' => 'Migrasi gagal karena terjadi error. Detailnya tercatat di log aplikasi.',
                 'output' => Artisan::output(),
                 'success' => false,
@@ -71,27 +73,47 @@ class MigrationController extends Controller
         }
     }
 
-    private function ensureLocalRequest(Request $request): void
+    private function ensureAccessibleRequest(Request $request): string
     {
-        abort_unless(
+        if (
             config('app.env') === 'local'
-            && in_array($request->ip(), ['127.0.0.1', '::1'], true),
+            && in_array($request->ip(), ['127.0.0.1', '::1'], true)
+        ) {
+            return 'local';
+        }
+
+        abort_unless(
+            config('app.env') === 'production'
+            && config('migration.remote_enabled')
+            && $request->isSecure()
+            && $this->hasStrongRemoteSecret(),
             404,
         );
+
+        return 'remote';
     }
 
-    private function isConfigured(): bool
+    private function isConfigured(string $accessMode): bool
     {
-        return filled(config('migration.admin_pin'))
-            && filled(config('app.key'));
+        return filled(config('app.key'))
+            && ($accessMode === 'local'
+                ? filled(config('migration.admin_pin'))
+                : $this->hasStrongRemoteSecret());
     }
 
-    private function pageData(array $state = []): array
+    private function hasStrongRemoteSecret(): bool
+    {
+        return is_string(config('migration.admin_secret'))
+            && strlen(config('migration.admin_secret')) >= 64;
+    }
+
+    private function pageData(string $accessMode, array $state = []): array
     {
         $timestamp = now()->timestamp;
 
         return array_merge([
-            'pinConfigured' => $this->isConfigured(),
+            'credentialConfigured' => $this->isConfigured($accessMode),
+            'accessMode' => $accessMode,
             'timestamp' => $timestamp,
             'token' => $this->tokenFor($timestamp),
             'message' => null,

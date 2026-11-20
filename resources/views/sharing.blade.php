@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#f5f7fb">
+    <title>Ruang — berbagi langsung</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body>
+    <div class="page-shell">
+        <header class="topbar">
+            <a class="brand" href="/" aria-label="Ruang - beranda">
+                <span class="brand-mark" aria-hidden="true">R</span>
+                <span>ruang<span class="brand-dot">.</span></span>
+            </a>
+            <div class="topbar-meta">
+                <span class="secure-pill"><span class="secure-dot"></span> Transfer langsung antar browser</span>
+                <span id="top-user" class="top-user" hidden></span>
+                <button id="logout-button" class="button button-quiet button-small" type="button" hidden>Keluar</button>
+            </div>
+        </header>
+
+        <main>
+            <section id="auth-screen" class="auth-layout">
+                <div class="intro-panel">
+                    <span class="eyebrow">RUANG BERSAMA</span>
+                    <h1>Kirim file.<br><span>Tanpa perantara.</span></h1>
+                    <p>Buat ruang privat, ngobrol, dan kirim file langsung ke browser temanmu. Isi file tidak diunggah ke server.</p>
+                    <div class="intro-points">
+                        <div><span class="point-icon">↗</span><span>Transfer peer-to-peer melalui WebRTC</span></div>
+                        <div><span class="point-icon">◎</span><span>Room dan chat tersimpan aman di akunmu</span></div>
+                        <div><span class="point-icon">⌁</span><span>Berjalan di browser modern dengan HTTPS</span></div>
+                    </div>
+                    <div class="intro-orbit orbit-one"></div>
+                    <div class="intro-orbit orbit-two"></div>
+                </div>
+
+                <div class="auth-card">
+                    <div class="auth-heading">
+                        <span class="eyebrow">MULAI BERBAGI</span>
+                        <h2 id="auth-title">Selamat datang kembali</h2>
+                        <p id="auth-subtitle">Masuk untuk membuka ruang berbagi.</p>
+                    </div>
+                    <div class="auth-tabs" role="tablist" aria-label="Jenis autentikasi">
+                        <button class="auth-tab is-active" data-auth-mode="login" type="button">Masuk</button>
+                        <button class="auth-tab" data-auth-mode="register" type="button">Buat akun</button>
+                    </div>
+                    <form id="auth-form">
+                        <label id="name-field" class="field" hidden>
+                            <span>Nama tampilan</span>
+                            <input name="name" type="text" maxlength="80" autocomplete="name" placeholder="Namamu">
+                        </label>
+                        <label class="field">
+                            <span>Email</span>
+                            <input name="email" type="email" maxlength="255" autocomplete="email" required placeholder="nama@email.com">
+                        </label>
+                        <label class="field">
+                            <span>Kata sandi</span>
+                            <input name="password" type="password" minlength="10" autocomplete="current-password" required placeholder="Minimal 10 karakter">
+                        </label>
+                        <label id="password-confirm-field" class="field" hidden>
+                            <span>Ulangi kata sandi</span>
+                            <input name="password_confirmation" type="password" minlength="10" autocomplete="new-password" placeholder="Ulangi kata sandi">
+                        </label>
+                        <p id="auth-error" class="form-error" role="alert" hidden></p>
+                        <button id="auth-submit" class="button button-primary button-wide" type="submit">Masuk ke akun <span>→</span></button>
+                    </form>
+                    <p class="auth-footnote">Jangan bagikan kata sandi atau tautan room dengan orang yang tidak kamu kenal.</p>
+                </div>
+            </section>
+
+            <section id="workspace" class="workspace" hidden>
+                <div class="welcome-row">
+                    <div>
+                        <span class="eyebrow">RUANG KOLABORASI</span>
+                        <h1>Semua yang kamu bagikan,<br><span>tetap di antara kalian.</span></h1>
+                    </div>
+                    <div class="network-card" id="network-card" aria-live="polite">
+                        <span id="network-icon" class="network-icon">⌁</span>
+                        <div>
+                            <strong id="network-title">Memeriksa jaringan</strong>
+                            <span id="network-detail">Pemeriksaan tidak menghalangi kamu masuk room.</span>
+                        </div>
+                        <span id="network-indicator" class="network-indicator"></span>
+                    </div>
+                </div>
+
+                <div class="main-grid">
+                    <aside class="room-sidebar">
+                        <div class="sidebar-heading">
+                            <div>
+                                <span class="eyebrow">RUANGMU</span>
+                                <h2>Tempat berbagi</h2>
+                            </div>
+                            <span class="sidebar-icon">▦</span>
+                        </div>
+
+                        <form id="create-room-form" class="room-action-card">
+                            <span class="action-icon create-icon">＋</span>
+                            <div class="action-copy">
+                                <strong>Buat room baru</strong>
+                                <span>Undang teman dengan kode unik.</span>
+                            </div>
+                            <button class="button button-primary button-small" type="submit">Buat</button>
+                        </form>
+
+                        <form id="join-room-form" class="join-form">
+                            <label for="room-code">Punya kode undangan?</label>
+                            <div class="join-input-row">
+                                <input id="room-code" name="room_id" type="text" maxlength="12" autocomplete="off" placeholder="Contoh: A1B2C3D4E5F6" required>
+                                <button class="button button-outline button-small" type="submit">Gabung</button>
+                            </div>
+                        </form>
+
+                        <div class="recent-heading"><span>Room terakhir</span><span class="recent-count" id="room-count">0</span></div>
+                        <div id="recent-rooms" class="recent-rooms">
+                            <p class="empty-note">Room yang pernah kamu ikuti akan tampil di sini.</p>
+                        </div>
+                    </aside>
+
+                    <section class="room-panel">
+                        <div id="room-empty" class="room-empty">
+                            <div class="empty-illustration" aria-hidden="true">
+                                <span class="empty-window window-back"></span>
+                                <span class="empty-window window-front"><i>↗</i></span>
+                                <span class="empty-spark spark-one">✦</span>
+                                <span class="empty-spark spark-two">✦</span>
+                            </div>
+                            <span class="eyebrow">BELUM ADA ROOM AKTIF</span>
+                            <h2>Siap berbagi?</h2>
+                            <p>Buat room baru atau gabung dengan kode undangan untuk mulai ngobrol dan mengirim file.</p>
+                        </div>
+
+                        <div id="active-room" class="active-room" hidden>
+                            <div class="room-header">
+                                <div class="room-title-block">
+                                    <span class="room-live"><span></span> ROOM AKTIF</span>
+                                    <h2 id="active-room-name">Room</h2>
+                                    <span class="room-code">Kode <strong id="active-room-code"></strong></span>
+                                </div>
+                                <div class="room-actions">
+                                    <button id="copy-invite" class="button button-outline button-small" type="button">⧉ <span>Salin undangan</span></button>
+                                    <button id="show-qr" class="button button-outline button-small" type="button">▦ <span>QR</span></button>
+                                    <button id="leave-room" class="button button-quiet button-small" type="button">Keluar room</button>
+                                </div>
+                            </div>
+
+                            <div id="room-status" class="room-status" aria-live="polite">
+                                <span class="status-pulse"></span>
+                                <span>Menghubungkan ke layanan realtime…</span>
+                            </div>
+
+                            <div class="room-content">
+                                <aside class="members-panel">
+                                    <div class="section-heading">
+                                        <div><span class="eyebrow">HADIR DI ROOM</span><h3>Orang-orang</h3></div>
+                                        <span id="online-count" class="online-count">0</span>
+                                    </div>
+                                    <div id="online-members" class="online-members"></div>
+                                    <div class="peer-note">
+                                        <span class="peer-note-icon">⌁</span>
+                                        <p>Koneksi langsung diuji saat transfer dimulai. Beberapa jaringan mungkin memerlukan TURN.</p>
+                                    </div>
+                                </aside>
+
+                                <div class="conversation-panel">
+                                    <div class="section-heading conversation-heading">
+                                        <div><span class="eyebrow">PESAN ROOM</span><h3>Percakapan</h3></div>
+                                        <span class="chat-encryption">REALTIME</span>
+                                    </div>
+                                    <div id="chat-messages" class="chat-messages" role="log" aria-live="polite" aria-relevant="additions">
+                                        <div class="chat-empty">Belum ada pesan. Sapa temanmu dulu 👋</div>
+                                    </div>
+                                    <form id="chat-form" class="chat-form">
+                                        <input id="chat-input" name="body" type="text" maxlength="2000" autocomplete="off" placeholder="Tulis pesan..." required>
+                                        <button class="send-button" type="submit" aria-label="Kirim pesan">↑</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <section class="transfer-section">
+                                <div class="section-heading transfer-heading">
+                                    <div><span class="eyebrow">P2P FILE SHARING</span><h3>Kirim file langsung</h3></div>
+                                    <span class="transfer-limit">Maks. 100 MB · tidak diunggah ke server</span>
+                                </div>
+                                <form id="send-file-form" class="send-file-form">
+                                    <label class="file-picker" for="file-input">
+                                        <span class="file-picker-icon">↥</span>
+                                        <span><strong id="selected-file-name">Pilih file untuk dikirim</strong><small id="selected-file-size">File akan dikirim langsung ke browser penerima.</small></span>
+                                        <span class="file-picker-browse">Pilih file</span>
+                                    </label>
+                                    <input id="file-input" type="file" hidden>
+                                    <label class="recipient-picker">
+                                        <span>Kirim kepada</span>
+                                        <select id="recipient-select" required>
+                                            <option value="">Pilih pengguna online</option>
+                                        </select>
+                                    </label>
+                                    <button id="send-file-button" class="button button-primary" type="submit" disabled>Kirim file <span>→</span></button>
+                                </form>
+                                <div id="transfers-list" class="transfers-list">
+                                    <p class="empty-note">Belum ada aktivitas transfer di room ini.</p>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </main>
+
+        <footer class="page-footer">
+            <span>ruang<span class="brand-dot">.</span> <span>Berbagi langsung, tetap privat.</span></span>
+            <span class="footer-tech">WebRTC <i>·</i> Ably Realtime <i>·</i> HTTPS</span>
+        </footer>
+    </div>
+
+    <dialog id="qr-dialog" class="qr-dialog">
+        <div class="qr-dialog-card">
+            <button id="close-qr" class="dialog-close" type="button" aria-label="Tutup">×</button>
+            <span class="eyebrow">UNDANG TEMAN</span>
+            <h2>Pindai untuk bergabung</h2>
+            <canvas id="qr-canvas" width="240" height="240"></canvas>
+            <p id="qr-room-code" class="qr-room-code"></p>
+        </div>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script>
+        window.sharingApp = {{ Illuminate\Support\Js::from([
+            'user' => auth()->user()?->only(['id', 'name', 'email']),
+            'csrfToken' => csrf_token(),
+        ]) }};
+    </script>
+</body>
+</html>

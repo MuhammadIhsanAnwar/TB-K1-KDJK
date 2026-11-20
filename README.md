@@ -1,62 +1,77 @@
-<<<<<<< HEAD
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TB-K1-KDJK — Berbagi File P2P
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi berbagi file dan chat per-room berbasis Laravel. Chat dan metadata transfer disimpan di MySQL; isi file dikirim langsung antar-browser melalui WebRTC dan tidak diunggah atau disimpan oleh server. Ably digunakan untuk presence, chat realtime, serta signaling WebRTC.
 
-## About Laravel
+## Kebutuhan
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3+ dengan ekstensi Laravel yang diperlukan, Composer, dan MySQL/MariaDB.
+- Node.js dan npm untuk membangun aset frontend.
+- API key Ably untuk fitur realtime.
+- HTTPS untuk penggunaan di hosting dan WebRTC.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Menjalankan secara lokal
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Salin `.env.example` menjadi `.env`, lalu isi koneksi MySQL dan `ABLY_API_KEY`. Format key Ably adalah `nama-key:secret`.
+2. Pasang dependency dan buat application key:
 
-## Learning Laravel
+   ```sh
+   composer install
+   php artisan key:generate
+   npm ci
+   npm run build
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. Jalankan migrasi dan server:
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   ```sh
+   php artisan migrate
+   php artisan serve
+   ```
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+4. Buka `http://127.0.0.1:8000`. Untuk halaman migrasi lokal, isi `MIGRATE_ADMIN_PIN` di `.env`, kemudian buka `/migrate`.
 
-## Agentic Development
+## Konfigurasi hosting cPanel
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+1. Pilih PHP 8.3 atau lebih baru dan siapkan database MySQL/MariaDB beserta user database.
+2. Arahkan document root domain/subdomain ke folder proyek `public` (jangan arahkan ke root proyek). Aktifkan HTTPS dan pastikan `storage` serta `bootstrap/cache` dapat ditulis oleh PHP.
+3. Siapkan `.env` di server; jangan unggah atau commit file `.env` ke repository. Minimal, atur:
 
-```bash
-composer require laravel/boost --dev
+   ```dotenv
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://domain-anda
+   APP_KEY=base64:...
+   DB_CONNECTION=mysql
+   DB_HOST=...
+   DB_PORT=3306
+   DB_DATABASE=...
+   DB_USERNAME=...
+   DB_PASSWORD=...
+   SESSION_DRIVER=file
+   CACHE_STORE=file
+   QUEUE_CONNECTION=sync
+   ABLY_API_KEY=nama-key:secret
+   ```
 
-php artisan boost:install
-```
+   Buat `APP_KEY` sekali menggunakan `php artisan key:generate`; jangan menggantinya setelah aplikasi digunakan. Simpan secret Ably di `.env` server, bukan di variabel `VITE_*` atau kode browser.
+4. Jalankan `composer install --no-dev --optimize-autoloader`, `npm ci`, dan `npm run build` (build aset dapat dilakukan lokal lalu unggah folder `public/build`). Jika tersedia terminal cPanel, jalankan `php artisan config:cache` setelah konfigurasi selesai.
+5. Untuk menjalankan migrasi tanpa akses terminal, aktifkan sementara:
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+   ```dotenv
+   MIGRATE_REMOTE_ENABLED=true
+   MIGRATE_ADMIN_SECRET=<secret-acak-minimal-64-karakter>
+   ```
 
-## Contributing
+   Buat secret dengan `php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"`. Setelah konfigurasi diterapkan, buka `https://domain-anda/migrate`, masukkan secret, lalu jalankan migrasi. Mode hosting mensyaratkan `APP_ENV=production`, HTTPS, `APP_KEY`, dan secret kuat; PIN lokal bukan kredensial hosting. Setelah migrasi berhasil, nonaktifkan `MIGRATE_REMOTE_ENABLED` dan hapus/rotasi secret.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Batasan dan pengaturan
 
-## Code of Conduct
+- Batas default ukuran file 100 MiB dan maksimal 8 anggota per room. Nilainya dapat diubah melalui `SHARING_MAX_FILE_SIZE` (byte) dan `ROOM_MAX_MEMBERS`.
+- Isi file hanya berada di memori browser selama transfer. Database menyimpan metadata transfer dan riwayat chat.
+- Koneksi WebRTC menggunakan STUN tanpa TURN. NAT/firewall tertentu dapat menghalangi koneksi langsung; room dan chat tetap dapat digunakan.
+- Tes dan build frontend:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-=======
-# TB-K1-KDJK
->>>>>>> origin/main
+  ```sh
+  php artisan test
+  npm run build
+  ```

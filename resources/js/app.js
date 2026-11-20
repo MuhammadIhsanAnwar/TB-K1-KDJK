@@ -1,1 +1,1 @@
-//
+import './sharing.js';

@@ -23,12 +23,22 @@
 <body>
 <main>
     <h1>Jalankan Migrasi Database</h1>
-    <p>Halaman lokal untuk menjalankan <code>php artisan migrate --force</code>. Perintah selain migrasi tidak dapat dijalankan dari sini.</p>
+    <p>
+        Halaman ini hanya menjalankan <code>php artisan migrate --force</code>; perintah lain tidak dapat dijalankan.
+        @if ($accessMode === 'remote')
+            Akses hosting dilindungi rahasia admin dan pembatasan percobaan.
+        @else
+            Akses lokal dibatasi ke localhost.
+        @endif
+    </p>
 
-    @if (! $pinConfigured)
+    @if (! $credentialConfigured)
         <div class="notice error">
-            Atur <code>MIGRATE_ADMIN_PIN</code> dan <code>APP_KEY</code> di file <code>.env</code> agar migrasi dapat dijalankan.
-            Halaman ini hanya tersedia pada <code>APP_ENV=local</code> dan alamat loopback.
+            @if ($accessMode === 'remote')
+                Atur <code>MIGRATE_ADMIN_SECRET</code> minimal 64 karakter acak dan <code>APP_KEY</code> di <code>.env</code>.
+            @else
+                Atur <code>MIGRATE_ADMIN_PIN</code> dan <code>APP_KEY</code> di <code>.env</code>.
+            @endif
         </div>
     @endif
 
@@ -39,9 +49,9 @@
     <form method="post" action="{{ route('migrate.run') }}">
         <input type="hidden" name="timestamp" value="{{ $timestamp }}">
         <input type="hidden" name="token" value="{{ $token }}">
-        <label for="pin">PIN admin</label>
-        <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="off" required>
-        <button type="submit" {{ $pinConfigured ? '' : 'disabled' }}>Jalankan migrasi</button>
+        <label for="credential">{{ $accessMode === 'remote' ? 'Rahasia admin (minimal 64 karakter)' : 'PIN admin' }}</label>
+        <input id="credential" name="credential" type="password" autocomplete="off" required>
+        <button type="submit" {{ $credentialConfigured ? '' : 'disabled' }}>Jalankan migrasi</button>
     </form>
 
     @if ($output)

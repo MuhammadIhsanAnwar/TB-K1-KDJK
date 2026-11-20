@@ -6,6 +6,13 @@ use Tests\TestCase;
 
 class MigrationPageTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['cache.limiter' => 'array']);
+    }
+
     public function test_migration_page_does_not_require_a_database_session(): void
     {
         config([
@@ -48,9 +55,9 @@ class MigrationPageTest extends TestCase
         $this->post('/migrate', [
             'timestamp' => $timestamp,
             'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
-            'pin' => 'wrong-pin',
+            'credential' => 'wrong-pin',
         ])->assertForbidden()
-            ->assertSee('PIN admin tidak sesuai.');
+            ->assertSee('Kredensial admin tidak sesuai.');
     }
 
     public function test_database_failure_is_reported_without_breaking_the_page(): void
@@ -69,8 +76,107 @@ class MigrationPageTest extends TestCase
         $this->post('/migrate', [
             'timestamp' => $timestamp,
             'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
-            'pin' => '10982345',
+            'credential' => '10982345',
         ])->assertInternalServerError()
             ->assertSee('Migrasi gagal karena terjadi error.');
+    }
+
+    public function test_hosting_access_requires_explicit_enablement_and_a_strong_secret(): void
+    {
+        config([
+            'app.env' => 'production',
+            'app.url' => 'https://localhost',
+            'app.key' => 'base64:'.base64_encode(str_repeat('a', 32)),
+            'migration.remote_enabled' => false,
+            'migration.admin_secret' => 'short-secret',
+        ]);
+
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '203.0.113.10',
+            'HTTPS' => 'on',
+        ])
+            ->get('https://localhost/migrate')
+            ->assertNotFound();
+
+        config([
+            'migration.remote_enabled' => true,
+            'migration.admin_secret' => 'short-secret',
+        ]);
+
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '203.0.113.10',
+            'HTTPS' => 'on',
+        ])->get('https://localhost/migrate')
+            ->assertNotFound();
+
+        config(['migration.admin_secret' => str_repeat('b', 64)]);
+
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '203.0.113.10',
+            'HTTPS' => 'on',
+        ])->get('https://localhost/migrate')
+            ->assertOk()
+            ->assertSee('Rahasia admin (minimal 64 karakter)');
+    }
+
+    public function test_hosting_requires_the_strong_secret_instead_of_local_pin(): void
+    {
+        $key = 'base64:'.base64_encode(str_repeat('a', 32));
+
+        config([
+            'app.env' => 'production',
+            'app.url' => 'https://localhost',
+            'app.key' => $key,
+            'migration.remote_enabled' => true,
+            'migration.admin_secret' => str_repeat('b', 64),
+        ]);
+
+        $timestamp = now()->timestamp;
+
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '203.0.113.10',
+            'HTTPS' => 'on',
+        ])->post('/migrate', [
+            'timestamp' => $timestamp,
+            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
+            'credential' => '10982345',
+        ])->assertForbidden()
+            ->assertSee('Kredensial admin tidak sesuai.');
+
+        config(['database.default' => 'missing_connection']);
+
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '203.0.113.10',
+            'HTTPS' => 'on',
+        ])->post('https://localhost/migrate', [
+            'timestamp' => $timestamp,
+            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
+            'credential' => str_repeat('b', 64),
+        ])->assertInternalServerError()
+            ->assertSee('Migrasi gagal karena terjadi error.');
+    }
+
+    public function test_migration_attempts_are_rate_limited(): void
+    {
+        $key = 'base64:'.base64_encode(str_repeat('a', 32));
+
+        config([
+            'app.env' => 'local',
+            'app.key' => $key,
+            'migration.admin_pin' => '10982345',
+        ]);
+
+        $timestamp = now()->timestamp;
+        $request = [
+            'timestamp' => $timestamp,
+            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
+            'credential' => 'wrong-pin',
+        ];
+
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->post('/migrate', $request)->assertForbidden();
+        }
+
+        $this->post('/migrate', $request)->assertTooManyRequests();
     }
 }

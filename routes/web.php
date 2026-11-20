@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('sharing');
 });
 
 Route::get('/migrate', [MigrationController::class, 'index'])
+    ->middleware('throttle:30,1')
     ->withoutMiddleware([
         StartSession::class,
         ShareErrorsFromSession::class,
@@ -23,6 +24,7 @@ Route::get('/migrate', [MigrationController::class, 'index'])
     ->name('migrate.index');
 
 Route::post('/migrate', [MigrationController::class, 'run'])
+    ->middleware('throttle:5,1')
     ->withoutMiddleware([
         StartSession::class,
         ShareErrorsFromSession::class,

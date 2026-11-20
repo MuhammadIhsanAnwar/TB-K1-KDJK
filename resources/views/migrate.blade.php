@@ -24,11 +24,13 @@
 <main>
     <h1>Jalankan Migrasi Database</h1>
     <p>
-        Pilih perintah Artisan yang tersedia. Perintah atau argumen bebas tidak diterima.
+        @if ($authenticated)
+            Pilih perintah Artisan yang tersedia. Perintah atau argumen bebas tidak diterima.
+        @else
+            Masukkan PIN admin untuk membuka panel perintah.
+        @endif
         @if ($accessMode === 'remote')
             Gunakan HTTPS; akses dilindungi PIN dan pembatasan percobaan.
-        @else
-            Masukkan PIN admin untuk menjalankan perintah.
         @endif
     </p>
 
@@ -42,19 +44,28 @@
         <div class="notice {{ $success ? '' : 'error' }}">{{ $message }}</div>
     @endif
 
-    <form method="post" action="{{ route('migrate.run') }}">
-        <input type="hidden" name="timestamp" value="{{ $timestamp }}">
-        <input type="hidden" name="token" value="{{ $token }}">
-        <label for="command">Perintah Artisan</label>
-        <select id="command" name="command" required>
-            @foreach ($commands as $commandOption)
-                <option value="{{ $commandOption }}" @selected($command === $commandOption)>{{ $commandOption }}</option>
-            @endforeach
-        </select>
-        <label for="credential">PIN admin</label>
-        <input id="credential" name="credential" type="password" autocomplete="off" required>
-        <button type="submit" {{ $credentialConfigured ? '' : 'disabled' }}>Jalankan perintah</button>
-    </form>
+    @if ($authenticated)
+        <form method="post" action="{{ route('migrate.run') }}">
+            <input type="hidden" name="access_expires" value="{{ $accessExpires }}">
+            <input type="hidden" name="access_token" value="{{ $accessToken }}">
+            <label for="command">Perintah Artisan</label>
+            <select id="command" name="command" required>
+                @foreach ($commands as $commandOption)
+                    <option value="{{ $commandOption }}" @selected($command === $commandOption)>{{ $commandOption }}</option>
+                @endforeach
+            </select>
+            <button type="submit">Jalankan perintah</button>
+        </form>
+        <p><a href="{{ route('migrate.index') }}">Kunci panel migrasi</a></p>
+    @else
+        <form method="post" action="{{ route('migrate.authenticate') }}">
+            <input type="hidden" name="pin_timestamp" value="{{ $pinTimestamp }}">
+            <input type="hidden" name="pin_token" value="{{ $pinToken }}">
+            <label for="credential">PIN admin</label>
+            <input id="credential" name="credential" type="password" inputmode="numeric" autocomplete="current-password" required>
+            <button type="submit" {{ $credentialConfigured ? '' : 'disabled' }}>Masuk</button>
+        </form>
+    @endif
 
     @if ($output)
         <h2>Output</h2>

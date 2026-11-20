@@ -24,8 +24,19 @@ Route::get('/migrate', [MigrationController::class, 'index'])
     ])
     ->name('migrate.index');
 
-Route::post('/migrate', [MigrationController::class, 'run'])
+Route::post('/migrate', [MigrationController::class, 'authenticate'])
     ->middleware('throttle:5,1')
+    ->withoutMiddleware([
+        StartSession::class,
+        ShareErrorsFromSession::class,
+        PreventRequestForgery::class,
+        ValidateCsrfToken::class,
+        VerifyCsrfToken::class,
+    ])
+    ->name('migrate.authenticate');
+
+Route::post('/migrate/run', [MigrationController::class, 'run'])
+    ->middleware('throttle:10,1')
     ->withoutMiddleware([
         StartSession::class,
         ShareErrorsFromSession::class,

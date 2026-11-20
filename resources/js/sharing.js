@@ -1648,15 +1648,19 @@ function bindEvents() {
     });
 
     el('#select-all-recipients').addEventListener('click', () => {
-        const select = el('#recipient-select');
+    const select = el('#recipient-select');
 
-        for (const option of select.options) {
-            option.selected = true;
-        }
+    const shouldSelectAll = [...select.options].some(
+        option => !option.selected
+    );
 
-        state.pendingTransferRequest = null;
-        updateRecipientSelectionControls();
-        updateFileButton();
+    for (const option of select.options) {
+        option.selected = shouldSelectAll;
+    }
+
+    state.pendingTransferRequest = null;
+    updateRecipientSelectionControls();
+    updateFileButton();
     });
 
     el('#clear-recipients').addEventListener('click', () => {

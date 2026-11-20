@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Room;
 use RuntimeException;
 
 class NetworkFingerprintService
 {
-    public function forRoom(Room $room, string $ipAddress): string
+    public function forRoom(string $roomId, string $ipAddress): string
     {
         $appKey = config('app.key');
 
@@ -15,6 +14,6 @@ class NetworkFingerprintService
             throw new RuntimeException('The application key is required to verify room networks.');
         }
 
-        return hash_hmac('sha256', $room->public_id.'|'.$ipAddress, $appKey);
+        return hash_hmac('sha256', $roomId.'|'.$ipAddress, $appKey);
     }
 }

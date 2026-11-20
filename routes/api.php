@@ -1,14 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\RoomController;
-use App\Http\Middleware\EnsureGuestUser;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['web', EnsureGuestUser::class])->group(function (): void {
-    Route::get('/rooms', [RoomController::class, 'index']);
-    Route::post('/rooms', [RoomController::class, 'create'])->middleware('throttle:room-create');
-    Route::post('/rooms/join', [RoomController::class, 'join'])->middleware('throttle:room-join');
-    Route::post('/rooms/{room}/leave', [RoomController::class, 'leave']);
-    Route::get('/rooms/{room}/network', [RoomController::class, 'networkFingerprint']);
-    Route::get('/rooms/{room}/ably-token', [RoomController::class, 'ablyToken']);
+Route::middleware('throttle:60,1')->group(function (): void {
+    Route::get('/rooms/{roomId}/network', [RoomController::class, 'networkFingerprint'])
+        ->where('roomId', '[A-Z0-9]{12}');
+    Route::get('/rooms/{roomId}/ably-token', [RoomController::class, 'ablyToken'])
+        ->where('roomId', '[A-Z0-9]{12}');
 });

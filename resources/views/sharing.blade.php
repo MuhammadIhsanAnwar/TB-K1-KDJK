@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#f5f7fb">
     <title>Ruang — berbagi langsung</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -67,7 +66,7 @@
 
                         <div class="recent-heading"><span>Room terakhir</span><span class="recent-count" id="room-count">0</span></div>
                         <div id="recent-rooms" class="recent-rooms">
-                            <p class="empty-note">Room yang pernah kamu ikuti akan tampil di sini.</p>
+                            <p class="empty-note">Room yang pernah kamu ikuti di browser ini akan tampil di sini.</p>
                         </div>
                     </aside>
 
@@ -179,11 +178,5 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <script>
-        window.sharingApp = {{ Illuminate\Support\Js::from([
-            'user' => auth()->user()?->only(['id', 'name']),
-            'csrfToken' => csrf_token(),
-        ]) }};
-    </script>
 </body>
 </html>

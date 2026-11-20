@@ -1,10 +1,37 @@
 import { createClient } from '@ably/pubsub-device';
 import QRCode from 'qrcode';
 
-const appConfig = window.sharingApp ?? {};
-const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+const LOCAL_USER_KEY = 'sharing-user-v1';
+const LOCAL_ROOMS_KEY = 'sharing-rooms-v1';
+let localStorageAvailable = true;
+
+function loadOrCreateLocalUser() {
+    try {
+        const saved = JSON.parse(window.localStorage.getItem(LOCAL_USER_KEY) ?? 'null');
+        if (
+            saved
+            && /^[0-9a-f-]{36}$/i.test(saved.id)
+            && typeof saved.name === 'string'
+            && saved.name.length > 0
+        ) return saved;
+    } catch {
+        localStorageAvailable = false;
+    }
+
+    const user = {
+        id: crypto.randomUUID(),
+        name: `Tamu-${crypto.randomUUID().slice(0, 6).toUpperCase()}`,
+    };
+    try {
+        window.localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(user));
+    } catch {
+        localStorageAvailable = false;
+    }
+    return user;
+}
+
 const state = {
-    user: appConfig.user ?? null,
+    user: loadOrCreateLocalUser(),
     room: null,
     ably: null,
     channel: null,
@@ -36,7 +63,6 @@ let inviteCode = new URL(window.location.href).searchParams.get('room');
 async function api(url, options = {}) {
     const headers = new Headers(options.headers ?? {});
     headers.set('Accept', 'application/json');
-    headers.set('X-CSRF-TOKEN', csrfMeta?.content ?? appConfig.csrfToken ?? '');
 
     let body = options.body;
     if (body !== undefined && !(body instanceof FormData) && typeof body !== 'string') {
@@ -48,7 +74,7 @@ async function api(url, options = {}) {
         ...options,
         body,
         headers,
-        credentials: 'same-origin',
+        credentials: 'omit',
     });
 
     if (response.status === 204) {
@@ -80,12 +106,10 @@ function showToast(message, isError = false) {
 }
 
 function initializeApp() {
-    if (!state.user) {
-        showToast('Sesi tamu tidak tersedia. Muat ulang halaman.', true);
-        return;
-    }
-
     el('#top-user').textContent = state.user.name;
+    if (!localStorageAvailable) {
+        showToast('Penyimpanan lokal browser tidak tersedia; identitas dan room terakhir tidak tersimpan.', true);
+    }
     void loadRecentRooms();
     if (inviteCode) {
         el('#room-code').value = inviteCode;
@@ -115,13 +139,48 @@ function formatTime(value) {
         : new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit' }).format(date);
 }
 
-async function loadRecentRooms() {
+function readRecentRooms() {
     try {
-        const result = await api('/api/rooms');
-        renderRecentRooms(result.rooms ?? []);
-    } catch (error) {
-        showToast(error.message, true);
+        const rooms = JSON.parse(window.localStorage.getItem(LOCAL_ROOMS_KEY) ?? '[]');
+        return Array.isArray(rooms)
+            ? rooms.filter((room) => /^[A-Z0-9]{12}$/.test(room?.id) && typeof room.name === 'string').slice(0, 20)
+            : [];
+    } catch {
+        localStorageAvailable = false;
+        return [];
     }
+}
+
+function saveRecentRooms(rooms) {
+    try {
+        window.localStorage.setItem(LOCAL_ROOMS_KEY, JSON.stringify(rooms.slice(0, 20)));
+    } catch {
+        localStorageAvailable = false;
+        showToast('Room terakhir tidak dapat disimpan di browser ini.', true);
+    }
+}
+
+function rememberRoom(room) {
+    const rooms = readRecentRooms().filter((recent) => recent.id !== room.id);
+    rooms.unshift({ id: room.id, name: room.name });
+    saveRecentRooms(rooms);
+    renderRecentRooms(rooms);
+}
+
+function generateRoomCode() {
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const bytes = crypto.getRandomValues(new Uint8Array(12));
+    return [...bytes].map((byte) => alphabet[byte & 31]).join('');
+}
+
+function updateRoomUrl(roomId) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('room', roomId);
+    window.history.replaceState({}, '', url);
+}
+
+function loadRecentRooms() {
+    renderRecentRooms(readRecentRooms());
 }
 
 function renderRecentRooms(rooms) {
@@ -132,7 +191,7 @@ function renderRecentRooms(rooms) {
     if (!rooms.length) {
         const empty = document.createElement('p');
         empty.className = 'empty-note';
-        empty.textContent = 'Room yang pernah kamu ikuti akan tampil di sini.';
+        empty.textContent = 'Room yang pernah kamu ikuti di browser ini akan tampil di sini.';
         container.append(empty);
         return;
     }
@@ -151,7 +210,7 @@ function renderRecentRooms(rooms) {
         const name = document.createElement('strong');
         name.textContent = room.name;
         const detail = document.createElement('small');
-        detail.textContent = `${room.active_members_count} anggota · ${room.id}`;
+        detail.textContent = `Kode undangan · ${room.id}`;
         copy.append(name, detail);
         button.append(icon, copy);
         container.append(button);
@@ -161,12 +220,11 @@ function renderRecentRooms(rooms) {
 async function createRoom(event) {
     event.preventDefault();
     try {
-        const result = await api('/api/rooms', {
-            method: 'POST',
-            body: { name: 'Room baru' },
-        });
-        await openRoom(result.room);
-        await loadRecentRooms();
+        const id = generateRoomCode();
+        const room = { id, name: `Room ${id}` };
+        rememberRoom(room);
+        await openRoom(room);
+        updateRoomUrl(room.id);
     } catch (error) {
         showToast(error.message, true);
     }
@@ -175,17 +233,17 @@ async function createRoom(event) {
 async function joinRoom(code) {
     const roomCode = String(code ?? '').trim().toUpperCase();
     if (!roomCode) return;
+    if (!/^[A-Z0-9]{12}$/.test(roomCode)) {
+        showToast('Kode room harus terdiri dari 12 huruf atau angka.', true);
+        return;
+    }
 
     try {
-        const result = await api('/api/rooms/join', {
-            method: 'POST',
-            body: { room_id: roomCode },
-        });
-        await openRoom(result.room);
-        await loadRecentRooms();
-        const url = new URL(window.location.href);
-        url.searchParams.set('room', roomCode);
-        window.history.replaceState({}, '', url);
+        const room = readRecentRooms().find((recent) => recent.id === roomCode)
+            ?? { id: roomCode, name: `Room ${roomCode}` };
+        rememberRoom(room);
+        await openRoom(room);
+        updateRoomUrl(roomCode);
     } catch (error) {
         showToast(error.message, true);
     }
@@ -237,7 +295,7 @@ async function connectRealtime(room) {
     state.networkFingerprint = network.network_fingerprint;
 
     const client = createClient({
-        authUrl: `${window.location.origin}/api/rooms/${encodeURIComponent(room.id)}/ably-token`,
+        authUrl: `${window.location.origin}/api/rooms/${encodeURIComponent(room.id)}/ably-token?client_id=${encodeURIComponent(state.user.id)}`,
         authMethod: 'GET',
         autoConnect: true,
     });
@@ -271,7 +329,7 @@ function setRoomStatus(message, connected) {
 }
 
 function parseRoomClientId(clientId) {
-    const match = /^(\d+):([a-f0-9]{64})$/i.exec(String(clientId ?? ''));
+    const match = /^([0-9a-f-]{36}):([a-f0-9]{64})$/i.exec(String(clientId ?? ''));
     return match ? { userId: match[1], fingerprint: match[2].toLowerCase() } : null;
 }
 
@@ -299,7 +357,7 @@ function handlePresence(member) {
         };
         state.blockedNetworkPeers.delete(clientId);
         state.onlineUsers.set(clientId, user);
-        if (clientId !== String(state.user.id) && Number(state.user.id) < Number(clientId)) {
+        if (clientId !== String(state.user.id) && String(state.user.id) < clientId) {
             void startChatOffer(user);
         }
     }
@@ -395,7 +453,7 @@ async function handleChatSignal(message, signal) {
 
     let peer = state.chatPeers.get(from);
     if (signal.type === 'chat-offer') {
-        if (Number(from) >= Number(state.user.id)) return;
+        if (from >= String(state.user.id)) return;
         if (peer?.pc.remoteDescription) return;
         peer = makeChatPeer(user, false);
         await peer.pc.setRemoteDescription(signal.payload.description);
@@ -672,7 +730,7 @@ async function requestFileTransfer(event) {
                 room_id: state.room.id,
                 sender_id: state.user.id,
                 sender_name: state.user.name,
-                receiver_id: Number(receiverId),
+                receiver_id: receiverId,
                 receiver_name: recipient.name,
                 file_name: file.name,
                 mime_type: file.type || 'application/octet-stream',
@@ -1249,12 +1307,6 @@ async function leaveRoom() {
     state.channel = null;
     state.ably = null;
 
-    try {
-        await api(`/api/rooms/${encodeURIComponent(room.id)}/leave`, { method: 'POST', body: {} });
-    } catch (error) {
-        showToast(error.message, true);
-    }
-
     for (const progress of state.transferProgress.values()) {
         if (progress.downloadUrl) URL.revokeObjectURL(progress.downloadUrl);
     }
@@ -1274,6 +1326,9 @@ async function leaveRoom() {
     el('#online-members').replaceChildren();
     el('#chat-messages').replaceChildren();
     el('#transfers-list').replaceChildren();
+    const url = new URL(window.location.href);
+    url.searchParams.delete('room');
+    window.history.replaceState({}, '', url);
 }
 
 async function inspectNetwork() {

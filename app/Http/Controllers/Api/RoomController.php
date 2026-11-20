@@ -38,7 +38,7 @@ class RoomController extends Controller
     ): JsonResponse {
         $this->validateRoomId($roomId);
         $ipAddress = $this->clientIpAddress($request);
-        $roomProof = $this->roomProof($request->query('proof'));
+        $roomProof = $this->roomProof($request->query('proof'), required: true);
         abort_unless(
             $presence->allowsNetwork($roomId, $ipAddress, $roomProof),
             404,
@@ -63,7 +63,7 @@ class RoomController extends Controller
         abort_unless(is_string($clientId) && Str::isUuid($clientId), 422, 'Identitas browser tidak valid.');
 
         $ipAddress = $this->clientIpAddress($request);
-        $roomProof = $this->roomProof($request->query('room_proof'));
+        $roomProof = $this->roomProof($request->query('room_proof'), required: true);
         abort_unless(
             $presence->allowsNetwork($roomId, $ipAddress, $roomProof),
             404,
@@ -87,9 +87,15 @@ class RoomController extends Controller
         return $ipAddress;
     }
 
-    private function roomProof(mixed $proof): ?string
+    private function roomProof(mixed $proof, bool $required = false): ?string
     {
         if ($proof === null) {
+            abort_unless(
+                ! $required,
+                422,
+                'Undangan room tidak lengkap. Gunakan tautan undangan atau kode lengkap ROOMID.PROOF.',
+            );
+
             return null;
         }
 

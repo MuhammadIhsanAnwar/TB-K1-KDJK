@@ -350,6 +350,12 @@ async function openRoom(room) {
         el('#copy-invite').disabled = false;
         el('#show-qr').disabled = false;
     } catch (error) {
+        if (error.status === 422) {
+            await leaveRoom();
+            removeRecentRoom(room.id);
+            showToast(error.message, true);
+            return;
+        }
         if (error.status === 404) {
             await leaveRoom();
             removeRecentRoom(room.id);
@@ -362,6 +368,12 @@ async function openRoom(room) {
 }
 
 async function connectRealtime(room) {
+    if (!room.proof) {
+        const error = new Error('Undangan room tidak lengkap. Gunakan tautan undangan atau kode lengkap ROOMID.PROOF.');
+        error.status = 422;
+        throw error;
+    }
+
     const networkUrl = new URL(
         `/api/rooms/${encodeURIComponent(room.id)}/network`,
         window.location.origin,

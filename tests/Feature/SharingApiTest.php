@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -61,8 +60,6 @@ class SharingApiTest extends TestCase
     public function test_network_check_returns_a_room_scoped_fingerprint_and_public_ip(): void
     {
         config(['database.default' => 'p2p-no-database']);
-        config(['services.ably.key' => 'test-key-name:'.str_repeat('s', 32)]);
-        Http::fake(['https://rest.ably.io/*' => Http::response([], 200)]);
         $roomId = 'ABCDEF234567';
         $ipAddress = '203.0.113.42';
         $proof = substr(hash_hmac('sha256', 'room-invite|'.$roomId.'|'.$ipAddress, (string) config('app.key')), 0, 32);
@@ -79,7 +76,7 @@ class SharingApiTest extends TestCase
         );
 
         $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.43'])
-            ->getJson("/api/rooms/{$roomId}/network")
+            ->getJson("/api/rooms/{$roomId}/network?proof={$proof}")
             ->assertNotFound();
     }
 
@@ -91,7 +88,6 @@ class SharingApiTest extends TestCase
         $ipAddress = '203.0.113.42';
         $secret = str_repeat('s', 32);
         config(['services.ably.key' => 'test-key-name:'.$secret]);
-        Http::fake(['https://rest.ably.io/*' => Http::response([], 200)]);
         $proof = substr(hash_hmac('sha256', 'room-invite|'.$roomId.'|'.$ipAddress, (string) config('app.key')), 0, 32);
 
         $response = $this->withServerVariables(['REMOTE_ADDR' => $ipAddress])
@@ -115,15 +111,7 @@ class SharingApiTest extends TestCase
         $roomId = 'ABCDEF234567';
         $creatorIp = '203.0.113.42';
         $attackerIp = '203.0.113.99';
-        $creatorFingerprint = hash_hmac('sha256', $roomId.'|'.$creatorIp, (string) config('app.key'));
         $creatorProof = substr(hash_hmac('sha256', 'room-invite|'.$roomId.'|'.$creatorIp, (string) config('app.key')), 0, 32);
-        $encodedIp = rtrim(strtr(base64_encode($creatorIp), '+/', '-_'), '=');
-        $creatorClientId = Str::uuid().':'.$creatorFingerprint.':'.$encodedIp;
-        Http::fake([
-            'https://rest.ably.io/*' => Http::response([
-                ['clientId' => $creatorClientId],
-            ], 200),
-        ]);
 
         $this->withServerVariables(['REMOTE_ADDR' => $attackerIp])
             ->getJson("/api/rooms/{$roomId}/network?proof={$creatorProof}")
@@ -134,38 +122,37 @@ class SharingApiTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_a_room_code_without_its_invitation_proof_cannot_create_an_empty_room(): void
+    public function test_a_room_code_without_its_invitation_proof_is_rejected_with_an_actionable_message(): void
     {
         config(['database.default' => 'p2p-no-database']);
-        config(['services.ably.key' => 'test-key-name:'.str_repeat('s', 32)]);
-        Http::fake(['https://rest.ably.io/*' => Http::response([], 200)]);
 
         $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.99'])
             ->getJson('/api/rooms/ABCDEF234567/network')
-            ->assertNotFound();
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Undangan room tidak lengkap. Gunakan tautan undangan atau kode lengkap ROOMID.PROOF.');
+
+        $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.99'])
+            ->get('/api/rooms/ABCDEF234567/ably-token?client_id='.Str::uuid())
+            ->assertUnprocessable()
+            ->assertSeeText('Undangan room tidak lengkap. Gunakan tautan undangan atau kode lengkap ROOMID.PROOF.');
     }
 
-    public function test_legacy_active_room_only_allows_users_on_its_current_public_ip(): void
+    public function test_a_room_with_a_valid_invitation_only_allows_its_creator_public_ip(): void
     {
         config(['database.default' => 'p2p-no-database']);
-        config(['services.ably.key' => 'test-key-name:'.str_repeat('s', 32)]);
         $roomId = 'ABCDEF234567';
         $ipAddress = '203.0.113.42';
         $fingerprint = hash_hmac('sha256', $roomId.'|'.$ipAddress, (string) config('app.key'));
-        Http::fake([
-            'https://rest.ably.io/*' => Http::response([
-                ['clientId' => Str::uuid().':'.$fingerprint],
-            ], 200),
-        ]);
+        $proof = substr(hash_hmac('sha256', 'room-invite|'.$roomId.'|'.$ipAddress, (string) config('app.key')), 0, 32);
 
         $this->withServerVariables(['REMOTE_ADDR' => $ipAddress])
-            ->getJson("/api/rooms/{$roomId}/network")
+            ->getJson("/api/rooms/{$roomId}/network?proof={$proof}")
             ->assertOk()
             ->assertJsonPath('client_ip', $ipAddress)
             ->assertJsonPath('network_fingerprint', $fingerprint);
 
         $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.99'])
-            ->getJson("/api/rooms/{$roomId}/network")
+            ->getJson("/api/rooms/{$roomId}/network?proof={$proof}")
             ->assertNotFound();
     }
 

@@ -263,7 +263,7 @@ async function createRoom(event) {
         const id = generateRoomCode();
         const room = { id, name: `Room ${id}`, proof: await requestRoomProof(id) };
         rememberRoom(room);
-        await openRoom(room);
+        await openRoom(room, true);
         if (state.room?.id === room.id) updateRoomUrl(room);
     } catch (error) {
         showToast(error.message, true);
@@ -317,7 +317,7 @@ async function joinRoom(invitation) {
     }
 }
 
-async function openRoom(room) {
+async function openRoom(room, allowEmpty = false) {
     if (state.room?.id === room.id && state.room?.proof === room.proof) return;
     if (state.room) await leaveRoom();
 
@@ -351,7 +351,7 @@ async function openRoom(room) {
     setRoomStatus('Memeriksa jaringan dan menyiapkan P2P…', false);
 
     try {
-        await connectRealtime(room);
+        await connectRealtime(room, allowEmpty);
         await loadRecentRooms();
         el('#copy-invite').disabled = false;
         el('#show-qr').disabled = false;
@@ -373,7 +373,7 @@ async function openRoom(room) {
     }
 }
 
-async function connectRealtime(room) {
+async function connectRealtime(room, allowEmpty) {
     if (!room.proof) {
         const error = new Error('Undangan room tidak lengkap. Gunakan tautan undangan atau kode lengkap ROOMID.PROOF.');
         error.status = 422;
@@ -426,11 +426,30 @@ async function connectRealtime(room) {
     ]);
 
     const existingMembers = await channel.presence.get();
+    if (!allowEmpty && !hasOtherSameNetworkMember(existingMembers)) {
+        const error = new Error('Room tidak ditemukan atau jaringanmu berbeda dari pembuat room.');
+        error.status = 404;
+        throw error;
+    }
     for (const member of existingMembers) handlePresence(member);
     await channel.presence.enter({ name: state.user.name });
     state.presenceEntered = true;
     const members = await channel.presence.get();
+    if (!allowEmpty && !hasOtherSameNetworkMember(members)) {
+        const error = new Error('Room tidak ditemukan atau jaringanmu berbeda dari pembuat room.');
+        error.status = 404;
+        throw error;
+    }
     for (const member of members) handlePresence(member);
+}
+
+function hasOtherSameNetworkMember(members) {
+    return members.some((member) => {
+        const identity = parseRoomClientId(member.clientId);
+        return identity
+            && identity.userId !== String(state.user.id)
+            && identity.fingerprint === state.networkFingerprint;
+    });
 }
 
 function setRoomStatus(message, connected) {

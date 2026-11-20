@@ -13,7 +13,9 @@
             <div class="loader-logo">R<span>.</span></div>
             <h2>ruang<span>.</span></h2>
             <p>Menyiapkan ruang untukmu...</p>
-            <div class="loader-spinner"></div>
+            <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
         </div>
     </div>
 

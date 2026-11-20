@@ -67,6 +67,7 @@ Aplikasi berbagi file dan chat per-room berbasis Laravel tanpa akun. Room code d
 
 - Batas default ukuran file 100 MiB. Room dan anggota hanya ada selama browser terhubung ke presence; room terakhir disimpan lokal di browser.
 - Migration `drop_database_backed_p2p_state` menghapus permanen tabel lama `rooms`, `room_members`, `chat_messages`, `file_transfers`, `users`, dan tabel sesi/token terkait. Aplikasi tidak memerlukannya setelah migration.
+- Saat peserta terakhir menekan **Keluar room**, aplikasi memeriksa Ably Presence; jika tidak ada peserta tersisa, kode room dan riwayat lokal dihapus dari browser tersebut. Presence room otomatis berakhir saat semua peserta terputus. Karena tidak ada penyimpanan pusat, riwayat lokal pada perangkat lain yang sedang offline tidak dapat dihapus jarak jauh.
 - Isi file hanya berada di memori browser selama transfer. Pesan dan permintaan file tidak ditulis ke database.
 - Peserta hanya dapat bertukar pesan/file jika fingerprint HMAC dari IP publik yang dilihat server sama. IP mentah tidak dibagikan atau disimpan. Port tidak dibandingkan: port sumber klien dapat berubah karena NAT/proxy dan kesamaan port tidak membuktikan satu jaringan lokal. Kesamaan IP publik juga bukan bukti mutlak satu LAN (misalnya VPN atau NAT bersama).
 - Jika hosting berada di belakang reverse proxy, isi `TRUSTED_PROXIES` dengan alamat/CIDR proxy tepercaya yang dipisahkan koma agar Laravel membaca IP klien yang benar. Jangan percaya header proxy dari sumber yang tidak tepercaya.

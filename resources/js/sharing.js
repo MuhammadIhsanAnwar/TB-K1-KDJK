@@ -167,6 +167,17 @@ function rememberRoom(room) {
     renderRecentRooms(rooms);
 }
 
+function removeRecentRoom(roomId) {
+    const rooms = readRecentRooms().filter((room) => room.id !== roomId);
+    saveRecentRooms(rooms);
+    renderRecentRooms(rooms);
+    try {
+        window.localStorage.removeItem(localHistoryKey(roomId));
+    } catch {
+        showToast('Riwayat room tidak dapat dihapus dari browser ini.', true);
+    }
+}
+
 function generateRoomCode() {
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     const bytes = crypto.getRandomValues(new Uint8Array(12));
@@ -1298,11 +1309,17 @@ async function leaveRoom() {
 
     for (const transferId of [...state.peers.keys()]) closePeer(transferId);
     for (const userId of [...state.chatPeers.keys()]) closeChatPeer(userId);
+    const channel = state.channel;
+    let roomIsEmpty = false;
     try {
-        await state.channel?.presence.leave();
+        await channel?.presence.leave();
+        if (channel) {
+            roomIsEmpty = (await channel.presence.get()).length === 0;
+        }
     } catch {
         // The connection may already be closed; Ably removes the presence member after disconnect.
     }
+    if (roomIsEmpty) removeRecentRoom(room.id);
     state.ably?.close();
     state.channel = null;
     state.ably = null;
@@ -1419,6 +1436,9 @@ function bindEvents() {
         el('#network-title').textContent = 'Browser melaporkan offline';
         el('#network-detail').textContent = 'Room tetap terbuka; realtime menunggu koneksi.';
         el('#network-indicator').className = 'network-indicator is-warn';
+    });
+    window.addEventListener('storage', (event) => {
+        if (event.key === LOCAL_ROOMS_KEY) loadRecentRooms();
     });
 }
 

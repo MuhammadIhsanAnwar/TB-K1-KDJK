@@ -1671,10 +1671,6 @@ function bindEvents() {
         updateFileButton();
     });
 
-    el('#select-all-recipients').addEventListener(
-        'click',
-        toggleAllRecipients
-    );
     el('#copy-invite').addEventListener('click', () => void copyInvite());
     el('#show-qr').addEventListener('click', () => void showQrCode());
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());

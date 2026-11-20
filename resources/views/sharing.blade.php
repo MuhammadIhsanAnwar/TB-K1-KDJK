@@ -17,61 +17,12 @@
             </a>
             <div class="topbar-meta">
                 <span class="secure-pill"><span class="secure-dot"></span> Transfer langsung antar browser</span>
-                <span id="top-user" class="top-user" hidden></span>
-                <button id="logout-button" class="button button-quiet button-small" type="button" hidden>Keluar</button>
+                <span id="top-user" class="top-user"></span>
             </div>
         </header>
 
         <main>
-            <section id="auth-screen" class="auth-layout">
-                <div class="intro-panel">
-                    <span class="eyebrow">RUANG BERSAMA</span>
-                    <h1>Kirim file.<br><span>Tanpa perantara.</span></h1>
-                    <p>Buat ruang privat, ngobrol, dan kirim file langsung ke browser temanmu. Isi file tidak diunggah ke server.</p>
-                    <div class="intro-points">
-                        <div><span class="point-icon">↗</span><span>Transfer peer-to-peer melalui WebRTC</span></div>
-                        <div><span class="point-icon">◎</span><span>Room dan chat tersimpan aman di akunmu</span></div>
-                        <div><span class="point-icon">⌁</span><span>Berjalan di browser modern dengan HTTPS</span></div>
-                    </div>
-                    <div class="intro-orbit orbit-one"></div>
-                    <div class="intro-orbit orbit-two"></div>
-                </div>
-
-                <div class="auth-card">
-                    <div class="auth-heading">
-                        <span class="eyebrow">MULAI BERBAGI</span>
-                        <h2 id="auth-title">Selamat datang kembali</h2>
-                        <p id="auth-subtitle">Masuk untuk membuka ruang berbagi.</p>
-                    </div>
-                    <div class="auth-tabs" role="tablist" aria-label="Jenis autentikasi">
-                        <button class="auth-tab is-active" data-auth-mode="login" type="button">Masuk</button>
-                        <button class="auth-tab" data-auth-mode="register" type="button">Buat akun</button>
-                    </div>
-                    <form id="auth-form">
-                        <label id="name-field" class="field" hidden>
-                            <span>Nama tampilan</span>
-                            <input name="name" type="text" maxlength="80" autocomplete="name" placeholder="Namamu">
-                        </label>
-                        <label class="field">
-                            <span>Email</span>
-                            <input name="email" type="email" maxlength="255" autocomplete="email" required placeholder="nama@email.com">
-                        </label>
-                        <label class="field">
-                            <span>Kata sandi</span>
-                            <input name="password" type="password" minlength="10" autocomplete="current-password" required placeholder="Minimal 10 karakter">
-                        </label>
-                        <label id="password-confirm-field" class="field" hidden>
-                            <span>Ulangi kata sandi</span>
-                            <input name="password_confirmation" type="password" minlength="10" autocomplete="new-password" placeholder="Ulangi kata sandi">
-                        </label>
-                        <p id="auth-error" class="form-error" role="alert" hidden></p>
-                        <button id="auth-submit" class="button button-primary button-wide" type="submit">Masuk ke akun <span>→</span></button>
-                    </form>
-                    <p class="auth-footnote">Jangan bagikan kata sandi atau tautan room dengan orang yang tidak kamu kenal.</p>
-                </div>
-            </section>
-
-            <section id="workspace" class="workspace" hidden>
+            <section id="workspace" class="workspace">
                 <div class="welcome-row">
                     <div>
                         <span class="eyebrow">RUANG KOLABORASI</span>
@@ -230,7 +181,7 @@
 
     <script>
         window.sharingApp = {{ Illuminate\Support\Js::from([
-            'user' => auth()->user()?->only(['id', 'name', 'email']),
+            'user' => auth()->user()?->only(['id', 'name']),
             'csrfToken' => csrf_token(),
         ]) }};
     </script>

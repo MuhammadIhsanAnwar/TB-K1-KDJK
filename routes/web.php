@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MigrationController;
+use App\Http\Middleware\EnsureGuestUser;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -10,7 +11,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 Route::get('/', function () {
     return view('sharing');
-});
+})->middleware(EnsureGuestUser::class);
 
 Route::get('/migrate', [MigrationController::class, 'index'])
     ->middleware('throttle:30,1')

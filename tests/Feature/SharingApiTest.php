@@ -10,38 +10,57 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class SharingApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_a_user_can_register_and_create_a_room(): void
+    public function test_the_homepage_is_ready_to_use_without_an_account(): void
     {
-        $this->postJson('/api/auth/register', [
-            'name' => 'Ayu',
-            'email' => 'ayu@example.test',
-            'password' => 'StrongPass123',
-            'password_confirmation' => 'StrongPass123',
-        ])->assertCreated()
-            ->assertJsonPath('user.name', 'Ayu');
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Buat room baru')
+            ->assertDontSee('Masuk ke akun')
+            ->assertDontSee('Buat akun baru');
+        $this->postJson('/api/auth/register', [])->assertNotFound();
+        $this->postJson('/api/auth/login', [])->assertNotFound();
 
+        $this->assertDatabaseCount('users', 1);
+        $this->assertStringEndsWith('@guest.invalid', User::query()->value('email'));
+    }
+
+    public function test_a_guest_can_create_a_room_without_registering(): void
+    {
         $response = $this->postJson('/api/rooms', ['name' => 'Diskusi']);
         $response->assertCreated()->assertJsonPath('room.name', 'Diskusi');
 
         $roomId = $response->json('room.id');
         $room = Room::query()->where('public_id', $roomId)->firstOrFail();
+        $guest = User::query()->findOrFail($room->created_by);
 
         $this->assertDatabaseHas('room_members', [
             'room_id' => $room->getKey(),
-            'user_id' => User::query()->where('email', 'ayu@example.test')->value('id'),
+            'user_id' => $guest->getKey(),
             'left_at' => null,
         ]);
+        $this->assertStringStartsWith('Tamu-', $guest->name);
+    }
+
+    public function test_existing_account_sessions_are_replaced_with_guest_sessions(): void
+    {
+        $account = User::factory()->create();
+
+        $this->actingAs($account)->get('/')->assertOk();
+
+        $guest = User::query()->where('email', 'like', 'guest-%@guest.invalid')->firstOrFail();
+        $this->assertAuthenticatedAs($guest);
     }
 
     public function test_room_chat_is_persisted_and_published_without_sending_file_content(): void
     {
-        $user = User::factory()->create();
+        $user = $this->guestUser();
         $room = $this->createRoomWithMember($user);
         config(['services.ably.key' => 'test-key-name:'.str_repeat('s', 32)]);
 
@@ -68,7 +87,7 @@ class SharingApiTest extends TestCase
 
     public function test_ably_token_is_scoped_to_the_joined_room_and_user(): void
     {
-        $user = User::factory()->create();
+        $user = $this->guestUser();
         $room = $this->createRoomWithMember($user);
         $secret = str_repeat('s', 32);
         config(['services.ably.key' => 'test-key-name:'.$secret]);
@@ -86,8 +105,8 @@ class SharingApiTest extends TestCase
 
     public function test_a_non_member_cannot_get_a_room_token(): void
     {
-        $owner = User::factory()->create();
-        $otherUser = User::factory()->create();
+        $owner = $this->guestUser();
+        $otherUser = $this->guestUser();
         $room = $this->createRoomWithMember($owner);
 
         $this->actingAs($otherUser)
@@ -97,7 +116,7 @@ class SharingApiTest extends TestCase
 
     public function test_joining_an_existing_room_refreshes_the_membership_activity(): void
     {
-        $user = User::factory()->create();
+        $user = $this->guestUser();
         $room = $this->createRoomWithMember($user);
         $membership = RoomMember::query()
             ->where('room_id', $room->getKey())
@@ -114,8 +133,8 @@ class SharingApiTest extends TestCase
 
     public function test_leaving_a_room_cancels_the_users_active_transfers(): void
     {
-        $sender = User::factory()->create();
-        $receiver = User::factory()->create();
+        $sender = $this->guestUser();
+        $receiver = $this->guestUser();
         $room = $this->createRoomWithMember($sender);
         RoomMember::query()->create([
             'room_id' => $room->getKey(),
@@ -156,8 +175,8 @@ class SharingApiTest extends TestCase
 
     public function test_transfer_requests_store_metadata_and_allow_only_the_recipient_to_accept(): void
     {
-        $sender = User::factory()->create();
-        $receiver = User::factory()->create();
+        $sender = $this->guestUser();
+        $receiver = $this->guestUser();
         $room = $this->createRoomWithMember($sender);
         RoomMember::query()->create([
             'room_id' => $room->getKey(),
@@ -222,5 +241,12 @@ class SharingApiTest extends TestCase
         ]);
 
         return $room;
+    }
+
+    private function guestUser(): User
+    {
+        return User::factory()->create([
+            'email' => 'guest-'.Str::uuid().'@guest.invalid',
+        ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class MigrationPageTest extends TestCase
@@ -11,6 +12,7 @@ class MigrationPageTest extends TestCase
         parent::setUp();
 
         config(['cache.limiter' => 'array']);
+        Cache::store('array')->flush();
     }
 
     public function test_migration_page_does_not_require_a_database_session(): void
@@ -27,7 +29,7 @@ class MigrationPageTest extends TestCase
             ->assertSee('Jalankan Migrasi Database');
     }
 
-    public function test_migration_page_rejects_non_local_requests(): void
+    public function test_migration_page_explains_when_hosting_access_is_not_configured(): void
     {
         config([
             'app.env' => 'local',
@@ -37,7 +39,9 @@ class MigrationPageTest extends TestCase
 
         $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.1'])
             ->get('/migrate')
-            ->assertNotFound();
+            ->assertOk()
+            ->assertSee('APP_ENV=production')
+            ->assertSee('disabled', false);
     }
 
     public function test_migration_page_rejects_an_incorrect_pin(): void
@@ -96,7 +100,20 @@ class MigrationPageTest extends TestCase
             'HTTPS' => 'on',
         ])
             ->get('https://localhost/migrate')
-            ->assertNotFound();
+            ->assertOk()
+            ->assertSee('MIGRATE_REMOTE_ENABLED=true');
+
+        $timestamp = now()->timestamp;
+        $key = 'base64:'.base64_encode(str_repeat('a', 32));
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '203.0.113.10',
+            'HTTPS' => 'on',
+        ])->post('https://localhost/migrate', [
+            'timestamp' => $timestamp,
+            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
+            'credential' => 'short-secret',
+        ])->assertStatus(503)
+            ->assertSee('Migrasi belum diaktifkan.');
 
         config([
             'migration.remote_enabled' => true,
@@ -107,7 +124,9 @@ class MigrationPageTest extends TestCase
             'REMOTE_ADDR' => '203.0.113.10',
             'HTTPS' => 'on',
         ])->get('https://localhost/migrate')
-            ->assertNotFound();
+            ->assertOk()
+            ->assertSee('MIGRATE_ADMIN_SECRET')
+            ->assertSee('disabled', false);
 
         config(['migration.admin_secret' => str_repeat('b', 64)]);
 

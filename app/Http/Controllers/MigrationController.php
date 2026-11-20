@@ -10,18 +10,18 @@ class MigrationController extends Controller
 {
     public function index(Request $request)
     {
-        $accessMode = $this->ensureAccessibleRequest($request);
+        $accessMode = $this->accessMode($request);
 
-        return view('migrate', $this->pageData($accessMode));
+        return view('migrate', $this->pageData($accessMode, $request));
     }
 
     public function run(Request $request)
     {
-        $accessMode = $this->ensureAccessibleRequest($request);
+        $accessMode = $this->accessMode($request);
 
-        if (! $this->isConfigured($accessMode)) {
-            return response()->view('migrate', $this->pageData($accessMode, [
-                'message' => 'Konfigurasi kredensial atau APP_KEY belum tersedia.',
+        if (! $this->isConfigured($accessMode, $request)) {
+            return response()->view('migrate', $this->pageData($accessMode, $request, [
+                'message' => 'Migrasi belum diaktifkan. Lengkapi konfigurasi hosting lalu muat ulang halaman.',
                 'success' => false,
             ]), 503);
         }
@@ -35,7 +35,7 @@ class MigrationController extends Controller
             || ! is_string($token)
             || ! hash_equals($this->tokenFor($timestamp), $token)
         ) {
-            return response()->view('migrate', $this->pageData($accessMode, [
+            return response()->view('migrate', $this->pageData($accessMode, $request, [
                 'message' => 'Form kedaluwarsa atau tidak valid. Muat ulang halaman lalu coba lagi.',
                 'success' => false,
             ]), 419);
@@ -47,7 +47,7 @@ class MigrationController extends Controller
         );
 
         if (! is_string($credential) || ! hash_equals($configuredCredential, $credential)) {
-            return response()->view('migrate', $this->pageData($accessMode, [
+            return response()->view('migrate', $this->pageData($accessMode, $request, [
                 'message' => 'Kredensial admin tidak sesuai.',
                 'success' => false,
             ]), 403);
@@ -57,7 +57,7 @@ class MigrationController extends Controller
             $exitCode = Artisan::call('migrate', ['--force' => true]);
             $output = Artisan::output();
 
-            return response()->view('migrate', $this->pageData($accessMode, [
+            return response()->view('migrate', $this->pageData($accessMode, $request, [
                 'message' => $exitCode === 0 ? 'Migrasi berhasil dijalankan.' : 'Migrasi gagal. Periksa output di bawah.',
                 'output' => $output,
                 'success' => $exitCode === 0,
@@ -65,7 +65,7 @@ class MigrationController extends Controller
         } catch (Throwable $exception) {
             report($exception);
 
-            return response()->view('migrate', $this->pageData($accessMode, [
+            return response()->view('migrate', $this->pageData($accessMode, $request, [
                 'message' => 'Migrasi gagal karena terjadi error. Detailnya tercatat di log aplikasi.',
                 'output' => Artisan::output(),
                 'success' => false,
@@ -73,7 +73,7 @@ class MigrationController extends Controller
         }
     }
 
-    private function ensureAccessibleRequest(Request $request): string
+    private function accessMode(Request $request): string
     {
         if (
             config('app.env') === 'local'
@@ -82,23 +82,48 @@ class MigrationController extends Controller
             return 'local';
         }
 
-        abort_unless(
-            config('app.env') === 'production'
-            && config('migration.remote_enabled')
-            && $request->isSecure()
-            && $this->hasStrongRemoteSecret(),
-            404,
-        );
-
         return 'remote';
     }
 
-    private function isConfigured(string $accessMode): bool
+    private function isConfigured(string $accessMode, Request $request): bool
     {
-        return filled(config('app.key'))
-            && ($accessMode === 'local'
-                ? filled(config('migration.admin_pin'))
-                : $this->hasStrongRemoteSecret());
+        if (! filled(config('app.key'))) {
+            return false;
+        }
+
+        if ($accessMode === 'local') {
+            return filled(config('migration.admin_pin'));
+        }
+
+        return config('app.env') === 'production'
+            && config('migration.remote_enabled')
+            && $request->isSecure()
+            && $this->hasStrongRemoteSecret();
+    }
+
+    private function configurationMessage(string $accessMode, Request $request): string
+    {
+        if ($accessMode === 'local') {
+            return 'Atur MIGRATE_ADMIN_PIN dan APP_KEY di .env agar migrasi lokal dapat dijalankan.';
+        }
+
+        if (config('app.env') !== 'production') {
+            return 'Atur APP_ENV=production pada .env hosting.';
+        }
+
+        if (! $request->isSecure()) {
+            return 'Buka halaman melalui HTTPS agar form migrasi dapat digunakan.';
+        }
+
+        if (! config('migration.remote_enabled')) {
+            return 'Atur MIGRATE_REMOTE_ENABLED=true pada .env hosting.';
+        }
+
+        if (! $this->hasStrongRemoteSecret()) {
+            return 'Atur MIGRATE_ADMIN_SECRET dengan nilai acak minimal 64 karakter di .env hosting.';
+        }
+
+        return 'Atur APP_KEY pada .env hosting.';
     }
 
     private function hasStrongRemoteSecret(): bool
@@ -107,12 +132,14 @@ class MigrationController extends Controller
             && strlen(config('migration.admin_secret')) >= 64;
     }
 
-    private function pageData(string $accessMode, array $state = []): array
+    private function pageData(string $accessMode, Request $request, array $state = []): array
     {
         $timestamp = now()->timestamp;
+        $configured = $this->isConfigured($accessMode, $request);
 
         return array_merge([
-            'credentialConfigured' => $this->isConfigured($accessMode),
+            'credentialConfigured' => $configured,
+            'accessMessage' => $configured ? null : $this->configurationMessage($accessMode, $request),
             'accessMode' => $accessMode,
             'timestamp' => $timestamp,
             'token' => $this->tokenFor($timestamp),

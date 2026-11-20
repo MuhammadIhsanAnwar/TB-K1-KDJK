@@ -23,7 +23,6 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const CHUNK_SIZE = 16 * 1024;
 const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }];
 let toastTimer;
-let authMode = 'login';
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 
 async function api(url, options = {}) {
@@ -72,77 +71,18 @@ function showToast(message, isError = false) {
     toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 3600);
 }
 
-function setAuthMode(mode) {
-    authMode = mode;
-    const registering = mode === 'register';
-    el('#name-field').hidden = !registering;
-    el('#password-confirm-field').hidden = !registering;
-    el('#auth-title').textContent = registering ? 'Buat akun baru' : 'Selamat datang kembali';
-    el('#auth-subtitle').textContent = registering
-        ? 'Buat akun untuk memulai ruang berbagi.'
-        : 'Masuk untuk membuka ruang berbagi.';
-    el('#auth-submit').innerHTML = registering
-        ? 'Buat akun <span>→</span>'
-        : 'Masuk ke akun <span>→</span>';
-    el('#auth-form [name="password"]').autocomplete = registering ? 'new-password' : 'current-password';
-    document.querySelectorAll('[data-auth-mode]').forEach((button) => {
-        button.classList.toggle('is-active', button.dataset.authMode === mode);
-    });
-    el('#auth-error').hidden = true;
-}
-
-function setSignedInUser(user) {
-    state.user = user;
-    el('#auth-screen').hidden = Boolean(user);
-    el('#workspace').hidden = !user;
-    el('#logout-button').hidden = !user;
-    el('#top-user').hidden = !user;
-    el('#top-user').textContent = user ? user.name : '';
-
-    if (user) {
-        void loadRecentRooms();
-        if (inviteCode) {
-            el('#room-code').value = inviteCode;
-            void joinRoom(inviteCode);
-            inviteCode = null;
-        }
-    } else {
-        setAuthMode('login');
+function initializeApp() {
+    if (!state.user) {
+        showToast('Sesi tamu tidak tersedia. Muat ulang halaman.', true);
+        return;
     }
-}
 
-async function submitAuth(event) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = Object.fromEntries(new FormData(form).entries());
-    const error = el('#auth-error');
-    error.hidden = true;
-
-    try {
-        const result = await api(`/api/auth/${authMode === 'register' ? 'register' : 'login'}`, {
-            method: 'POST',
-            body: data,
-        });
-        form.reset();
-        setSignedInUser(result.user);
-    } catch (requestError) {
-        error.textContent = requestError.message;
-        error.hidden = false;
-    }
-}
-
-async function logout() {
-    try {
-        await leaveRoom();
-        const result = await api('/api/auth/logout', { method: 'POST', body: {} });
-        const token = result?.csrf_token;
-        if (token && csrfMeta) {
-            csrfMeta.content = token;
-            appConfig.csrfToken = token;
-        }
-        setSignedInUser(null);
-    } catch (error) {
-        showToast(error.message, true);
+    el('#top-user').textContent = state.user.name;
+    void loadRecentRooms();
+    if (inviteCode) {
+        el('#room-code').value = inviteCode;
+        void joinRoom(inviteCode);
+        inviteCode = null;
     }
 }
 
@@ -1057,11 +997,6 @@ async function inspectNetwork() {
 }
 
 function bindEvents() {
-    document.querySelectorAll('[data-auth-mode]').forEach((button) => {
-        button.addEventListener('click', () => setAuthMode(button.dataset.authMode));
-    });
-    el('#auth-form').addEventListener('submit', (event) => void submitAuth(event));
-    el('#logout-button').addEventListener('click', () => void logout());
     el('#create-room-form').addEventListener('submit', (event) => void createRoom(event));
     el('#join-room-form').addEventListener('submit', (event) => {
         event.preventDefault();
@@ -1087,6 +1022,5 @@ function bindEvents() {
 }
 
 bindEvents();
-setSignedInUser(state.user);
-if (inviteCode) el('#room-code').value = inviteCode;
+initializeApp();
 void inspectNetwork();

@@ -34,11 +34,7 @@
 
     @if (! $credentialConfigured)
         <div class="notice error">
-            @if ($accessMode === 'remote')
-                Atur <code>MIGRATE_ADMIN_SECRET</code> minimal 64 karakter acak dan <code>APP_KEY</code> di <code>.env</code>.
-            @else
-                Atur <code>MIGRATE_ADMIN_PIN</code> dan <code>APP_KEY</code> di <code>.env</code>.
-            @endif
+            {{ $accessMessage }}
         </div>
     @endif
 

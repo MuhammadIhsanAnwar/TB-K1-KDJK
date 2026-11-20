@@ -2,14 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\FileTransfer;
 use App\Models\Room;
 use App\Models\RoomMember;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -58,32 +57,57 @@ class SharingApiTest extends TestCase
         $this->assertAuthenticatedAs($guest);
     }
 
-    public function test_room_chat_is_persisted_and_published_without_sending_file_content(): void
+    public function test_chat_and_file_transfer_endpoints_do_not_persist_messages_or_metadata(): void
     {
         $user = $this->guestUser();
         $room = $this->createRoomWithMember($user);
-        config(['services.ably.key' => 'test-key-name:'.str_repeat('s', 32)]);
 
-        Http::fake([
-            'https://rest.ably.io/*' => Http::response([], 201),
-        ]);
-
-        $response = $this->actingAs($user)->postJson("/api/rooms/{$room->public_id}/messages", [
+        $this->actingAs($user)->postJson("/api/rooms/{$room->public_id}/messages", [
             'client_message_id' => '08ca4cf7-72b6-4f69-a7c4-ddb299f1c7d2',
             'body' => 'Halo room',
-        ]);
+        ])->assertNotFound();
 
-        $response->assertCreated()->assertJsonPath('message.body', 'Halo room');
-        $this->assertDatabaseHas('chat_messages', [
+        $this->actingAs($user)->postJson("/api/rooms/{$room->public_id}/transfers", [
+            'file_name' => 'photo.png',
+        ])->assertNotFound();
+
+        $this->assertDatabaseCount('chat_messages', 0);
+        $this->assertDatabaseCount('file_transfers', 0);
+    }
+
+    public function test_migration_purges_previously_persisted_messages_and_transfer_metadata(): void
+    {
+        $user = $this->guestUser();
+        $room = $this->createRoomWithMember($user);
+        $now = now();
+
+        DB::table('chat_messages')->insert([
             'room_id' => $room->getKey(),
             'user_id' => $user->getKey(),
-            'body' => 'Halo room',
+            'client_message_id' => '08ca4cf7-72b6-4f69-a7c4-ddb299f1c7d2',
+            'body' => 'Riwayat lama',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        DB::table('file_transfers')->insert([
+            'public_id' => '44996ed0-f200-4d3a-98e9-7487eb1527df',
+            'client_transfer_id' => 'ca623bd3-8796-40a6-b79a-8fdc927b1722',
+            'room_id' => $room->getKey(),
+            'sender_id' => $user->getKey(),
+            'receiver_id' => $user->getKey(),
+            'file_name' => 'file-lama.pdf',
+            'mime_type' => 'application/pdf',
+            'file_size' => 1024,
+            'status' => 'pending',
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
-        Http::assertSent(fn ($request) => str_contains($request->url(), 'p2p%3Aroom%3A'.$room->public_id)
-            && $request['0']['name'] === 'chat.message'
-            && $request['0']['data']['body'] === 'Halo room'
-            && ! isset($request['0']['clientId']));
+        $migration = require database_path('migrations/2026_11_20_134500_purge_persisted_chat_and_transfer_data.php');
+        $migration->up();
+
+        $this->assertDatabaseCount('chat_messages', 0);
+        $this->assertDatabaseCount('file_transfers', 0);
     }
 
     public function test_ably_token_is_scoped_to_the_joined_room_and_user(): void
@@ -91,14 +115,20 @@ class SharingApiTest extends TestCase
         $user = $this->guestUser();
         $room = $this->createRoomWithMember($user);
         $secret = str_repeat('s', 32);
+        $clientIp = '203.0.113.42';
         config(['services.ably.key' => 'test-key-name:'.$secret]);
 
-        $response = $this->actingAs($user)->get("/api/rooms/{$room->public_id}/ably-token");
+        $response = $this->withServerVariables(['REMOTE_ADDR' => $clientIp])
+            ->actingAs($user)
+            ->get("/api/rooms/{$room->public_id}/ably-token");
         $response->assertOk();
 
         $claims = JWT::decode($response->getContent(), new Key($secret, 'HS256'));
 
-        $this->assertSame((string) $user->getKey(), $claims->{'x-ably-clientId'});
+        $this->assertSame(
+            $user->getKey().':'.hash_hmac('sha256', $room->public_id.'|'.$clientIp, (string) config('app.key')),
+            $claims->{'x-ably-clientId'},
+        );
         $this->assertSame([
             'p2p:room:'.$room->public_id => ['publish', 'subscribe', 'presence'],
         ], json_decode($claims->{'x-ably-capability'}, true, 512, JSON_THROW_ON_ERROR));
@@ -132,33 +162,10 @@ class SharingApiTest extends TestCase
         $this->assertTrue($membership->fresh()->last_seen_at->greaterThan(now()->subMinutes(1)));
     }
 
-    public function test_leaving_a_room_cancels_the_users_active_transfers(): void
+    public function test_leaving_a_room_only_updates_membership(): void
     {
         $sender = $this->guestUser();
-        $receiver = $this->guestUser();
         $room = $this->createRoomWithMember($sender);
-        RoomMember::query()->create([
-            'room_id' => $room->getKey(),
-            'user_id' => $receiver->getKey(),
-            'joined_at' => now(),
-            'last_seen_at' => now(),
-        ]);
-        $transfer = FileTransfer::query()->create([
-            'public_id' => '44996ed0-f200-4d3a-98e9-7487eb1527df',
-            'client_transfer_id' => '08ca4cf7-72b6-4f69-a7c4-ddb299f1c7d2',
-            'room_id' => $room->getKey(),
-            'sender_id' => $sender->getKey(),
-            'receiver_id' => $receiver->getKey(),
-            'file_name' => 'photo.png',
-            'mime_type' => 'image/png',
-            'file_size' => 1024,
-            'status' => 'accepted',
-        ]);
-        config(['services.ably.key' => 'test-key-name:'.str_repeat('s', 32)]);
-
-        Http::fake([
-            'https://rest.ably.io/*' => Http::response([], 201),
-        ]);
 
         $this->actingAs($sender)
             ->postJson("/api/rooms/{$room->public_id}/leave")
@@ -168,87 +175,37 @@ class SharingApiTest extends TestCase
             ->where('room_id', $room->getKey())
             ->where('user_id', $sender->getKey())
             ->value('left_at'));
-        $this->assertSame('cancelled', $transfer->fresh()->status);
-        Http::assertSent(fn ($request) => $request['0']['name'] === 'transfer.updated'
-            && $request['0']['data']['id'] === $transfer->public_id
-            && $request['0']['data']['status'] === 'cancelled');
     }
 
-    public function test_transfer_requests_create_independent_approval_for_each_recipient(): void
+    public function test_network_check_returns_only_a_room_scoped_ip_fingerprint(): void
     {
-        $sender = $this->guestUser();
-        $receiver = $this->guestUser();
-        $secondReceiver = $this->guestUser();
-        $room = $this->createRoomWithMember($sender);
-        foreach ([$receiver, $secondReceiver] as $member) {
-            RoomMember::query()->create([
-                'room_id' => $room->getKey(),
-                'user_id' => $member->getKey(),
-                'joined_at' => now(),
-                'last_seen_at' => now(),
-            ]);
-        }
-        config(['services.ably.key' => 'test-key-name:'.str_repeat('s', 32)]);
+        $user = $this->guestUser();
+        $room = $this->createRoomWithMember($user);
+        $appKey = config('app.key');
 
-        Http::fake([
-            'https://rest.ably.io/*' => Http::response([], 201),
-        ]);
+        $response = $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.42'])
+            ->actingAs($user)
+            ->getJson("/api/rooms/{$room->public_id}/network");
 
-        $response = $this->actingAs($sender)->postJson("/api/rooms/{$room->public_id}/transfers", [
-            'recipients' => [
-                [
-                    'client_transfer_id' => '44996ed0-f200-4d3a-98e9-7487eb1527df',
-                    'receiver_id' => $receiver->getKey(),
-                ],
-                [
-                    'client_transfer_id' => 'ca623bd3-8796-40a6-b79a-8fdc927b1722',
-                    'receiver_id' => $secondReceiver->getKey(),
-                ],
-            ],
-            'file_name' => 'photo.png',
-            'mime_type' => 'image/png',
-            'file_size' => 1024,
-        ]);
+        $response->assertOk()->assertHeader('Cache-Control', 'no-store, private');
+        $fingerprint = $response->json('network_fingerprint');
+        $this->assertSame(
+            hash_hmac('sha256', $room->public_id.'|203.0.113.42', (string) $appKey),
+            $fingerprint,
+        );
+        $this->assertStringNotContainsString('203.0.113.42', $response->getContent());
 
-        $response->assertCreated()->assertJsonCount(2, 'transfers')
-            ->assertJsonPath('transfers.0.status', 'pending')
-            ->assertJsonPath('transfers.1.status', 'pending');
-        $firstTransferId = $response->json('transfers.0.id');
-        $secondTransferId = $response->json('transfers.1.id');
-        $firstTransfer = FileTransfer::query()->where('public_id', $firstTransferId)->firstOrFail();
-        $secondTransfer = FileTransfer::query()->where('public_id', $secondTransferId)->firstOrFail();
+        $sameIp = $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.42'])
+            ->actingAs($user)
+            ->getJson("/api/rooms/{$room->public_id}/network")
+            ->json('network_fingerprint');
+        $differentIp = $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.43'])
+            ->actingAs($user)
+            ->getJson("/api/rooms/{$room->public_id}/network")
+            ->json('network_fingerprint');
 
-        $this->assertDatabaseHas('file_transfers', [
-            'id' => $firstTransfer->getKey(),
-            'file_name' => 'photo.png',
-            'file_size' => 1024,
-            'status' => 'pending',
-        ]);
-        $this->assertArrayNotHasKey('content', $response->json('transfers.0'));
-
-        $this->actingAs($sender)
-            ->postJson("/api/transfers/{$firstTransferId}/accept")
-            ->assertForbidden();
-
-        $this->actingAs($receiver)
-            ->postJson("/api/transfers/{$firstTransferId}/accept")
-            ->assertOk()
-            ->assertJsonPath('transfer.status', 'accepted');
-
-        $this->actingAs($secondReceiver)
-            ->postJson("/api/transfers/{$secondTransferId}/decline")
-            ->assertOk()
-            ->assertJsonPath('transfer.status', 'declined');
-
-        $this->assertDatabaseHas('file_transfers', [
-            'id' => $firstTransfer->getKey(),
-            'status' => 'accepted',
-        ]);
-        $this->assertDatabaseHas('file_transfers', [
-            'id' => $secondTransfer->getKey(),
-            'status' => 'declined',
-        ]);
-        Http::assertSentCount(4);
+        $this->assertSame($fingerprint, $sameIp);
+        $this->assertNotSame($fingerprint, $differentIp);
     }
 
     private function createRoomWithMember(User $user): Room

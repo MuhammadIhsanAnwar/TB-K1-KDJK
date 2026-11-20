@@ -3,18 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\ChatMessage;
-use App\Models\FileTransfer;
 use App\Models\Room;
-use App\Services\AblyPublisher;
 use App\Services\AblyTokenService;
+use App\Services\NetworkFingerprintService;
 use App\Services\RoomMembershipService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
 class RoomController extends Controller
 {
@@ -75,81 +72,26 @@ class RoomController extends Controller
         Request $request,
         Room $room,
         RoomMembershipService $memberships,
-        AblyPublisher $ably,
-        RoomController $rooms,
     ): JsonResponse|Response {
         $membership = $memberships->requireActive($room, $request->user());
-        $transfers = DB::transaction(function () use ($membership, $room, $request, $rooms): array {
-            $membership->forceFill(['left_at' => now()])->save();
-
-            $transfers = $room->transfers()
-                ->whereIn('status', ['pending', 'accepted'])
-                ->where(fn ($query) => $query
-                    ->where('sender_id', $request->user()->getKey())
-                    ->orWhere('receiver_id', $request->user()->getKey()))
-                ->lockForUpdate()
-                ->get();
-            $payloads = [];
-
-            foreach ($transfers as $transfer) {
-                $transfer->forceFill(['status' => 'cancelled'])->save();
-                $transfer->load(['room', 'sender:id,name', 'receiver:id,name']);
-                $payloads[] = $rooms->transferPayload($transfer);
-            }
-
-            return $payloads;
-        });
-
-        $publishFailed = false;
-        foreach ($transfers as $transfer) {
-            try {
-                $ably->publish($room, 'transfer.updated', $transfer);
-            } catch (Throwable $exception) {
-                report($exception);
-                $publishFailed = true;
-            }
-        }
-
-        if ($publishFailed) {
-            return response()->json([
-                'message' => 'Room ditinggalkan, tetapi sebagian pembaruan transfer realtime gagal.',
-                'saved' => true,
-            ], 503);
-        }
+        $membership->forceFill(['left_at' => now()])->save();
 
         return response()->noContent();
     }
 
-    public function history(
+    public function networkFingerprint(
         Request $request,
         Room $room,
         RoomMembershipService $memberships,
+        NetworkFingerprintService $fingerprints,
     ): JsonResponse {
         $memberships->requireActive($room, $request->user());
-
-        $messages = $room->messages()
-            ->with('user:id,name')
-            ->latest('id')
-            ->limit(100)
-            ->get()
-            ->reverse()
-            ->values()
-            ->map(fn (ChatMessage $message) => $this->messagePayload($message));
-
-        $transfers = $room->transfers()
-            ->with(['sender:id,name', 'receiver:id,name'])
-            ->latest('id')
-            ->limit(30)
-            ->get()
-            ->reverse()
-            ->values()
-            ->map(fn (FileTransfer $transfer) => $this->transferPayload($transfer));
+        $ipAddress = $request->ip();
+        abort_if(! is_string($ipAddress) || $ipAddress === '', 503, 'Alamat jaringan tidak dapat diverifikasi.');
 
         return response()->json([
-            'room' => $this->roomPayload($room),
-            'messages' => $messages,
-            'transfers' => $transfers,
-        ]);
+            'network_fingerprint' => $fingerprints->forRoom($room, $ipAddress),
+        ])->header('Cache-Control', 'no-store, private');
     }
 
     public function ablyToken(
@@ -159,8 +101,10 @@ class RoomController extends Controller
         AblyTokenService $tokens,
     ): Response {
         $memberships->requireActive($room, $request->user());
+        $ipAddress = $request->ip();
+        abort_if(! is_string($ipAddress) || $ipAddress === '', 503, 'Alamat jaringan tidak dapat diverifikasi.');
 
-        return response($tokens->issueForRoom($room, $request->user()))
+        return response($tokens->issueForRoom($room, $request->user(), $ipAddress))
             ->header('Content-Type', 'text/plain; charset=UTF-8')
             ->header('Cache-Control', 'no-store, private');
     }
@@ -176,35 +120,6 @@ class RoomController extends Controller
                     ->where('last_seen_at', '>=', now()->subMinutes(30))
                     ->count(),
             'created_at' => $room->created_at?->toISOString(),
-        ];
-    }
-
-    public function messagePayload(ChatMessage $message): array
-    {
-        return [
-            'id' => $message->getKey(),
-            'client_message_id' => $message->client_message_id,
-            'user_id' => $message->user_id,
-            'user_name' => $message->user->name,
-            'body' => $message->body,
-            'created_at' => $message->created_at?->toISOString(),
-        ];
-    }
-
-    public function transferPayload(FileTransfer $transfer): array
-    {
-        return [
-            'id' => $transfer->public_id,
-            'room_id' => $transfer->room->public_id,
-            'sender_id' => $transfer->sender_id,
-            'sender_name' => $transfer->sender->name,
-            'receiver_id' => $transfer->receiver_id,
-            'receiver_name' => $transfer->receiver->name,
-            'file_name' => $transfer->file_name,
-            'mime_type' => $transfer->mime_type,
-            'file_size' => $transfer->file_size,
-            'status' => $transfer->status,
-            'created_at' => $transfer->created_at?->toISOString(),
         ];
     }
 }

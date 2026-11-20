@@ -1,6 +1,6 @@
 # TB-K1-KDJK — Berbagi File P2P
 
-Aplikasi berbagi file dan chat per-room berbasis Laravel. Tidak ada formulir daftar atau login; setiap browser mendapat identitas tamu otomatis. Pengirim dapat memilih beberapa anggota room untuk satu file; setiap penerima memberi persetujuan secara terpisah. Chat dan metadata transfer disimpan di MySQL; isi file dikirim langsung antar-browser melalui WebRTC dan tidak diunggah atau disimpan oleh server. Ably digunakan untuk presence, chat realtime, serta signaling WebRTC.
+Aplikasi berbagi file dan chat per-room berbasis Laravel. Tidak ada formulir daftar atau login; setiap browser mendapat identitas tamu otomatis. Pengirim dapat memilih beberapa anggota room untuk satu file; setiap penerima memberi persetujuan secara terpisah. Pesan, permintaan transfer, dan isi file hanya dikirim antar-browser melalui WebRTC; server tidak menyimpan pesan atau metadata transfer. Ably hanya dipakai untuk presence dan signaling WebRTC. Riwayat chat disimpan lokal di browser masing-masing (maksimal 100 pesan), bukan disinkronkan atau disimpan di server.
 
 ## Kebutuhan
 
@@ -51,6 +51,7 @@ Aplikasi berbagi file dan chat per-room berbasis Laravel. Tidak ada formulir daf
    CACHE_STORE=file
    QUEUE_CONNECTION=sync
    ABLY_API_KEY=nama-key:secret
+   TRUSTED_PROXIES=
    MIGRATE_ADMIN_PIN=<PIN-admin>
    ```
 
@@ -63,8 +64,10 @@ Aplikasi berbagi file dan chat per-room berbasis Laravel. Tidak ada formulir daf
 ## Batasan dan pengaturan
 
 - Batas default ukuran file 100 MiB dan maksimal 8 anggota per room. Nilainya dapat diubah melalui `SHARING_MAX_FILE_SIZE` (byte) dan `ROOM_MAX_MEMBERS`.
-- Isi file hanya berada di memori browser selama transfer. Database menyimpan metadata transfer dan riwayat chat.
-- Koneksi WebRTC menggunakan STUN tanpa TURN. NAT/firewall tertentu dapat menghalangi koneksi langsung; room dan chat tetap dapat digunakan.
+- Isi file hanya berada di memori browser selama transfer. Pesan/permintaan file tidak ditulis ke database; migration baru menghapus data chat dan metadata transfer lama.
+- Peserta hanya dapat bertukar pesan/file jika fingerprint HMAC dari IP publik yang dilihat server sama. IP mentah tidak dibagikan atau disimpan. Port tidak dibandingkan: port sumber klien dapat berubah karena NAT/proxy dan kesamaan port tidak membuktikan satu jaringan lokal. Kesamaan IP publik juga bukan bukti mutlak satu LAN (misalnya VPN atau NAT bersama).
+- Jika hosting berada di belakang reverse proxy, isi `TRUSTED_PROXIES` dengan alamat/CIDR proxy tepercaya yang dipisahkan koma agar Laravel membaca IP klien yang benar. Jangan percaya header proxy dari sumber yang tidak tepercaya.
+- Koneksi WebRTC menggunakan STUN tanpa TURN. NAT/firewall tertentu dapat menghalangi koneksi langsung; pesan dan transfer tidak memiliki fallback database/server sehingga perlu koneksi P2P aktif.
 - Tes dan build frontend:
 
   ```sh

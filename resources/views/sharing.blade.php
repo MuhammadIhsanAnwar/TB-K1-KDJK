@@ -100,7 +100,7 @@
 
                             <div id="room-status" class="room-status" aria-live="polite">
                                 <span class="status-pulse"></span>
-                                <span>Menghubungkan ke layanan realtime…</span>
+                                <span>Menyiapkan koneksi P2P…</span>
                             </div>
 
                             <div class="room-content">
@@ -112,18 +112,19 @@
                                     <div id="online-members" class="online-members"></div>
                                     <div class="peer-note">
                                         <span class="peer-note-icon">⌁</span>
-                                        <p>Koneksi langsung diuji saat transfer dimulai. Beberapa jaringan mungkin memerlukan TURN.</p>
+                                        <p>Pesan dan file dikirim langsung antar-browser. Hanya peserta dengan IP publik sama yang dapat terhubung; firewall/NAT masih dapat menghalangi P2P.</p>
                                     </div>
                                 </aside>
 
                                 <div class="conversation-panel">
                                     <div class="section-heading conversation-heading">
                                         <div><span class="eyebrow">PESAN ROOM</span><h3>Percakapan</h3></div>
-                                        <span class="chat-encryption">REALTIME</span>
+                                        <span class="chat-encryption">P2P LANGSUNG</span>
                                     </div>
                                     <div id="chat-messages" class="chat-messages" role="log" aria-live="polite" aria-relevant="additions">
                                         <div class="chat-empty">Belum ada pesan. Sapa temanmu dulu 👋</div>
                                     </div>
+                                    <p class="chat-local-note">Pesan dikirim P2P; riwayat hanya tersimpan lokal di browser ini.</p>
                                     <form id="chat-form" class="chat-form">
                                         <input id="chat-input" name="body" type="text" maxlength="2000" autocomplete="off" placeholder="Tulis pesan..." required>
                                         <button class="send-button" type="submit" aria-label="Kirim pesan">↑</button>

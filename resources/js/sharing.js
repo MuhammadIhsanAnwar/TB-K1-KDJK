@@ -10,15 +10,20 @@ const state = {
     channel: null,
     onlineUsers: new Map(),
     messages: new Set(),
+    messageHistory: [],
     pendingChatMessage: null,
     transfers: new Map(),
     transferProgress: new Map(),
     files: new Map(),
     peers: new Map(),
     pendingCandidates: new Map(),
+    chatPeers: new Map(),
+    chatCandidates: new Map(),
+    blockedNetworkPeers: new Set(),
+    networkFingerprint: null,
     selectedFile: null,
-    pendingTransferRequest: null,
     transferSubmitting: false,
+    pendingTransferRequest: null,
 };
 
 const el = (selector) => document.querySelector(selector);
@@ -193,27 +198,29 @@ async function openRoom(room) {
     state.room = room;
     state.onlineUsers.clear();
     state.messages.clear();
+    state.messageHistory = [];
     state.pendingChatMessage = null;
     state.transfers.clear();
     state.transferProgress.clear();
     state.files.clear();
     state.pendingCandidates.clear();
+    state.chatCandidates.clear();
+    state.blockedNetworkPeers.clear();
+    state.networkFingerprint = null;
     state.pendingTransferRequest = null;
+    state.chatPeers.clear();
     el('#recipient-select').replaceChildren();
     el('#room-empty').hidden = true;
     el('#active-room').hidden = false;
     el('#active-room-name').textContent = room.name;
     el('#active-room-code').textContent = room.id;
     el('#chat-messages').replaceChildren();
+    loadLocalMessages(room.id);
     renderOnlineUsers();
     renderTransfers();
-    setRoomStatus('Memuat riwayat room…', false);
+    setRoomStatus('Memeriksa jaringan dan menyiapkan P2P…', false);
 
     try {
-        const history = await api(`/api/rooms/${encodeURIComponent(room.id)}/history`);
-        for (const message of history.messages ?? []) addChatMessage(message);
-        for (const transfer of history.transfers ?? []) state.transfers.set(transfer.id, transfer);
-        renderTransfers();
         await connectRealtime(room);
         await loadRecentRooms();
     } catch (error) {
@@ -223,6 +230,12 @@ async function openRoom(room) {
 }
 
 async function connectRealtime(room) {
+    const network = await api(`/api/rooms/${encodeURIComponent(room.id)}/network`);
+    if (typeof network.network_fingerprint !== 'string' || network.network_fingerprint.length !== 64) {
+        throw new Error('Fingerprint jaringan tidak valid.');
+    }
+    state.networkFingerprint = network.network_fingerprint;
+
     const client = createClient({
         authUrl: `${window.location.origin}/api/rooms/${encodeURIComponent(room.id)}/ably-token`,
         authMethod: 'GET',
@@ -234,17 +247,14 @@ async function connectRealtime(room) {
 
     client.connection.on((change) => {
         if (change.current === 'connected') {
-            setRoomStatus('Terhubung realtime · Presence aktif', true);
+            setRoomStatus('Signaling siap · Menghubungkan P2P', true);
         } else if (['failed', 'suspended', 'closed'].includes(change.current)) {
-            setRoomStatus('Realtime terputus. Chat tersimpan, tetapi pembaruan langsung mungkin tertunda.', false);
+            setRoomStatus('Signaling terputus. Koneksi P2P baru mungkin tidak dapat dibuat.', false);
         }
     });
 
     await channel.attach();
     await Promise.all([
-        channel.subscribe('chat.message', (message) => addChatMessage(message.data)),
-        channel.subscribe('transfer.requested', (message) => receiveTransferRequest(message.data)),
-        channel.subscribe('transfer.updated', (message) => receiveTransferUpdate(message.data)),
         channel.subscribe('signal', (message) => void handleSignal(message)),
         channel.presence.subscribe((member) => handlePresence(member)),
     ]);
@@ -260,20 +270,218 @@ function setRoomStatus(message, connected) {
     status.lastElementChild.textContent = message;
 }
 
+function parseRoomClientId(clientId) {
+    const match = /^(\d+):([a-f0-9]{64})$/i.exec(String(clientId ?? ''));
+    return match ? { userId: match[1], fingerprint: match[2].toLowerCase() } : null;
+}
+
 function handlePresence(member) {
     if (!member?.clientId) return;
-    const clientId = String(member.clientId);
+    const identity = parseRoomClientId(member.clientId);
+    if (!identity) return;
+    const clientId = identity.userId;
 
     if (member.action === 'leave') {
         state.onlineUsers.delete(clientId);
+        state.blockedNetworkPeers.delete(clientId);
+        closeChatPeer(clientId);
+    } else if (identity.fingerprint !== state.networkFingerprint) {
+        state.onlineUsers.delete(clientId);
+        closeChatPeer(clientId);
+        if (!state.blockedNetworkPeers.has(clientId)) {
+            state.blockedNetworkPeers.add(clientId);
+            showToast(`${member.data?.name || 'Pengguna'} memakai IP publik berbeda; koneksi room dibatasi.`, true);
+        }
     } else {
-        state.onlineUsers.set(clientId, {
+        const user = {
             id: clientId,
             name: member.data?.name || `Pengguna ${clientId}`,
-        });
+        };
+        state.blockedNetworkPeers.delete(clientId);
+        state.onlineUsers.set(clientId, user);
+        if (clientId !== String(state.user.id) && Number(state.user.id) < Number(clientId)) {
+            void startChatOffer(user);
+        }
     }
 
     renderOnlineUsers();
+}
+
+function chatSignalId() {
+    return `chat:${state.room?.id ?? ''}`;
+}
+
+function makeChatPeer(user, initiator) {
+    const userId = String(user.id);
+    const existing = state.chatPeers.get(userId);
+    if (existing) return existing;
+
+    const peer = {
+        user,
+        pc: new RTCPeerConnection({ iceServers: ICE_SERVERS }),
+        channel: null,
+        initiator,
+        offering: false,
+    };
+    state.chatPeers.set(userId, peer);
+
+    peer.pc.addEventListener('icecandidate', (event) => {
+        if (event.candidate) {
+            void sendSignal({ id: chatSignalId() }, userId, 'chat-candidate', {
+                candidate: event.candidate.toJSON(),
+            }).catch((error) => showToast(error.message, true));
+        }
+    });
+    peer.pc.addEventListener('datachannel', (event) => {
+        if (event.channel.label === 'room-chat') bindChatChannel(userId, event.channel);
+    });
+    peer.pc.addEventListener('connectionstatechange', () => {
+        if (peer.pc.connectionState === 'failed') {
+            closeChatPeer(userId);
+            showToast(`Koneksi P2P ke ${user.name} gagal.`, true);
+        }
+    });
+
+    if (initiator) {
+        bindChatChannel(userId, peer.pc.createDataChannel('room-chat', { ordered: true }));
+    }
+
+    return peer;
+}
+
+function bindChatChannel(userId, channel) {
+    const peer = state.chatPeers.get(String(userId));
+    if (!peer || channel.label !== 'room-chat') return;
+    peer.channel = channel;
+    channel.addEventListener('message', (event) => {
+        void handlePeerMessage(String(userId), event.data);
+    });
+    channel.addEventListener('open', () => {
+        setRoomStatus(`P2P terhubung · ${peer.user.name}`, true);
+    });
+    channel.addEventListener('error', () => showToast('Koneksi pesan P2P mengalami error.', true));
+}
+
+function closeChatPeer(userId) {
+    const peer = state.chatPeers.get(String(userId));
+    if (!peer) return;
+    peer.channel?.close();
+    peer.pc.close();
+    state.chatPeers.delete(String(userId));
+    state.chatCandidates.delete(String(userId));
+}
+
+async function startChatOffer(user) {
+    const peer = makeChatPeer(user, true);
+    if (!peer.initiator || peer.offering || peer.pc.localDescription) return;
+    peer.offering = true;
+
+    try {
+        const offer = await peer.pc.createOffer();
+        await peer.pc.setLocalDescription(offer);
+        await sendSignal({ id: chatSignalId() }, user.id, 'chat-offer', {
+            description: peer.pc.localDescription,
+        });
+    } catch (error) {
+        closeChatPeer(user.id);
+        showToast(`Tidak dapat memulai P2P ke ${user.name}: ${error.message}`, true);
+    }
+}
+
+async function handleChatSignal(message, signal) {
+    const from = String(message?.clientId ?? '');
+    const user = state.onlineUsers.get(from);
+    if (!user || signal.to !== String(state.user.id) || from === String(state.user.id)) return;
+
+    let peer = state.chatPeers.get(from);
+    if (signal.type === 'chat-offer') {
+        if (Number(from) >= Number(state.user.id)) return;
+        if (peer?.pc.remoteDescription) return;
+        peer = makeChatPeer(user, false);
+        await peer.pc.setRemoteDescription(signal.payload.description);
+        await drainChatCandidates(from, peer);
+        const answer = await peer.pc.createAnswer();
+        await peer.pc.setLocalDescription(answer);
+        await sendSignal({ id: chatSignalId() }, from, 'chat-answer', {
+            description: peer.pc.localDescription,
+        });
+    } else if (signal.type === 'chat-answer') {
+        if (!peer?.initiator || peer.pc.remoteDescription) return;
+        await peer.pc.setRemoteDescription(signal.payload.description);
+        await drainChatCandidates(from, peer);
+    } else if (signal.type === 'chat-candidate') {
+        const candidate = signal.payload?.candidate;
+        if (!candidate) return;
+        if (!peer || !peer.pc.remoteDescription) {
+            const candidates = state.chatCandidates.get(from) ?? [];
+            candidates.push(candidate);
+            state.chatCandidates.set(from, candidates);
+        } else {
+            await peer.pc.addIceCandidate(candidate);
+        }
+    }
+}
+
+async function drainChatCandidates(userId, peer) {
+    const candidates = state.chatCandidates.get(String(userId)) ?? [];
+    state.chatCandidates.delete(String(userId));
+    for (const candidate of candidates) {
+        await peer.pc.addIceCandidate(candidate);
+    }
+}
+
+async function handlePeerMessage(fromUserId, rawData) {
+    let frame;
+    try {
+        frame = JSON.parse(rawData);
+    } catch {
+        showToast('Data P2P tidak valid dan diabaikan.', true);
+        return;
+    }
+
+    if (frame.type === 'chat.message') {
+        const message = frame.message;
+        if (
+            !message?.id
+            || String(message.user_id) !== fromUserId
+            || typeof message.user_name !== 'string'
+            || typeof message.body !== 'string'
+            || message.body.length > 2000
+        ) return;
+        addChatMessage(message);
+        return;
+    }
+
+    if (frame.type === 'transfer.request') {
+        const transfer = frame.transfer;
+        if (
+            transfer?.room_id !== state.room?.id
+            || String(transfer.sender_id) !== fromUserId
+            || String(transfer.receiver_id) !== String(state.user.id)
+            || typeof transfer.file_name !== 'string'
+            || transfer.file_name.length < 1
+            || transfer.file_name.length > 255
+            || typeof transfer.mime_type !== 'string'
+            || !Number.isSafeInteger(transfer.file_size)
+            || transfer.file_size < 1
+            || transfer.file_size > MAX_FILE_SIZE
+        ) return;
+        receiveTransferRequest(transfer);
+        return;
+    }
+
+    if (frame.type === 'transfer.update') {
+        const transfer = frame.transfer;
+        const current = state.transfers.get(transfer?.id);
+        if (
+            !current
+            || (String(current.sender_id) !== fromUserId && String(current.receiver_id) !== fromUserId)
+            || String(current.sender_id) !== String(transfer.sender_id)
+            || String(current.receiver_id) !== String(transfer.receiver_id)
+            || !['accepted', 'declined', 'cancelled', 'failed', 'completed'].includes(transfer.status)
+        ) return;
+        receiveTransferUpdate(transfer);
+    }
 }
 
 function renderOnlineUsers() {
@@ -321,8 +529,14 @@ function renderOnlineUsers() {
 }
 
 function addChatMessage(message) {
-    if (!message?.id || state.messages.has(String(message.id))) return;
+    if (
+        !message?.id
+        || typeof message.body !== 'string'
+        || state.messages.has(String(message.id))
+    ) return;
     state.messages.add(String(message.id));
+    state.messageHistory.push(message);
+    state.messageHistory = state.messageHistory.slice(-100);
     const list = el('#chat-messages');
     list.querySelector('.chat-empty')?.remove();
 
@@ -332,7 +546,7 @@ function addChatMessage(message) {
     const meta = document.createElement('div');
     meta.className = 'message-meta';
     const name = document.createElement('strong');
-    name.textContent = own ? 'Kamu' : message.user_name;
+    name.textContent = own ? 'Kamu' : (message.user_name || 'Pengguna room');
     const time = document.createElement('span');
     time.textContent = formatTime(message.created_at);
     meta.append(name, time);
@@ -342,6 +556,31 @@ function addChatMessage(message) {
     row.append(meta, bubble);
     list.append(row);
     list.scrollTop = list.scrollHeight;
+    saveLocalMessages();
+}
+
+function localHistoryKey(roomId = state.room?.id) {
+    return `sharing-chat:${roomId}:${state.user.id}`;
+}
+
+function loadLocalMessages(roomId) {
+    try {
+        const messages = JSON.parse(window.localStorage.getItem(localHistoryKey(roomId)) ?? '[]');
+        if (Array.isArray(messages)) {
+            for (const message of messages.slice(-100)) addChatMessage(message);
+        }
+    } catch {
+        showToast('Riwayat lokal browser tidak dapat dibaca.', true);
+    }
+}
+
+function saveLocalMessages() {
+    if (!state.room) return;
+    try {
+        window.localStorage.setItem(localHistoryKey(), JSON.stringify(state.messageHistory));
+    } catch {
+        showToast('Riwayat pesan tidak dapat disimpan di browser ini.', true);
+    }
 }
 
 async function sendChat(event) {
@@ -351,28 +590,41 @@ async function sendChat(event) {
     const body = input.value.trim();
     if (!body) return;
 
-    const clientMessageId = state.pendingChatMessage?.body === body
-        ? state.pendingChatMessage.clientMessageId
+    const recipientIds = [...state.onlineUsers.keys()]
+        .filter((userId) => userId !== String(state.user.id));
+    if (!recipientIds.length) {
+        showToast('Tidak ada pengguna online satu IP publik untuk menerima pesan.', true);
+        return;
+    }
+
+    const recipients = recipientIds
+        .map((userId) => state.chatPeers.get(userId))
+        .filter((peer) => peer?.channel?.readyState === 'open');
+    if (recipients.length !== recipientIds.length) {
+        showToast('Koneksi P2P ke semua pengguna belum siap. Tunggu sebentar lalu coba lagi.', true);
+        return;
+    }
+
+    const messageId = state.pendingChatMessage?.body === body
+        ? state.pendingChatMessage.id
         : crypto.randomUUID();
+    const message = {
+        id: messageId,
+        user_id: state.user.id,
+        user_name: state.user.name,
+        body,
+        created_at: new Date().toISOString(),
+    };
 
     try {
-        const result = await api(`/api/rooms/${encodeURIComponent(state.room.id)}/messages`, {
-            method: 'POST',
-            body: {
-                client_message_id: clientMessageId,
-                body,
-            },
-        });
-        addChatMessage(result.message ?? result.chat_message);
-        if (result.saved) showToast(result.message, true);
+        addChatMessage(message);
+        const frame = JSON.stringify({ type: 'chat.message', message });
+        for (const peer of recipients) peer.channel.send(frame);
         state.pendingChatMessage = null;
         input.value = '';
     } catch (error) {
-        state.pendingChatMessage = { body, clientMessageId };
-        if (error.payload?.saved && error.payload.chat_message) {
-            addChatMessage(error.payload.chat_message);
-        }
-        showToast(error.message, true);
+        state.pendingChatMessage = { body, id: messageId };
+        showToast(`Pesan tersimpan di browser ini, tetapi P2P belum terkirim: ${error.message}`, true);
     }
 }
 
@@ -412,27 +664,42 @@ async function requestFileTransfer(event) {
 
     const file = state.selectedFile;
     const request = state.pendingTransferRequest ?? {
-        recipients: selectedRecipientIds.map((receiverId) => ({
-            client_transfer_id: crypto.randomUUID(),
-            receiver_id: Number(receiverId),
-        })),
-        file_name: file.name,
-        mime_type: file.type || 'application/octet-stream',
-        file_size: file.size,
+        file,
+        transfers: selectedRecipientIds.map((receiverId) => {
+            const recipient = state.onlineUsers.get(receiverId);
+            return {
+                id: crypto.randomUUID(),
+                room_id: state.room.id,
+                sender_id: state.user.id,
+                sender_name: state.user.name,
+                receiver_id: Number(receiverId),
+                receiver_name: recipient.name,
+                file_name: file.name,
+                mime_type: file.type || 'application/octet-stream',
+                file_size: file.size,
+                status: 'pending',
+                created_at: new Date().toISOString(),
+            };
+        }),
     };
+    const recipients = request.transfers
+        .map((transfer) => state.chatPeers.get(String(transfer.receiver_id)));
+    if (recipients.some((peer) => peer?.channel?.readyState !== 'open')) {
+        showToast('Koneksi P2P ke semua penerima belum siap. Tunggu sebentar lalu coba lagi.', true);
+        return;
+    }
+
     state.pendingTransferRequest = request;
     state.transferSubmitting = true;
     updateFileButton();
 
     try {
-        const result = await api(`/api/rooms/${encodeURIComponent(state.room.id)}/transfers`, {
-            method: 'POST',
-            body: request,
-        });
-        for (const transfer of result.transfers ?? []) {
+        for (let index = 0; index < request.transfers.length; index += 1) {
+            const transfer = request.transfers[index];
             state.transfers.set(transfer.id, transfer);
-            state.files.set(transfer.id, file);
+            state.files.set(transfer.id, request.file);
             state.transferProgress.set(transfer.id, { percent: 0, direction: 'Mengirim' });
+            recipients[index].channel.send(JSON.stringify({ type: 'transfer.request', transfer }));
         }
         renderTransfers();
         state.pendingTransferRequest = null;
@@ -441,14 +708,7 @@ async function requestFileTransfer(event) {
         el('#selected-file-name').textContent = 'Pilih file untuk dikirim';
         el('#selected-file-size').textContent = 'File akan dikirim langsung ke browser penerima.';
     } catch (error) {
-        if (error.payload?.saved && Array.isArray(error.payload.transfers)) {
-            for (const transfer of error.payload.transfers) {
-                state.transfers.set(transfer.id, transfer);
-                state.files.set(transfer.id, file);
-            }
-            renderTransfers();
-        }
-        showToast(error.message, true);
+        showToast(`Permintaan P2P belum terkirim ke semua penerima: ${error.message}`, true);
     } finally {
         state.transferSubmitting = false;
         updateFileButton();
@@ -456,16 +716,23 @@ async function requestFileTransfer(event) {
 }
 
 function receiveTransferRequest(transfer) {
-    if (!transfer?.id) return;
+    if (
+        !transfer?.id
+        || String(transfer.receiver_id) !== String(state.user.id)
+        || state.transfers.has(transfer.id)
+    ) return;
     state.transfers.set(transfer.id, transfer);
     renderTransfers();
-    if (String(transfer.receiver_id) === String(state.user.id)) {
-        showToast(`${transfer.sender_name} meminta mengirim ${transfer.file_name}.`);
-    }
+    showToast(`${transfer.sender_name} meminta mengirim ${transfer.file_name}.`);
 }
 
 function receiveTransferUpdate(transfer) {
-    if (!transfer?.id) return;
+    const current = state.transfers.get(transfer?.id);
+    if (
+        !current
+        || String(current.sender_id) !== String(transfer.sender_id)
+        || String(current.receiver_id) !== String(transfer.receiver_id)
+    ) return;
     state.transfers.set(transfer.id, transfer);
     renderTransfers();
 
@@ -579,24 +846,50 @@ function actionButton(label, action, transferId, primary) {
     return button;
 }
 
-async function updateTransfer(transferId, action) {
-    try {
-        const result = await api(`/api/transfers/${encodeURIComponent(transferId)}/${action}`, {
-            method: 'POST',
-            body: {},
-        });
-        state.transfers.set(transferId, result.transfer);
-        renderTransfers();
-        if (action === 'accept') showToast('Permintaan diterima. Menunggu koneksi langsung…');
-        if (action === 'decline') showToast('Permintaan file ditolak.');
-        if (action === 'cancel') closePeer(transferId);
-    } catch (error) {
-        if (error.payload?.saved && error.payload.transfer) {
-            state.transfers.set(transferId, error.payload.transfer);
-            renderTransfers();
-        }
-        showToast(error.message, true);
+function sendPeerMessage(userId, frame) {
+    const channel = state.chatPeers.get(String(userId))?.channel;
+    if (!channel || channel.readyState !== 'open') {
+        throw new Error('Koneksi P2P ke pengguna terputus.');
     }
+    channel.send(JSON.stringify(frame));
+}
+
+async function updateTransfer(transferId, action) {
+    const transfer = state.transfers.get(transferId);
+    if (!transfer) return;
+
+    const isSender = String(transfer.sender_id) === String(state.user.id);
+    const isReceiver = String(transfer.receiver_id) === String(state.user.id);
+    const allowed = {
+        accept: isReceiver && transfer.status === 'pending',
+        decline: isReceiver && transfer.status === 'pending',
+        cancel: (isSender || isReceiver) && ['pending', 'accepted'].includes(transfer.status),
+        complete: (isSender || isReceiver) && transfer.status === 'accepted',
+        fail: (isSender || isReceiver) && transfer.status === 'accepted',
+    };
+    const statuses = {
+        accept: 'accepted',
+        decline: 'declined',
+        cancel: 'cancelled',
+        complete: 'completed',
+        fail: 'failed',
+    };
+    if (!allowed[action]) return;
+
+    const updated = { ...transfer, status: statuses[action] };
+    const peerId = isSender ? transfer.receiver_id : transfer.sender_id;
+    try {
+        sendPeerMessage(peerId, { type: 'transfer.update', transfer: updated });
+    } catch (error) {
+        showToast(error.message, true);
+        return;
+    }
+
+    state.transfers.set(transferId, updated);
+    renderTransfers();
+    if (action === 'accept') showToast('Permintaan diterima. Menunggu koneksi langsung…');
+    if (action === 'decline') showToast('Permintaan file ditolak.');
+    if (['cancel', 'complete', 'fail'].includes(action)) closePeer(transferId);
 }
 
 function setTransferProgress(transferId, progress) {
@@ -677,9 +970,27 @@ async function startOffer(transfer, file) {
 
 async function handleSignal(message) {
     const signal = message?.data;
-    const transfer = state.transfers.get(signal?.transfer_id);
-    const from = String(message?.clientId ?? '');
-    if (!signal || !transfer || signal.to !== String(state.user.id)) return;
+    const identity = parseRoomClientId(message?.clientId);
+    const from = identity?.userId;
+    if (
+        !signal
+        || !identity
+        || identity.fingerprint !== state.networkFingerprint
+        || signal.to !== String(state.user.id)
+    ) return;
+
+    if (signal.transfer_id === chatSignalId()) {
+        try {
+            await handleChatSignal(message, signal);
+        } catch (error) {
+            closeChatPeer(from);
+            showToast(`Signaling chat P2P gagal: ${error.message}`, true);
+        }
+        return;
+    }
+
+    const transfer = state.transfers.get(signal.transfer_id);
+    if (!transfer) return;
     if (transfer.status !== 'accepted') return;
 
     const currentIsSender = String(transfer.sender_id) === String(state.user.id);
@@ -928,6 +1239,7 @@ async function leaveRoom() {
     if (!room) return;
 
     for (const transferId of [...state.peers.keys()]) closePeer(transferId);
+    for (const userId of [...state.chatPeers.keys()]) closeChatPeer(userId);
     try {
         await state.channel?.presence.leave();
     } catch {
@@ -948,11 +1260,14 @@ async function leaveRoom() {
     }
     state.room = null;
     state.onlineUsers.clear();
+    state.blockedNetworkPeers.clear();
+    state.networkFingerprint = null;
     state.pendingChatMessage = null;
     state.transfers.clear();
     state.transferProgress.clear();
     state.files.clear();
     state.pendingCandidates.clear();
+    state.chatCandidates.clear();
     state.pendingTransferRequest = null;
     el('#active-room').hidden = true;
     el('#room-empty').hidden = false;

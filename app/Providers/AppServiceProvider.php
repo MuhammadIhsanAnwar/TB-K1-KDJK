@@ -24,7 +24,5 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('room-create', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
         RateLimiter::for('room-join', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
-        RateLimiter::for('chat-message', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
-        RateLimiter::for('transfer-create', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
     }
 }

@@ -36,14 +36,4 @@ class Room extends Model
     {
         return $this->hasMany(RoomMember::class);
     }
-
-    public function messages(): HasMany
-    {
-        return $this->hasMany(ChatMessage::class);
-    }
-
-    public function transfers(): HasMany
-    {
-        return $this->hasMany(FileTransfer::class);
-    }
 }

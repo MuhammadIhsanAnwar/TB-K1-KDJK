@@ -82,7 +82,8 @@ class SharingApiTest extends TestCase
 
         Http::assertSent(fn ($request) => str_contains($request->url(), 'p2p%3Aroom%3A'.$room->public_id)
             && $request['0']['name'] === 'chat.message'
-            && $request['0']['data']['body'] === 'Halo room');
+            && $request['0']['data']['body'] === 'Halo room'
+            && ! isset($request['0']['clientId']));
     }
 
     public function test_ably_token_is_scoped_to_the_joined_room_and_user(): void
@@ -173,17 +174,20 @@ class SharingApiTest extends TestCase
             && $request['0']['data']['status'] === 'cancelled');
     }
 
-    public function test_transfer_requests_store_metadata_and_allow_only_the_recipient_to_accept(): void
+    public function test_transfer_requests_create_independent_approval_for_each_recipient(): void
     {
         $sender = $this->guestUser();
         $receiver = $this->guestUser();
+        $secondReceiver = $this->guestUser();
         $room = $this->createRoomWithMember($sender);
-        RoomMember::query()->create([
-            'room_id' => $room->getKey(),
-            'user_id' => $receiver->getKey(),
-            'joined_at' => now(),
-            'last_seen_at' => now(),
-        ]);
+        foreach ([$receiver, $secondReceiver] as $member) {
+            RoomMember::query()->create([
+                'room_id' => $room->getKey(),
+                'user_id' => $member->getKey(),
+                'joined_at' => now(),
+                'last_seen_at' => now(),
+            ]);
+        }
         config(['services.ably.key' => 'test-key-name:'.str_repeat('s', 32)]);
 
         Http::fake([
@@ -191,38 +195,60 @@ class SharingApiTest extends TestCase
         ]);
 
         $response = $this->actingAs($sender)->postJson("/api/rooms/{$room->public_id}/transfers", [
-            'client_transfer_id' => '44996ed0-f200-4d3a-98e9-7487eb1527df',
-            'receiver_id' => $receiver->getKey(),
+            'recipients' => [
+                [
+                    'client_transfer_id' => '44996ed0-f200-4d3a-98e9-7487eb1527df',
+                    'receiver_id' => $receiver->getKey(),
+                ],
+                [
+                    'client_transfer_id' => 'ca623bd3-8796-40a6-b79a-8fdc927b1722',
+                    'receiver_id' => $secondReceiver->getKey(),
+                ],
+            ],
             'file_name' => 'photo.png',
             'mime_type' => 'image/png',
             'file_size' => 1024,
         ]);
 
-        $response->assertCreated()->assertJsonPath('transfer.status', 'pending');
-        $transferId = $response->json('transfer.id');
-        $transfer = FileTransfer::query()->where('public_id', $transferId)->firstOrFail();
+        $response->assertCreated()->assertJsonCount(2, 'transfers')
+            ->assertJsonPath('transfers.0.status', 'pending')
+            ->assertJsonPath('transfers.1.status', 'pending');
+        $firstTransferId = $response->json('transfers.0.id');
+        $secondTransferId = $response->json('transfers.1.id');
+        $firstTransfer = FileTransfer::query()->where('public_id', $firstTransferId)->firstOrFail();
+        $secondTransfer = FileTransfer::query()->where('public_id', $secondTransferId)->firstOrFail();
 
         $this->assertDatabaseHas('file_transfers', [
-            'id' => $transfer->getKey(),
+            'id' => $firstTransfer->getKey(),
             'file_name' => 'photo.png',
             'file_size' => 1024,
             'status' => 'pending',
         ]);
-        $this->assertArrayNotHasKey('content', $response->json('transfer'));
+        $this->assertArrayNotHasKey('content', $response->json('transfers.0'));
 
         $this->actingAs($sender)
-            ->postJson("/api/transfers/{$transferId}/accept")
+            ->postJson("/api/transfers/{$firstTransferId}/accept")
             ->assertForbidden();
 
         $this->actingAs($receiver)
-            ->postJson("/api/transfers/{$transferId}/accept")
+            ->postJson("/api/transfers/{$firstTransferId}/accept")
             ->assertOk()
             ->assertJsonPath('transfer.status', 'accepted');
 
+        $this->actingAs($secondReceiver)
+            ->postJson("/api/transfers/{$secondTransferId}/decline")
+            ->assertOk()
+            ->assertJsonPath('transfer.status', 'declined');
+
         $this->assertDatabaseHas('file_transfers', [
-            'id' => $transfer->getKey(),
+            'id' => $firstTransfer->getKey(),
             'status' => 'accepted',
         ]);
+        $this->assertDatabaseHas('file_transfers', [
+            'id' => $secondTransfer->getKey(),
+            'status' => 'declined',
+        ]);
+        Http::assertSentCount(4);
     }
 
     private function createRoomWithMember(User $user): Room

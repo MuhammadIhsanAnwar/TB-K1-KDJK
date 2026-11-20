@@ -10,12 +10,15 @@ const state = {
     channel: null,
     onlineUsers: new Map(),
     messages: new Set(),
+    pendingChatMessage: null,
     transfers: new Map(),
     transferProgress: new Map(),
     files: new Map(),
     peers: new Map(),
     pendingCandidates: new Map(),
     selectedFile: null,
+    pendingTransferRequest: null,
+    transferSubmitting: false,
 };
 
 const el = (selector) => document.querySelector(selector);
@@ -190,10 +193,13 @@ async function openRoom(room) {
     state.room = room;
     state.onlineUsers.clear();
     state.messages.clear();
+    state.pendingChatMessage = null;
     state.transfers.clear();
     state.transferProgress.clear();
     state.files.clear();
     state.pendingCandidates.clear();
+    state.pendingTransferRequest = null;
+    el('#recipient-select').replaceChildren();
     el('#room-empty').hidden = true;
     el('#active-room').hidden = false;
     el('#active-room-name').textContent = room.name;
@@ -286,8 +292,8 @@ function renderOnlineUsers() {
     }
 
     const select = el('#recipient-select');
-    const selected = select.value;
-    select.replaceChildren(new Option('Pilih pengguna online', ''));
+    const selected = new Set([...select.selectedOptions].map((option) => option.value));
+    select.replaceChildren();
 
     for (const user of users) {
         const row = document.createElement('div');
@@ -306,12 +312,10 @@ function renderOnlineUsers() {
         container.append(row);
 
         if (user.id !== String(state.user.id)) {
-            select.add(new Option(user.name, user.id));
+            const option = new Option(user.name, user.id);
+            option.selected = selected.has(user.id);
+            select.add(option);
         }
-    }
-
-    if ([...select.options].some((option) => option.value === selected)) {
-        select.value = selected;
     }
     updateFileButton();
 }
@@ -347,21 +351,26 @@ async function sendChat(event) {
     const body = input.value.trim();
     if (!body) return;
 
+    const clientMessageId = state.pendingChatMessage?.body === body
+        ? state.pendingChatMessage.clientMessageId
+        : crypto.randomUUID();
+
     try {
         const result = await api(`/api/rooms/${encodeURIComponent(state.room.id)}/messages`, {
             method: 'POST',
             body: {
-                client_message_id: crypto.randomUUID(),
+                client_message_id: clientMessageId,
                 body,
             },
         });
         addChatMessage(result.message ?? result.chat_message);
         if (result.saved) showToast(result.message, true);
+        state.pendingChatMessage = null;
         input.value = '';
     } catch (error) {
+        state.pendingChatMessage = { body, clientMessageId };
         if (error.payload?.saved && error.payload.chat_message) {
             addChatMessage(error.payload.chat_message);
-            input.value = '';
         }
         showToast(error.message, true);
     }
@@ -370,6 +379,7 @@ async function sendChat(event) {
 function onFileSelection(event) {
     const file = event.currentTarget.files?.[0] ?? null;
     state.selectedFile = file;
+    state.pendingTransferRequest = null;
     if (file && file.size > MAX_FILE_SIZE) {
         state.selectedFile = null;
         event.currentTarget.value = '';
@@ -384,48 +394,64 @@ function onFileSelection(event) {
 }
 
 function updateFileButton() {
-    el('#send-file-button').disabled = !state.selectedFile || !el('#recipient-select').value;
+    const hasRecipients = el('#recipient-select').selectedOptions.length > 0;
+    el('#send-file-button').disabled = !state.selectedFile || !hasRecipients || state.transferSubmitting;
 }
 
 async function requestFileTransfer(event) {
     event.preventDefault();
     if (!state.room || !state.selectedFile) return;
 
-    const recipientId = el('#recipient-select').value;
-    if (!recipientId) {
+    const selectedRecipientIds = [...el('#recipient-select').selectedOptions]
+        .map((option) => option.value)
+        .filter(Boolean);
+    if (!selectedRecipientIds.length) {
         showToast('Pilih pengguna online terlebih dahulu.', true);
         return;
     }
 
     const file = state.selectedFile;
+    const request = state.pendingTransferRequest ?? {
+        recipients: selectedRecipientIds.map((receiverId) => ({
+            client_transfer_id: crypto.randomUUID(),
+            receiver_id: Number(receiverId),
+        })),
+        file_name: file.name,
+        mime_type: file.type || 'application/octet-stream',
+        file_size: file.size,
+    };
+    state.pendingTransferRequest = request;
+    state.transferSubmitting = true;
+    updateFileButton();
+
     try {
         const result = await api(`/api/rooms/${encodeURIComponent(state.room.id)}/transfers`, {
             method: 'POST',
-            body: {
-                client_transfer_id: crypto.randomUUID(),
-                receiver_id: Number(recipientId),
-                file_name: file.name,
-                mime_type: file.type || 'application/octet-stream',
-                file_size: file.size,
-            },
+            body: request,
         });
-        const transfer = result.transfer;
-        state.transfers.set(transfer.id, transfer);
-        state.files.set(transfer.id, file);
-        state.transferProgress.set(transfer.id, { percent: 0, direction: 'Mengirim' });
+        for (const transfer of result.transfers ?? []) {
+            state.transfers.set(transfer.id, transfer);
+            state.files.set(transfer.id, file);
+            state.transferProgress.set(transfer.id, { percent: 0, direction: 'Mengirim' });
+        }
         renderTransfers();
+        state.pendingTransferRequest = null;
         state.selectedFile = null;
         el('#file-input').value = '';
         el('#selected-file-name').textContent = 'Pilih file untuk dikirim';
         el('#selected-file-size').textContent = 'File akan dikirim langsung ke browser penerima.';
-        updateFileButton();
     } catch (error) {
-        if (error.payload?.saved && error.payload.transfer) {
-            state.transfers.set(error.payload.transfer.id, error.payload.transfer);
-            state.files.set(error.payload.transfer.id, file);
+        if (error.payload?.saved && Array.isArray(error.payload.transfers)) {
+            for (const transfer of error.payload.transfers) {
+                state.transfers.set(transfer.id, transfer);
+                state.files.set(transfer.id, file);
+            }
             renderTransfers();
         }
         showToast(error.message, true);
+    } finally {
+        state.transferSubmitting = false;
+        updateFileButton();
     }
 }
 
@@ -922,10 +948,12 @@ async function leaveRoom() {
     }
     state.room = null;
     state.onlineUsers.clear();
+    state.pendingChatMessage = null;
     state.transfers.clear();
     state.transferProgress.clear();
     state.files.clear();
     state.pendingCandidates.clear();
+    state.pendingTransferRequest = null;
     el('#active-room').hidden = true;
     el('#room-empty').hidden = false;
     el('#online-members').replaceChildren();
@@ -1005,7 +1033,10 @@ function bindEvents() {
     el('#chat-form').addEventListener('submit', (event) => void sendChat(event));
     el('#file-input').addEventListener('change', onFileSelection);
     el('#send-file-form').addEventListener('submit', (event) => void requestFileTransfer(event));
-    el('#recipient-select').addEventListener('change', updateFileButton);
+    el('#recipient-select').addEventListener('change', () => {
+        state.pendingTransferRequest = null;
+        updateFileButton();
+    });
     el('#copy-invite').addEventListener('click', () => void copyInvite());
     el('#show-qr').addEventListener('click', () => void showQrCode());
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());

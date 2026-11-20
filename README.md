@@ -1,12 +1,12 @@
 # TB-K1-KDJK — Berbagi File P2P
 
-Aplikasi berbagi file dan chat per-room berbasis Laravel. Tidak ada formulir daftar atau login; setiap browser mendapat identitas tamu otomatis. Chat dan metadata transfer disimpan di MySQL; isi file dikirim langsung antar-browser melalui WebRTC dan tidak diunggah atau disimpan oleh server. Ably digunakan untuk presence, chat realtime, serta signaling WebRTC.
+Aplikasi berbagi file dan chat per-room berbasis Laravel. Tidak ada formulir daftar atau login; setiap browser mendapat identitas tamu otomatis. Pengirim dapat memilih beberapa anggota room untuk satu file; setiap penerima memberi persetujuan secara terpisah. Chat dan metadata transfer disimpan di MySQL; isi file dikirim langsung antar-browser melalui WebRTC dan tidak diunggah atau disimpan oleh server. Ably digunakan untuk presence, chat realtime, serta signaling WebRTC.
 
 ## Kebutuhan
 
 - PHP 8.3+ dengan ekstensi Laravel yang diperlukan, Composer, dan MySQL/MariaDB.
 - Node.js dan npm untuk membangun aset frontend.
-- API key Ably untuk fitur realtime.
+- API key Ably untuk fitur realtime dengan kapabilitas `publish`, `subscribe`, dan `presence` pada channel `p2p:room:*`.
 - HTTPS untuk penggunaan di hosting dan WebRTC.
 
 ## Menjalankan secara lokal

@@ -145,9 +145,8 @@
                                     <input id="file-input" type="file" hidden>
                                     <label class="recipient-picker">
                                         <span>Kirim kepada</span>
-                                        <select id="recipient-select" required>
-                                            <option value="">Pilih pengguna online</option>
-                                        </select>
+                                        <select id="recipient-select" required multiple size="4"></select>
+                                        <small>Pilih satu atau beberapa pengguna online. Setiap penerima akan diminta menerima atau menolak.</small>
                                     </label>
                                     <button id="send-file-button" class="button button-primary" type="submit" disabled>Kirim file <span>→</span></button>
                                 </form>

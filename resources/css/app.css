@@ -171,6 +171,8 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .file-picker-browse { margin-left: auto; color: #6979dc; font-size: 9px; font-weight: 750; white-space: nowrap; }
 .recipient-picker { display: grid; gap: 6px; color: #8290a6; font-size: 8px; font-weight: 700; }
 .recipient-picker select { padding: 10px; font-size: 9px; }
+.recipient-picker select[multiple] { min-height: 74px; }
+.recipient-picker small { color: #a3acbb; font-size: 8px; line-height: 1.4; }
 .send-file-form > .button { min-height: 37px; font-size: 10px; white-space: nowrap; }
 .transfers-list { display: grid; gap: 8px; margin-top: 13px; }
 .transfer-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 11px 12px; border: 1px solid #eaedf3; border-radius: 11px; background: #fff; }

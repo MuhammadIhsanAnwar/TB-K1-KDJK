@@ -16,7 +16,8 @@ class SharingApiTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Buat room baru')
-            ->assertSee('Punya kode undangan?');
+            ->assertSee('Punya kode room?')
+            ->assertSee('Masukkan kode room 12 karakter');
     }
 
     public function test_database_backed_room_and_message_endpoints_are_removed(): void

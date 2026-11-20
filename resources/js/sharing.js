@@ -261,20 +261,25 @@ async function createRoom(event) {
     event.preventDefault();
     try {
         const id = generateRoomCode();
-        const invitation = await api('/api/rooms/invitation', {
-            method: 'POST',
-            body: { room_id: id },
-        });
-        if (typeof invitation.room_proof !== 'string' || !/^[a-f0-9]{32}$/i.test(invitation.room_proof)) {
-            throw new Error('Bukti undangan room tidak valid.');
-        }
-        const room = { id, name: `Room ${id}`, proof: invitation.room_proof };
+        const room = { id, name: `Room ${id}`, proof: await requestRoomProof(id) };
         rememberRoom(room);
         await openRoom(room);
         if (state.room?.id === room.id) updateRoomUrl(room);
     } catch (error) {
         showToast(error.message, true);
     }
+}
+
+async function requestRoomProof(roomId) {
+    const invitation = await api('/api/rooms/invitation', {
+        method: 'POST',
+        body: { room_id: roomId },
+    });
+    if (typeof invitation.room_proof !== 'string' || !/^[a-f0-9]{32}$/i.test(invitation.room_proof)) {
+        throw new Error('Bukti undangan room tidak valid.');
+    }
+
+    return invitation.room_proof.toLowerCase();
 }
 
 async function joinRoom(invitation) {
@@ -285,8 +290,8 @@ async function joinRoom(invitation) {
     const roomCode = parts[0].toUpperCase();
     const savedRoom = readRecentRooms().find((recent) => recent.id === roomCode);
     const proof = typeof invitation === 'object' && invitation !== null
-        ? invitation.proof ?? savedRoom?.proof ?? null
-        : parts[1] ?? savedRoom?.proof ?? null;
+        ? invitation.proof ?? null
+        : parts[1] ?? null;
     if (!roomCode) return;
     if (!/^[A-Z0-9]{12}$/.test(roomCode)) {
         showToast('Kode room harus terdiri dari 12 huruf atau angka.', true);
@@ -298,10 +303,11 @@ async function joinRoom(invitation) {
     }
 
     try {
+        const roomProof = proof?.toLowerCase() ?? await requestRoomProof(roomCode);
         const room = {
             id: roomCode,
             name: savedRoom?.name ?? `Room ${roomCode}`,
-            proof: proof?.toLowerCase() ?? null,
+            proof: roomProof,
         };
         rememberRoom(room);
         await openRoom(room);
@@ -337,7 +343,7 @@ async function openRoom(room) {
     el('#copy-invite').disabled = true;
     el('#show-qr').disabled = true;
     el('#active-room-name').textContent = room.name;
-    el('#active-room-code').textContent = room.proof ? `${room.id}.${room.proof}` : room.id;
+    el('#active-room-code').textContent = room.id;
     el('#chat-messages').replaceChildren();
     loadLocalMessages(room.id);
     renderOnlineUsers();

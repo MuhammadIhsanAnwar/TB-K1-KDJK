@@ -58,9 +58,9 @@
                         </form>
 
                         <form id="join-room-form" class="join-form">
-                            <label for="room-code">Punya kode undangan?</label>
+                            <label for="room-code">Punya kode room?</label>
                             <div class="join-input-row">
-                                <input id="room-code" name="room_id" type="text" maxlength="45" autocomplete="off" placeholder="Tempel kode undangan lengkap" required>
+                                <input id="room-code" name="room_id" type="text" maxlength="45" autocomplete="off" placeholder="Masukkan kode room 12 karakter" required>
                                 <button class="button button-outline button-small" type="submit">Gabung</button>
                             </div>
                         </form>

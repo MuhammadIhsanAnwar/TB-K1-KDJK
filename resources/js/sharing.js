@@ -1663,18 +1663,6 @@ function bindEvents() {
     updateFileButton();
     });
 
-    el('#clear-recipients').addEventListener('click', () => {
-        const select = el('#recipient-select');
-
-        for (const option of select.options) {
-            option.selected = false;
-        }
-
-        state.pendingTransferRequest = null;
-        updateRecipientSelectionControls();
-        updateFileButton();
-    });
-
     el('#copy-invite').addEventListener('click', () => void copyInvite());
     el('#show-qr').addEventListener('click', () => void showQrCode());
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());

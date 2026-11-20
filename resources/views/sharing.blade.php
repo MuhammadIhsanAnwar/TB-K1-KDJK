@@ -156,13 +156,6 @@
                                             Pilih Semua
                                         </button>
 
-                                        <button
-                                            type="button"
-                                            id="clear-recipients"
-                                            class="button button-outline"
-                                        >
-                                            Hapus Pilihan
-                                        </button>
                                     </div>
 
                                     <select id="recipient-select" required multiple size="4"></select>

@@ -8,6 +8,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-logo">R<span>.</span></div>
+            <h2>ruang<span>.</span></h2>
+            <p>Menyiapkan ruang untukmu...</p>
+            <div class="loader-spinner"></div>
+        </div>
+    </div>
+
     <div class="page-shell">
         <header class="topbar">
             <a class="brand" href="/" aria-label="Ruang - beranda">

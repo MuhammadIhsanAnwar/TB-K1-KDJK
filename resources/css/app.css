@@ -292,3 +292,75 @@ button:disabled { cursor: not-allowed; opacity: .55; }
     font-weight: 700;
     color: #586cde;
 }
+/* PAGE LOADER */
+.page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f172a;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.page-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loader-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #ffffff;
+}
+
+.loader-logo {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    background: #6366f1;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.loader-logo span,
+.loader-content h2 span {
+    color: #a5b4fc;
+}
+
+.loader-content h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.loader-content p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.loader-spinner {
+    width: 30px;
+    height: 30px;
+    margin-top: 12px;
+    border: 3px solid #334155;
+    border-top-color: #818cf8;
+    border-radius: 50%;
+    animation: loader-spin 0.8s linear infinite;
+}
+
+@keyframes loader-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

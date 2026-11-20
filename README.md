@@ -1,6 +1,6 @@
 # TB-K1-KDJK — Berbagi File P2P
 
-Aplikasi berbagi file dan chat per-room berbasis Laravel tanpa akun. Room code dan identitas tamu dibuat di browser, sedangkan daftar room serta riwayat chat disimpan hanya di `localStorage` browser tersebut. Pesan, permintaan transfer, dan isi file dikirim langsung antar-browser melalui WebRTC; server tidak menyimpan room, anggota, pesan, metadata transfer, atau file. Ably hanya dipakai untuk presence sementara dan signaling WebRTC. Setiap penerima file menyetujui atau menolak secara terpisah.
+Aplikasi berbagi file dan chat per-room berbasis Laravel tanpa akun. Room code dan identitas tamu dibuat di browser; server menandatangani undangan dengan HMAC yang terikat ke IP publik pembuat room tanpa menyimpan room. Daftar room serta riwayat chat disimpan hanya di `localStorage` browser tersebut. Pesan, permintaan transfer, dan isi file dikirim langsung antar-browser melalui WebRTC; server tidak menyimpan room, anggota, pesan, metadata transfer, atau file. Ably hanya dipakai untuk presence sementara dan signaling WebRTC. Setiap penerima file menyetujui atau menolak secara terpisah.
 
 ## Kebutuhan
 
@@ -67,9 +67,10 @@ Aplikasi berbagi file dan chat per-room berbasis Laravel tanpa akun. Room code d
 
 - Batas default ukuran file 100 MiB. Room dan anggota hanya ada selama browser terhubung ke presence; room terakhir disimpan lokal di browser.
 - Migration `drop_database_backed_p2p_state` menghapus permanen tabel lama `rooms`, `room_members`, `chat_messages`, `file_transfers`, `users`, dan tabel sesi/token terkait. Aplikasi tidak memerlukannya setelah migration.
+- Bagikan tautan undangan atau kode lengkap `ROOMID.BUKTI`; bukti undangan ditandatangani server berdasarkan IP pembuat. Kode room 12 karakter saja tidak cukup untuk membuat ulang room kosong.
 - Saat peserta terakhir menekan **Keluar room**, aplikasi memeriksa Ably Presence; jika tidak ada peserta tersisa, kode room dan riwayat lokal dihapus dari browser tersebut. Presence room otomatis berakhir saat semua peserta terputus. Karena tidak ada penyimpanan pusat, riwayat lokal pada perangkat lain yang sedang offline tidak dapat dihapus jarak jauh.
 - Isi file hanya berada di memori browser selama transfer. Pesan dan permintaan file tidak ditulis ke database.
-- Peserta hanya dapat bertukar pesan/file jika fingerprint HMAC dari IP publik yang dilihat server sama. IP mentah tidak dibagikan atau disimpan. Port tidak dibandingkan: port sumber klien dapat berubah karena NAT/proxy dan kesamaan port tidak membuktikan satu jaringan lokal. Kesamaan IP publik juga bukan bukti mutlak satu LAN (misalnya VPN atau NAT bersama).
+- Server menampilkan IP publik yang dilihatnya pada halaman dan daftar peserta; IP ini juga terlihat oleh peserta room melalui Ably Presence. Akses ke room aktif ditolak jika IP publik berbeda dari peserta yang sudah ada. IP tidak disimpan di database. Port tidak dibandingkan: port sumber klien dapat berubah karena NAT/proxy. Kesamaan IP publik bukan bukti mutlak satu LAN (misalnya VPN atau NAT bersama).
 - Jika hosting berada di belakang reverse proxy, isi `TRUSTED_PROXIES` dengan alamat/CIDR proxy tepercaya yang dipisahkan koma agar Laravel membaca IP klien yang benar. Jangan percaya header proxy dari sumber yang tidak tepercaya.
 - Koneksi WebRTC menggunakan STUN tanpa TURN. NAT/firewall tertentu dapat menghalangi koneksi langsung; pesan dan transfer tidak memiliki fallback database/server sehingga perlu koneksi P2P aktif.
 - Tes dan build frontend:

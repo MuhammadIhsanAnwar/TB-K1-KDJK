@@ -26,8 +26,8 @@ class AblyCredentials
         return [$keyName, $secret];
     }
 
-    public function roomChannel(string $roomId): string
+    public function roomChannel(string $roomId, ?string $roomProof = null): string
     {
-        return 'p2p:room:'.$roomId;
+        return 'p2p:room:'.$roomId.($roomProof === null ? '' : ':'.$roomProof);
     }
 }

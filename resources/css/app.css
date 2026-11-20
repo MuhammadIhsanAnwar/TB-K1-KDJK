@@ -126,7 +126,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .room-live span { width: 6px; height: 6px; }
 .room-title-block h2 { margin: 5px 0 3px; color: #293650; font-size: 20px; letter-spacing: -.04em; }
 .room-code { color: #9ba5b5; font-size: 9px; }
-.room-code strong { color: #6172dc; font-weight: 750; letter-spacing: .08em; }
+.room-code strong { color: #6172dc; font-weight: 750; letter-spacing: .08em; overflow-wrap: anywhere; }
 .room-actions { display: flex; flex-wrap: wrap; justify-content: end; gap: 6px; }
 .room-actions .button { font-size: 10px; }
 .room-status { display: flex; align-items: center; gap: 9px; padding: 10px 23px; color: #8590a3; background: #fafbfe; font-size: 9px; }
@@ -142,6 +142,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .member-copy { display: grid; gap: 3px; min-width: 0; }
 .member-copy strong { overflow: hidden; color: #53617a; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
 .member-copy small { color: #a6afbd; font-size: 8px; }
+.member-copy .member-ip { overflow-wrap: anywhere; }
 .peer-note { display: flex; gap: 8px; margin-top: 25px; padding: 10px; border-radius: 10px; background: #f7f8fc; }
 .peer-note-icon { color: #7080df; font-size: 15px; }
 .peer-note p { margin: 0; color: #9ba5b5; font-size: 8px; line-height: 1.55; }

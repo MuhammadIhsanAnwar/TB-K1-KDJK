@@ -39,6 +39,7 @@ const state = {
     messages: new Set(),
     messageHistory: [],
     pendingChatMessage: null,
+    chatMessageSending: false,
     transfers: new Map(),
     transferProgress: new Map(),
     files: new Map(),
@@ -48,6 +49,8 @@ const state = {
     chatCandidates: new Map(),
     blockedNetworkPeers: new Set(),
     networkFingerprint: null,
+    publicIp: null,
+    presenceEntered: false,
     selectedFile: null,
     transferSubmitting: false,
     pendingTransferRequest: null,
@@ -59,6 +62,7 @@ const CHUNK_SIZE = 16 * 1024;
 const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }];
 let toastTimer;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
+let inviteProof = new URL(window.location.href).searchParams.get('proof');
 
 async function api(url, options = {}) {
     const headers = new Headers(options.headers ?? {});
@@ -90,10 +94,24 @@ async function api(url, options = {}) {
             : null;
         const error = new Error(validationMessage || payload?.message || `Permintaan gagal (${response.status}).`);
         error.payload = payload;
+        error.status = response.status;
         throw error;
     }
 
     return payload;
+}
+
+async function loadPublicIp() {
+    try {
+        const network = await api('/api/network');
+        if (typeof network.client_ip !== 'string') {
+            throw new Error('Alamat IP publik tidak valid.');
+        }
+        state.publicIp = network.client_ip;
+        el('#public-ip').textContent = `IP publik kamu: ${state.publicIp}`;
+    } catch {
+        el('#public-ip').textContent = 'IP publik belum dapat diperiksa.';
+    }
 }
 
 function showToast(message, isError = false) {
@@ -111,10 +129,12 @@ function initializeApp() {
         showToast('Penyimpanan lokal browser tidak tersedia; identitas dan room terakhir tidak tersimpan.', true);
     }
     void loadRecentRooms();
+    void loadPublicIp();
     if (inviteCode) {
-        el('#room-code').value = inviteCode;
-        void joinRoom(inviteCode);
+        el('#room-code').value = inviteProof ? `${inviteCode}.${inviteProof}` : inviteCode;
+        void joinRoom({ id: inviteCode, proof: inviteProof });
         inviteCode = null;
+        inviteProof = null;
     }
 }
 
@@ -143,7 +163,11 @@ function readRecentRooms() {
     try {
         const rooms = JSON.parse(window.localStorage.getItem(LOCAL_ROOMS_KEY) ?? '[]');
         return Array.isArray(rooms)
-            ? rooms.filter((room) => /^[A-Z0-9]{12}$/.test(room?.id) && typeof room.name === 'string').slice(0, 20)
+            ? rooms.filter((room) => (
+                /^[A-Z0-9]{12}$/.test(room?.id)
+                && typeof room.name === 'string'
+                && (room.proof == null || /^[a-f0-9]{32}$/i.test(room.proof))
+            )).slice(0, 20)
             : [];
     } catch {
         localStorageAvailable = false;
@@ -162,7 +186,7 @@ function saveRecentRooms(rooms) {
 
 function rememberRoom(room) {
     const rooms = readRecentRooms().filter((recent) => recent.id !== room.id);
-    rooms.unshift({ id: room.id, name: room.name });
+    rooms.unshift({ id: room.id, name: room.name, proof: room.proof ?? null });
     saveRecentRooms(rooms);
     renderRecentRooms(rooms);
 }
@@ -184,9 +208,14 @@ function generateRoomCode() {
     return [...bytes].map((byte) => alphabet[byte & 31]).join('');
 }
 
-function updateRoomUrl(roomId) {
+function updateRoomUrl(room) {
     const url = new URL(window.location.href);
-    url.searchParams.set('room', roomId);
+    url.searchParams.set('room', room.id);
+    if (room.proof) {
+        url.searchParams.set('proof', room.proof);
+    } else {
+        url.searchParams.delete('proof');
+    }
     window.history.replaceState({}, '', url);
 }
 
@@ -211,7 +240,7 @@ function renderRecentRooms(rooms) {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'recent-room-button';
-        button.addEventListener('click', () => void joinRoom(room.id));
+        button.addEventListener('click', () => void joinRoom(room));
 
         const icon = document.createElement('span');
         icon.className = 'recent-room-icon';
@@ -232,36 +261,58 @@ async function createRoom(event) {
     event.preventDefault();
     try {
         const id = generateRoomCode();
-        const room = { id, name: `Room ${id}` };
+        const invitation = await api('/api/rooms/invitation', {
+            method: 'POST',
+            body: { room_id: id },
+        });
+        if (typeof invitation.room_proof !== 'string' || !/^[a-f0-9]{32}$/i.test(invitation.room_proof)) {
+            throw new Error('Bukti undangan room tidak valid.');
+        }
+        const room = { id, name: `Room ${id}`, proof: invitation.room_proof };
         rememberRoom(room);
         await openRoom(room);
-        updateRoomUrl(room.id);
+        if (state.room?.id === room.id) updateRoomUrl(room);
     } catch (error) {
         showToast(error.message, true);
     }
 }
 
-async function joinRoom(code) {
-    const roomCode = String(code ?? '').trim().toUpperCase();
+async function joinRoom(invitation) {
+    const rawCode = typeof invitation === 'object' && invitation !== null
+        ? String(invitation.id ?? '')
+        : String(invitation ?? '').trim();
+    const parts = rawCode.split('.');
+    const roomCode = parts[0].toUpperCase();
+    const savedRoom = readRecentRooms().find((recent) => recent.id === roomCode);
+    const proof = typeof invitation === 'object' && invitation !== null
+        ? invitation.proof ?? savedRoom?.proof ?? null
+        : parts[1] ?? savedRoom?.proof ?? null;
     if (!roomCode) return;
     if (!/^[A-Z0-9]{12}$/.test(roomCode)) {
         showToast('Kode room harus terdiri dari 12 huruf atau angka.', true);
         return;
     }
+    if (proof !== null && (typeof proof !== 'string' || !/^[a-f0-9]{32}$/i.test(proof))) {
+        showToast('Bukti undangan tidak valid.', true);
+        return;
+    }
 
     try {
-        const room = readRecentRooms().find((recent) => recent.id === roomCode)
-            ?? { id: roomCode, name: `Room ${roomCode}` };
+        const room = {
+            id: roomCode,
+            name: savedRoom?.name ?? `Room ${roomCode}`,
+            proof: proof?.toLowerCase() ?? null,
+        };
         rememberRoom(room);
         await openRoom(room);
-        updateRoomUrl(roomCode);
+        if (state.room?.id === roomCode) updateRoomUrl(room);
     } catch (error) {
         showToast(error.message, true);
     }
 }
 
 async function openRoom(room) {
-    if (state.room?.id === room.id) return;
+    if (state.room?.id === room.id && state.room?.proof === room.proof) return;
     if (state.room) await leaveRoom();
 
     state.room = room;
@@ -269,6 +320,7 @@ async function openRoom(room) {
     state.messages.clear();
     state.messageHistory = [];
     state.pendingChatMessage = null;
+    state.chatMessageSending = false;
     state.transfers.clear();
     state.transferProgress.clear();
     state.files.clear();
@@ -276,13 +328,16 @@ async function openRoom(room) {
     state.chatCandidates.clear();
     state.blockedNetworkPeers.clear();
     state.networkFingerprint = null;
+    state.presenceEntered = false;
     state.pendingTransferRequest = null;
     state.chatPeers.clear();
     el('#recipient-select').replaceChildren();
     el('#room-empty').hidden = true;
     el('#active-room').hidden = false;
+    el('#copy-invite').disabled = true;
+    el('#show-qr').disabled = true;
     el('#active-room-name').textContent = room.name;
-    el('#active-room-code').textContent = room.id;
+    el('#active-room-code').textContent = room.proof ? `${room.id}.${room.proof}` : room.id;
     el('#chat-messages').replaceChildren();
     loadLocalMessages(room.id);
     renderOnlineUsers();
@@ -292,25 +347,49 @@ async function openRoom(room) {
     try {
         await connectRealtime(room);
         await loadRecentRooms();
+        el('#copy-invite').disabled = false;
+        el('#show-qr').disabled = false;
     } catch (error) {
+        if (error.status === 404) {
+            await leaveRoom();
+            removeRecentRoom(room.id);
+            showToast('Room tidak ditemukan atau jaringanmu berbeda dari pembuat room.', true);
+            return;
+        }
         setRoomStatus(`Realtime belum tersedia: ${error.message}`, false);
         showToast(error.message, true);
     }
 }
 
 async function connectRealtime(room) {
-    const network = await api(`/api/rooms/${encodeURIComponent(room.id)}/network`);
+    const networkUrl = new URL(
+        `/api/rooms/${encodeURIComponent(room.id)}/network`,
+        window.location.origin,
+    );
+    if (room.proof) networkUrl.searchParams.set('proof', room.proof);
+    const network = await api(networkUrl.toString());
     if (typeof network.network_fingerprint !== 'string' || network.network_fingerprint.length !== 64) {
         throw new Error('Fingerprint jaringan tidak valid.');
     }
+    if (typeof network.client_ip !== 'string') {
+        throw new Error('Alamat IP publik tidak valid.');
+    }
     state.networkFingerprint = network.network_fingerprint;
-
+    state.publicIp = network.client_ip;
+    el('#public-ip').textContent = `IP publik kamu: ${state.publicIp}`;
+    const tokenUrl = new URL(
+        `/api/rooms/${encodeURIComponent(room.id)}/ably-token`,
+        window.location.origin,
+    );
+    tokenUrl.searchParams.set('client_id', state.user.id);
+    if (room.proof) tokenUrl.searchParams.set('room_proof', room.proof);
     const client = createClient({
-        authUrl: `${window.location.origin}/api/rooms/${encodeURIComponent(room.id)}/ably-token?client_id=${encodeURIComponent(state.user.id)}`,
+        authUrl: tokenUrl.toString(),
         authMethod: 'GET',
         autoConnect: true,
     });
-    const channel = client.channels.get(`p2p:room:${room.id}`);
+    const channelName = `p2p:room:${room.id}${room.proof ? `:${room.proof}` : ''}`;
+    const channel = client.channels.get(channelName);
     state.ably = client;
     state.channel = channel;
 
@@ -328,7 +407,10 @@ async function connectRealtime(room) {
         channel.presence.subscribe((member) => handlePresence(member)),
     ]);
 
+    const existingMembers = await channel.presence.get();
+    for (const member of existingMembers) handlePresence(member);
     await channel.presence.enter({ name: state.user.name });
+    state.presenceEntered = true;
     const members = await channel.presence.get();
     for (const member of members) handlePresence(member);
 }
@@ -340,8 +422,24 @@ function setRoomStatus(message, connected) {
 }
 
 function parseRoomClientId(clientId) {
-    const match = /^([0-9a-f-]{36}):([a-f0-9]{64})$/i.exec(String(clientId ?? ''));
-    return match ? { userId: match[1], fingerprint: match[2].toLowerCase() } : null;
+    const match = /^([0-9a-f-]{36}):([a-f0-9]{64})(?::([A-Za-z0-9_-]+))?$/i.exec(String(clientId ?? ''));
+    if (!match) return null;
+
+    try {
+        let ipAddress = null;
+        if (match[3]) {
+            const encodedIp = match[3].replace(/-/g, '+').replace(/_/g, '/');
+            ipAddress = atob(encodedIp.padEnd(Math.ceil(encodedIp.length / 4) * 4, '='));
+            if (!/^[0-9a-f:.]+$/i.test(ipAddress)) return null;
+        }
+        return {
+            userId: match[1],
+            fingerprint: match[2].toLowerCase(),
+            ipAddress,
+        };
+    } catch {
+        return null;
+    }
 }
 
 function handlePresence(member) {
@@ -365,10 +463,15 @@ function handlePresence(member) {
         const user = {
             id: clientId,
             name: member.data?.name || `Pengguna ${clientId}`,
+            ipAddress: identity.ipAddress,
         };
         state.blockedNetworkPeers.delete(clientId);
         state.onlineUsers.set(clientId, user);
-        if (clientId !== String(state.user.id) && String(state.user.id) < clientId) {
+        if (
+            state.presenceEntered
+            && clientId !== String(state.user.id)
+            && String(state.user.id) < clientId
+        ) {
             void startChatOffer(user);
         }
     }
@@ -427,8 +530,11 @@ function bindChatChannel(userId, channel) {
     });
     channel.addEventListener('open', () => {
         setRoomStatus(`P2P terhubung · ${peer.user.name}`, true);
+        updateFileButton();
+        void flushPendingChatMessage();
     });
     channel.addEventListener('error', () => showToast('Koneksi pesan P2P mengalami error.', true));
+    channel.addEventListener('close', updateFileButton);
 }
 
 function closeChatPeer(userId) {
@@ -438,6 +544,7 @@ function closeChatPeer(userId) {
     peer.pc.close();
     state.chatPeers.delete(String(userId));
     state.chatCandidates.delete(String(userId));
+    updateFileButton();
 }
 
 async function startChatOffer(user) {
@@ -457,8 +564,7 @@ async function startChatOffer(user) {
     }
 }
 
-async function handleChatSignal(message, signal) {
-    const from = String(message?.clientId ?? '');
+async function handleChatSignal(from, signal) {
     const user = state.onlineUsers.get(from);
     if (!user || signal.to !== String(state.user.id) || from === String(state.user.id)) return;
 
@@ -584,7 +690,10 @@ function renderOnlineUsers() {
         name.textContent = user.name;
         const role = document.createElement('small');
         role.textContent = user.id === String(state.user.id) ? 'Kamu · online' : 'Online';
-        copy.append(name, role);
+        const ipAddress = document.createElement('small');
+        ipAddress.className = 'member-ip';
+        ipAddress.textContent = `IP publik · ${user.ipAddress ?? 'belum tersedia'}`;
+        copy.append(name, role, ipAddress);
         row.append(avatar, copy);
         container.append(row);
 
@@ -666,34 +775,53 @@ async function sendChat(event) {
         return;
     }
 
-    const recipients = recipientIds
-        .map((userId) => state.chatPeers.get(userId))
-        .filter((peer) => peer?.channel?.readyState === 'open');
-    if (recipients.length !== recipientIds.length) {
-        showToast('Koneksi P2P ke semua pengguna belum siap. Tunggu sebentar lalu coba lagi.', true);
+    if (state.pendingChatMessage && state.pendingChatMessage.body !== body) {
+        showToast('Pesan sebelumnya masih menunggu koneksi P2P. Kirim pesan itu terlebih dahulu.', true);
         return;
     }
 
-    const messageId = state.pendingChatMessage?.body === body
-        ? state.pendingChatMessage.id
-        : crypto.randomUUID();
-    const message = {
-        id: messageId,
-        user_id: state.user.id,
-        user_name: state.user.name,
-        body,
-        created_at: new Date().toISOString(),
-    };
+    if (!state.pendingChatMessage) {
+        const message = {
+            id: crypto.randomUUID(),
+            user_id: state.user.id,
+            user_name: state.user.name,
+            body,
+            created_at: new Date().toISOString(),
+        };
+        state.pendingChatMessage = { body, message };
+    }
 
+    if (!await flushPendingChatMessage()) {
+        showToast('Koneksi P2P sedang disiapkan; pesan akan dikirim otomatis saat semua pengguna siap.');
+    }
+}
+
+async function flushPendingChatMessage() {
+    const pending = state.pendingChatMessage;
+    if (!pending || state.chatMessageSending || !state.room) return false;
+
+    const recipientIds = [...state.onlineUsers.keys()]
+        .filter((userId) => userId !== String(state.user.id));
+    if (!recipientIds.length) return false;
+
+    const recipients = recipientIds.map((userId) => state.chatPeers.get(userId));
+    if (recipients.some((peer) => peer?.channel?.readyState !== 'open')) return false;
+
+    state.chatMessageSending = true;
     try {
-        addChatMessage(message);
-        const frame = JSON.stringify({ type: 'chat.message', message });
+        const frame = JSON.stringify({ type: 'chat.message', message: pending.message });
         for (const peer of recipients) peer.channel.send(frame);
+        addChatMessage(pending.message);
         state.pendingChatMessage = null;
-        input.value = '';
+        if (el('#chat-input').value.trim() === pending.body) {
+            el('#chat-input').value = '';
+        }
+        return true;
     } catch (error) {
-        state.pendingChatMessage = { body, id: messageId };
-        showToast(`Pesan tersimpan di browser ini, tetapi P2P belum terkirim: ${error.message}`, true);
+        showToast(`Pesan belum terkirim: ${error.message}. Pesan akan dicoba lagi saat koneksi siap.`, true);
+        return false;
+    } finally {
+        state.chatMessageSending = false;
     }
 }
 
@@ -715,8 +843,17 @@ function onFileSelection(event) {
 }
 
 function updateFileButton() {
-    const hasRecipients = el('#recipient-select').selectedOptions.length > 0;
-    el('#send-file-button').disabled = !state.selectedFile || !hasRecipients || state.transferSubmitting;
+    const recipientIds = [...el('#recipient-select').selectedOptions].map((option) => option.value);
+    const hasRecipients = recipientIds.length > 0;
+    const allConnected = hasRecipients && recipientIds.every((userId) => (
+        state.chatPeers.get(userId)?.channel?.readyState === 'open'
+    ));
+    el('#send-file-button').disabled = !state.selectedFile || !allConnected || state.transferSubmitting;
+    el('#recipient-status').textContent = !hasRecipients
+        ? 'Pilih satu atau beberapa pengguna online. Setiap penerima akan diminta menerima atau menolak.'
+        : allConnected
+            ? 'Koneksi P2P siap. Setiap penerima akan diminta menerima atau menolak.'
+            : 'Menyiapkan koneksi P2P ke penerima...';
 }
 
 async function requestFileTransfer(event) {
@@ -754,7 +891,7 @@ async function requestFileTransfer(event) {
     const recipients = request.transfers
         .map((transfer) => state.chatPeers.get(String(transfer.receiver_id)));
     if (recipients.some((peer) => peer?.channel?.readyState !== 'open')) {
-        showToast('Koneksi P2P ke semua penerima belum siap. Tunggu sebentar lalu coba lagi.', true);
+        showToast('Koneksi P2P sedang disiapkan. Tunggu sampai status koneksi siap sebelum mengirim.', true);
         return;
     }
 
@@ -1050,7 +1187,7 @@ async function handleSignal(message) {
 
     if (signal.transfer_id === chatSignalId()) {
         try {
-            await handleChatSignal(message, signal);
+            await handleChatSignal(from, signal);
         } catch (error) {
             closeChatPeer(from);
             showToast(`Signaling chat P2P gagal: ${error.message}`, true);
@@ -1278,6 +1415,8 @@ async function copyInvite() {
     if (!state.room) return;
     const invite = new URL(window.location.href);
     invite.searchParams.set('room', state.room.id);
+    if (state.room.proof) invite.searchParams.set('proof', state.room.proof);
+    else invite.searchParams.delete('proof');
     try {
         await navigator.clipboard.writeText(invite.toString());
         showToast('Tautan undangan disalin.');
@@ -1290,13 +1429,17 @@ async function showQrCode() {
     if (!state.room) return;
     const invite = new URL(window.location.href);
     invite.searchParams.set('room', state.room.id);
+    if (state.room.proof) invite.searchParams.set('proof', state.room.proof);
+    else invite.searchParams.delete('proof');
     try {
         await QRCode.toCanvas(el('#qr-canvas'), invite.toString(), {
             width: 240,
             margin: 1,
             color: { dark: '#17233c', light: '#ffffff' },
         });
-        el('#qr-room-code').textContent = state.room.id;
+        el('#qr-room-code').textContent = state.room.proof
+            ? `${state.room.id}.${state.room.proof}`
+            : state.room.id;
         el('#qr-dialog').showModal();
     } catch (error) {
         showToast(`QR tidak dapat dibuat: ${error.message}`, true);
@@ -1331,7 +1474,9 @@ async function leaveRoom() {
     state.onlineUsers.clear();
     state.blockedNetworkPeers.clear();
     state.networkFingerprint = null;
+    state.presenceEntered = false;
     state.pendingChatMessage = null;
+    state.chatMessageSending = false;
     state.transfers.clear();
     state.transferProgress.clear();
     state.files.clear();
@@ -1339,12 +1484,15 @@ async function leaveRoom() {
     state.chatCandidates.clear();
     state.pendingTransferRequest = null;
     el('#active-room').hidden = true;
+    el('#copy-invite').disabled = true;
+    el('#show-qr').disabled = true;
     el('#room-empty').hidden = false;
     el('#online-members').replaceChildren();
     el('#chat-messages').replaceChildren();
     el('#transfers-list').replaceChildren();
     const url = new URL(window.location.href);
     url.searchParams.delete('room');
+    url.searchParams.delete('proof');
     window.history.replaceState({}, '', url);
 }
 

@@ -32,6 +32,7 @@
                         <div>
                             <strong id="network-title">Memeriksa jaringan</strong>
                             <span id="network-detail">Pemeriksaan tidak menghalangi kamu masuk room.</span>
+                            <span id="public-ip">IP publik sedang diperiksa...</span>
                         </div>
                         <span id="network-indicator" class="network-indicator"></span>
                     </div>
@@ -59,7 +60,7 @@
                         <form id="join-room-form" class="join-form">
                             <label for="room-code">Punya kode undangan?</label>
                             <div class="join-input-row">
-                                <input id="room-code" name="room_id" type="text" maxlength="12" autocomplete="off" placeholder="Contoh: A1B2C3D4E5F6" required>
+                                <input id="room-code" name="room_id" type="text" maxlength="45" autocomplete="off" placeholder="Tempel kode undangan lengkap" required>
                                 <button class="button button-outline button-small" type="submit">Gabung</button>
                             </div>
                         </form>
@@ -91,8 +92,8 @@
                                     <span class="room-code">Kode <strong id="active-room-code"></strong></span>
                                 </div>
                                 <div class="room-actions">
-                                    <button id="copy-invite" class="button button-outline button-small" type="button">⧉ <span>Salin undangan</span></button>
-                                    <button id="show-qr" class="button button-outline button-small" type="button">▦ <span>QR</span></button>
+                                    <button id="copy-invite" class="button button-outline button-small" type="button" disabled>⧉ <span>Salin undangan</span></button>
+                                    <button id="show-qr" class="button button-outline button-small" type="button" disabled>▦ <span>QR</span></button>
                                     <button id="leave-room" class="button button-quiet button-small" type="button">Keluar room</button>
                                 </div>
                             </div>
@@ -146,7 +147,7 @@
                                     <label class="recipient-picker">
                                         <span>Kirim kepada</span>
                                         <select id="recipient-select" required multiple size="4"></select>
-                                        <small>Pilih satu atau beberapa pengguna online. Setiap penerima akan diminta menerima atau menolak.</small>
+                                        <small id="recipient-status">Pilih satu atau beberapa pengguna online. Setiap penerima akan diminta menerima atau menolak.</small>
                                     </label>
                                     <button id="send-file-button" class="button button-primary" type="submit" disabled>Kirim file <span>→</span></button>
                                 </form>

@@ -272,3 +272,23 @@ button:disabled { cursor: not-allowed; opacity: .55; }
     .transfer-controls { justify-content: space-between; }
     .page-footer { align-items: flex-start; flex-direction: column; gap: 8px; padding-bottom: 24px; }
 }
+.recipient-actions {
+    display: flex;
+    gap: 8px;
+    margin: 5px 0;
+}
+
+.recipient-actions .button {
+    padding: 7px 10px;
+    font-size: 9px;
+}
+
+.recipient-actions .button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#recipient-count {
+    font-weight: 700;
+    color: #586cde;
+}

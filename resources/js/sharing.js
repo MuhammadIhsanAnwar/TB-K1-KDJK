@@ -740,6 +740,7 @@ function renderOnlineUsers() {
             select.add(option);
         }
     }
+    updateRecipientSelectionControls();
     updateFileButton();
 }
 
@@ -1641,6 +1642,30 @@ function bindEvents() {
     el('#file-input').addEventListener('change', onFileSelection);
     el('#send-file-form').addEventListener('submit', (event) => void requestFileTransfer(event));
     el('#recipient-select').addEventListener('change', () => {
+    state.pendingTransferRequest = null;
+    updateRecipientSelectionControls();
+    updateFileButton();
+    });
+
+    el('#select-all-recipients').addEventListener('click', () => {
+        const select = el('#recipient-select');
+
+        for (const option of select.options) {
+            option.selected = true;
+        }
+
+        state.pendingTransferRequest = null;
+        updateRecipientSelectionControls();
+        updateFileButton();
+    });
+
+    el('#clear-recipients').addEventListener('click', () => {
+        const select = el('#recipient-select');
+
+        for (const option of select.options) {
+            option.selected = false;
+        }
+
         state.pendingTransferRequest = null;
         updateRecipientSelectionControls();
         updateFileButton();

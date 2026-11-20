@@ -144,27 +144,35 @@
                                         <span class="file-picker-browse">Pilih file</span>
                                     </label>
                                     <input id="file-input" type="file" hidden>
-                                    <label class="recipient-picker">
+                                    <div class="recipient-picker">
                                     <span>Kirim kepada</span>
+
                                     <div class="recipient-actions">
-                                        <button id="select-all-recipients"
-                                            class="button button-outline button-small"
-                                            type="button" disabled>
-                                            Pilih semua
+                                        <button
+                                            type="button"
+                                            id="select-all-recipients"
+                                            class="button button-outline"
+                                        >
+                                            Pilih Semua
                                         </button>
-                                        <span id="recipient-count" class="recipient-count">
-                                            0 dipilih
-                                        </span>
+
+                                        <button
+                                            type="button"
+                                            id="clear-recipients"
+                                            class="button button-outline"
+                                        >
+                                            Hapus Pilihan
+                                        </button>
                                     </div>
-                                    <select id="recipient-select" required multiple
-                                        size="4"
-                                        aria-label="Pilih satu atau beberapa penerima">
-                                    </select>
+
+                                    <select id="recipient-select" required multiple size="4"></select>
+
+                                    <small id="recipient-count">0 penerima dipilih</small>
+
                                     <small id="recipient-status">
-                                        Pilih satu orang, beberapa orang, atau pilih semua.
-                                        Setiap penerima harus menerima atau menolak file.
+                                        Pilih penerima atau gunakan tombol Pilih Semua.
                                     </small>
-                                </label>
+                                </div>
                                     <button id="send-file-button" class="button button-primary" type="submit" disabled>Kirim file <span>→</span></button>
                                 </form>
                                 <div id="transfers-list" class="transfers-list">

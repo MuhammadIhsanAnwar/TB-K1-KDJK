@@ -1,4 +1,4 @@
-import * as Ably from 'ably';
+import { createClient } from '@ably/pubsub-device';
 import QRCode from 'qrcode';
 
 const appConfig = window.sharingApp ?? {};
@@ -217,7 +217,7 @@ async function openRoom(room) {
 }
 
 async function connectRealtime(room) {
-    const client = new Ably.Realtime({
+    const client = createClient({
         authUrl: `${window.location.origin}/api/rooms/${encodeURIComponent(room.id)}/ably-token`,
         authMethod: 'GET',
         autoConnect: true,

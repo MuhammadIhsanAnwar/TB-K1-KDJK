@@ -145,10 +145,26 @@
                                     </label>
                                     <input id="file-input" type="file" hidden>
                                     <label class="recipient-picker">
-                                        <span>Kirim kepada</span>
-                                        <select id="recipient-select" required multiple size="4"></select>
-                                        <small id="recipient-status">Pilih satu atau beberapa pengguna online. Setiap penerima akan diminta menerima atau menolak.</small>
-                                    </label>
+                                    <span>Kirim kepada</span>
+                                    <div class="recipient-actions">
+                                        <button id="select-all-recipients"
+                                            class="button button-outline button-small"
+                                            type="button" disabled>
+                                            Pilih semua
+                                        </button>
+                                        <span id="recipient-count" class="recipient-count">
+                                            0 dipilih
+                                        </span>
+                                    </div>
+                                    <select id="recipient-select" required multiple
+                                        size="4"
+                                        aria-label="Pilih satu atau beberapa penerima">
+                                    </select>
+                                    <small id="recipient-status">
+                                        Pilih satu orang, beberapa orang, atau pilih semua.
+                                        Setiap penerima harus menerima atau menolak file.
+                                    </small>
+                                </label>
                                     <button id="send-file-button" class="button button-primary" type="submit" disabled>Kirim file <span>→</span></button>
                                 </form>
                                 <div id="transfers-list" class="transfers-list">

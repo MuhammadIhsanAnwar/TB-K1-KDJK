@@ -743,6 +743,40 @@ function renderOnlineUsers() {
     updateFileButton();
 }
 
+function updateRecipientSelectionControls() {
+    const select = el('#recipient-select');
+    const button = el('#select-all-recipients');
+    const count = el('#recipient-count');
+
+    const selectedCount = select.selectedOptions.length;
+    const totalCount = select.options.length;
+
+    button.disabled = totalCount === 0;
+    button.textContent = totalCount > 0
+        && selectedCount === totalCount
+        ? 'Batalkan pilihan'
+        : 'Pilih semua';
+
+    count.textContent =
+        `${selectedCount} dari ${totalCount} dipilih`;
+}
+
+function toggleAllRecipients() {
+    const select = el('#recipient-select');
+
+    const shouldSelectAll =
+        [...select.options].some(option => !option.selected);
+
+    for (const option of select.options) {
+        option.selected = shouldSelectAll;
+    }
+
+    state.pendingTransferRequest = null;
+
+    updateRecipientSelectionControls();
+    updateFileButton();
+}
+
 function addChatMessage(message) {
     if (
         !message?.id
@@ -887,10 +921,11 @@ function updateFileButton() {
     ));
     el('#send-file-button').disabled = !state.selectedFile || !allConnected || state.transferSubmitting;
     el('#recipient-status').textContent = !hasRecipients
-        ? 'Pilih satu atau beberapa pengguna online. Setiap penerima akan diminta menerima atau menolak.'
-        : allConnected
-            ? 'Koneksi P2P siap. Setiap penerima akan diminta menerima atau menolak.'
-            : 'Menyiapkan koneksi P2P ke penerima...';
+    ? 'Pilih satu orang, beberapa orang, atau pilih semua. Setiap penerima harus menerima atau menolak file.'
+    : allConnected
+        ? `${recipientIds.length} penerima siap. Masing-masing akan diminta menerima atau menolak file.`
+        : 'Menyiapkan koneksi P2P ke penerima yang dipilih...';
+    updateRecipientSelectionControls();
 }
 
 async function requestFileTransfer(event) {
@@ -1607,8 +1642,14 @@ function bindEvents() {
     el('#send-file-form').addEventListener('submit', (event) => void requestFileTransfer(event));
     el('#recipient-select').addEventListener('change', () => {
         state.pendingTransferRequest = null;
+        updateRecipientSelectionControls();
         updateFileButton();
     });
+
+    el('#select-all-recipients').addEventListener(
+        'click',
+        toggleAllRecipients
+    );
     el('#copy-invite').addEventListener('click', () => void copyInvite());
     el('#show-qr').addEventListener('click', () => void showQrCode());
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());

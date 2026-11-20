@@ -28,7 +28,7 @@ Aplikasi berbagi file dan chat per-room berbasis Laravel. Tidak ada formulir daf
    php artisan serve
    ```
 
-4. Buka `http://127.0.0.1:8000`; room bisa langsung dibuat atau diikuti tanpa akun. Untuk halaman migrasi lokal, isi `MIGRATE_ADMIN_PIN` di `.env`, kemudian buka `/migrate`.
+4. Buka `http://127.0.0.1:8000`; room bisa langsung dibuat atau diikuti tanpa akun. Halaman `/migrate` menggunakan `MIGRATE_ADMIN_PIN`.
 
 ## Konfigurasi hosting cPanel
 
@@ -51,18 +51,14 @@ Aplikasi berbagi file dan chat per-room berbasis Laravel. Tidak ada formulir daf
    CACHE_STORE=file
    QUEUE_CONNECTION=sync
    ABLY_API_KEY=nama-key:secret
+   MIGRATE_ADMIN_PIN=<PIN-admin>
    ```
 
    Buat `APP_KEY` sekali menggunakan `php artisan key:generate`; jangan menggantinya setelah aplikasi digunakan. Simpan secret Ably di `.env` server, bukan di variabel `VITE_*` atau kode browser.
 4. Jalankan `composer install --no-dev --optimize-autoloader`, `npm ci`, dan `npm run build` (build aset dapat dilakukan lokal lalu unggah folder `public/build`). Jika tersedia terminal cPanel, jalankan `php artisan config:cache` setelah konfigurasi selesai.
-5. Untuk menjalankan migrasi tanpa akses terminal, aktifkan sementara:
+5. Atur PIN hanya di `.env` server (jangan commit file ini), lalu buka `https://domain-anda/migrate`, masukkan PIN, dan pilih perintah. Tidak perlu mengatur `APP_ENV=production`; akses dari luar server hanya menerima HTTPS. Jika config Laravel dicache, jalankan `php artisan config:clear` setelah mengubah `.env`. PIN delapan digit mudah ditebak, jadi batasi URL dengan proteksi/IP allowlist cPanel dan jangan gunakan melalui HTTP.
 
-   ```dotenv
-   MIGRATE_REMOTE_ENABLED=true
-   MIGRATE_ADMIN_SECRET=<secret-acak-minimal-64-karakter>
-   ```
-
-   Buat secret dengan `php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"`. Setelah konfigurasi diterapkan, buka `https://domain-anda/migrate`, masukkan secret, lalu jalankan migrasi. Halaman `/migrate` tetap menampilkan petunjuk jika konfigurasi belum lengkap, tetapi tombol migrasi dinonaktifkan. Mode hosting mensyaratkan `APP_ENV=production`, HTTPS, `APP_KEY`, dan secret kuat; PIN lokal bukan kredensial hosting. Jika config Laravel dicache, jalankan `php artisan config:clear` setelah mengubah `.env`, lalu buat ulang cache bila diperlukan. Setelah migrasi berhasil, nonaktifkan `MIGRATE_REMOTE_ENABLED` dan hapus/rotasi secret.
+   Perintah yang tersedia dibatasi ke `migrate`, `db:seed`, `optimize`, `optimize:clear`, `cache:clear`, `config:clear`, `route:clear`, dan `view:clear`. Tidak ada input perintah atau argumen bebas.
 
 ## Batasan dan pengaturan
 

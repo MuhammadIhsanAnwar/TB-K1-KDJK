@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class MigrationPageTest extends TestCase
 {
+    private const TEST_PIN = 'test-admin-pin';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -20,28 +23,65 @@ class MigrationPageTest extends TestCase
         config([
             'app.env' => 'local',
             'app.key' => 'base64:'.base64_encode(str_repeat('a', 32)),
-            'migration.admin_pin' => '10982345',
+            'migration.admin_pin' => self::TEST_PIN,
             'session.driver' => 'database',
         ]);
 
         $this->get('/migrate')
             ->assertOk()
-            ->assertSee('Jalankan Migrasi Database');
+            ->assertSee('Jalankan Migrasi Database')
+            ->assertSee('PIN admin')
+            ->assertSee('migrate');
     }
 
-    public function test_migration_page_explains_when_hosting_access_is_not_configured(): void
+    public function test_remote_migration_page_is_available_without_production_environment(): void
     {
         config([
             'app.env' => 'local',
             'app.key' => 'base64:'.base64_encode(str_repeat('a', 32)),
-            'migration.admin_pin' => '10982345',
+            'migration.admin_pin' => self::TEST_PIN,
         ]);
 
-        $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.1'])
-            ->get('/migrate')
+        $this->withServerVariables([
+            'REMOTE_ADDR' => '203.0.113.10',
+            'HTTPS' => 'on',
+        ])
+            ->get('https://localhost/migrate')
             ->assertOk()
-            ->assertSee('APP_ENV=production')
-            ->assertSee('disabled', false);
+            ->assertSee('PIN admin')
+            ->assertSee('<button type="submit" >Jalankan perintah</button>', false);
+    }
+
+    public function test_remote_migration_requires_https_but_page_remains_accessible(): void
+    {
+        $key = 'base64:'.base64_encode(str_repeat('a', 32));
+        config([
+            'app.env' => 'local',
+            'app.key' => $key,
+            'migration.admin_pin' => self::TEST_PIN,
+        ]);
+
+        $insecureRequest = [
+            'REMOTE_ADDR' => '203.0.113.10',
+            'HTTPS' => 'off',
+            'SERVER_PORT' => 80,
+        ];
+        $this->withServerVariables($insecureRequest)
+            ->get('http://localhost/migrate')
+            ->assertOk()
+            ->assertSee('HTTPS')
+            ->assertSee('<button type="submit" disabled>Jalankan perintah</button>', false);
+
+        $timestamp = now()->timestamp;
+        $this->withServerVariables($insecureRequest)
+            ->post('http://localhost/migrate', [
+                'timestamp' => $timestamp,
+                'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
+                'credential' => self::TEST_PIN,
+                'command' => 'migrate',
+            ])
+            ->assertStatus(503)
+            ->assertSee('HTTPS');
     }
 
     public function test_migration_page_rejects_an_incorrect_pin(): void
@@ -51,7 +91,7 @@ class MigrationPageTest extends TestCase
         config([
             'app.env' => 'local',
             'app.key' => $key,
-            'migration.admin_pin' => '10982345',
+            'migration.admin_pin' => self::TEST_PIN,
         ]);
 
         $timestamp = now()->timestamp;
@@ -60,8 +100,50 @@ class MigrationPageTest extends TestCase
             'timestamp' => $timestamp,
             'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
             'credential' => 'wrong-pin',
+            'command' => 'migrate',
         ])->assertForbidden()
-            ->assertSee('Kredensial admin tidak sesuai.');
+            ->assertSee('PIN admin tidak sesuai.');
+    }
+
+    public function test_only_allowlisted_artisan_commands_are_executed(): void
+    {
+        $key = 'base64:'.base64_encode(str_repeat('a', 32));
+        config([
+            'app.env' => 'local',
+            'app.key' => $key,
+            'migration.admin_pin' => self::TEST_PIN,
+        ]);
+
+        Artisan::shouldReceive('call')->once()->with('optimize:clear', [])->andReturn(0);
+        Artisan::shouldReceive('output')->once()->andReturn('Cache optimized files cleared.');
+
+        $timestamp = now()->timestamp;
+        $this->post('/migrate', [
+            'timestamp' => $timestamp,
+            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
+            'credential' => self::TEST_PIN,
+            'command' => 'optimize:clear',
+        ])->assertOk()
+            ->assertSee('Perintah berhasil dijalankan.')
+            ->assertSee('Cache optimized files cleared.');
+    }
+
+    public function test_arbitrary_artisan_commands_are_rejected(): void
+    {
+        $key = 'base64:'.base64_encode(str_repeat('a', 32));
+        config([
+            'app.env' => 'local',
+            'app.key' => $key,
+            'migration.admin_pin' => self::TEST_PIN,
+        ]);
+        $timestamp = now()->timestamp;
+        $this->post('/migrate', [
+            'timestamp' => $timestamp,
+            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
+            'credential' => self::TEST_PIN,
+            'command' => 'shell:exec',
+        ])->assertUnprocessable()
+            ->assertSee('Perintah tidak tersedia.');
     }
 
     public function test_database_failure_is_reported_without_breaking_the_page(): void
@@ -71,7 +153,7 @@ class MigrationPageTest extends TestCase
         config([
             'app.env' => 'local',
             'app.key' => $key,
-            'migration.admin_pin' => '10982345',
+            'migration.admin_pin' => self::TEST_PIN,
             'database.default' => 'missing_connection',
         ]);
 
@@ -80,99 +162,10 @@ class MigrationPageTest extends TestCase
         $this->post('/migrate', [
             'timestamp' => $timestamp,
             'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
-            'credential' => '10982345',
+            'credential' => self::TEST_PIN,
+            'command' => 'migrate',
         ])->assertInternalServerError()
-            ->assertSee('Migrasi gagal karena terjadi error.');
-    }
-
-    public function test_hosting_access_requires_explicit_enablement_and_a_strong_secret(): void
-    {
-        config([
-            'app.env' => 'production',
-            'app.url' => 'https://localhost',
-            'app.key' => 'base64:'.base64_encode(str_repeat('a', 32)),
-            'migration.remote_enabled' => false,
-            'migration.admin_secret' => 'short-secret',
-        ]);
-
-        $this->withServerVariables([
-            'REMOTE_ADDR' => '203.0.113.10',
-            'HTTPS' => 'on',
-        ])
-            ->get('https://localhost/migrate')
-            ->assertOk()
-            ->assertSee('MIGRATE_REMOTE_ENABLED=true');
-
-        $timestamp = now()->timestamp;
-        $key = 'base64:'.base64_encode(str_repeat('a', 32));
-        $this->withServerVariables([
-            'REMOTE_ADDR' => '203.0.113.10',
-            'HTTPS' => 'on',
-        ])->post('https://localhost/migrate', [
-            'timestamp' => $timestamp,
-            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
-            'credential' => 'short-secret',
-        ])->assertStatus(503)
-            ->assertSee('Migrasi belum diaktifkan.');
-
-        config([
-            'migration.remote_enabled' => true,
-            'migration.admin_secret' => 'short-secret',
-        ]);
-
-        $this->withServerVariables([
-            'REMOTE_ADDR' => '203.0.113.10',
-            'HTTPS' => 'on',
-        ])->get('https://localhost/migrate')
-            ->assertOk()
-            ->assertSee('MIGRATE_ADMIN_SECRET')
-            ->assertSee('disabled', false);
-
-        config(['migration.admin_secret' => str_repeat('b', 64)]);
-
-        $this->withServerVariables([
-            'REMOTE_ADDR' => '203.0.113.10',
-            'HTTPS' => 'on',
-        ])->get('https://localhost/migrate')
-            ->assertOk()
-            ->assertSee('Rahasia admin (minimal 64 karakter)');
-    }
-
-    public function test_hosting_requires_the_strong_secret_instead_of_local_pin(): void
-    {
-        $key = 'base64:'.base64_encode(str_repeat('a', 32));
-
-        config([
-            'app.env' => 'production',
-            'app.url' => 'https://localhost',
-            'app.key' => $key,
-            'migration.remote_enabled' => true,
-            'migration.admin_secret' => str_repeat('b', 64),
-        ]);
-
-        $timestamp = now()->timestamp;
-
-        $this->withServerVariables([
-            'REMOTE_ADDR' => '203.0.113.10',
-            'HTTPS' => 'on',
-        ])->post('/migrate', [
-            'timestamp' => $timestamp,
-            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
-            'credential' => '10982345',
-        ])->assertForbidden()
-            ->assertSee('Kredensial admin tidak sesuai.');
-
-        config(['database.default' => 'missing_connection']);
-
-        $this->withServerVariables([
-            'REMOTE_ADDR' => '203.0.113.10',
-            'HTTPS' => 'on',
-        ])->post('https://localhost/migrate', [
-            'timestamp' => $timestamp,
-            'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
-            'credential' => str_repeat('b', 64),
-        ])->assertInternalServerError()
-            ->assertSee('Migrasi gagal karena terjadi error.');
+            ->assertSee('Perintah gagal karena terjadi error.');
     }
 
     public function test_migration_attempts_are_rate_limited(): void
@@ -182,7 +175,7 @@ class MigrationPageTest extends TestCase
         config([
             'app.env' => 'local',
             'app.key' => $key,
-            'migration.admin_pin' => '10982345',
+            'migration.admin_pin' => self::TEST_PIN,
         ]);
 
         $timestamp = now()->timestamp;
@@ -190,6 +183,7 @@ class MigrationPageTest extends TestCase
             'timestamp' => $timestamp,
             'token' => hash_hmac('sha256', 'migrate:'.$timestamp, $key),
             'credential' => 'wrong-pin',
+            'command' => 'migrate',
         ];
 
         for ($attempt = 0; $attempt < 5; $attempt++) {

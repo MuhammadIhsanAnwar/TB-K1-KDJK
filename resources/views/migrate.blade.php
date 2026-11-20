@@ -11,7 +11,7 @@
         h1 { margin: 0 0 8px; font-size: 1.65rem; }
         p { color: #536078; line-height: 1.6; }
         label { display: block; margin: 24px 0 8px; font-weight: 650; }
-        input { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #b9c4d5; border-radius: 8px; font: inherit; }
+        input, select { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #b9c4d5; border-radius: 8px; font: inherit; }
         button { margin-top: 16px; padding: 12px 18px; border: 0; border-radius: 8px; background: #2457d6; color: white; font: inherit; font-weight: 650; cursor: pointer; }
         button:disabled { background: #8793a7; cursor: not-allowed; }
         .notice { margin-top: 20px; padding: 12px 14px; border-radius: 8px; background: #eef4ff; color: #244378; }
@@ -24,11 +24,11 @@
 <main>
     <h1>Jalankan Migrasi Database</h1>
     <p>
-        Halaman ini hanya menjalankan <code>php artisan migrate --force</code>; perintah lain tidak dapat dijalankan.
+        Pilih perintah Artisan yang tersedia. Perintah atau argumen bebas tidak diterima.
         @if ($accessMode === 'remote')
-            Akses hosting dilindungi rahasia admin dan pembatasan percobaan.
+            Gunakan HTTPS; akses dilindungi PIN dan pembatasan percobaan.
         @else
-            Akses lokal dibatasi ke localhost.
+            Masukkan PIN admin untuk menjalankan perintah.
         @endif
     </p>
 
@@ -45,9 +45,15 @@
     <form method="post" action="{{ route('migrate.run') }}">
         <input type="hidden" name="timestamp" value="{{ $timestamp }}">
         <input type="hidden" name="token" value="{{ $token }}">
-        <label for="credential">{{ $accessMode === 'remote' ? 'Rahasia admin (minimal 64 karakter)' : 'PIN admin' }}</label>
+        <label for="command">Perintah Artisan</label>
+        <select id="command" name="command" required>
+            @foreach ($commands as $commandOption)
+                <option value="{{ $commandOption }}" @selected($command === $commandOption)>{{ $commandOption }}</option>
+            @endforeach
+        </select>
+        <label for="credential">PIN admin</label>
         <input id="credential" name="credential" type="password" autocomplete="off" required>
-        <button type="submit" {{ $credentialConfigured ? '' : 'disabled' }}>Jalankan migrasi</button>
+        <button type="submit" {{ $credentialConfigured ? '' : 'disabled' }}>Jalankan perintah</button>
     </form>
 
     @if ($output)

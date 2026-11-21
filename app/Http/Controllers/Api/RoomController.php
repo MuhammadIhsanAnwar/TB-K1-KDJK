@@ -23,11 +23,34 @@ class RoomController extends Controller
         ])->header('Cache-Control', 'no-store, private');
     }
 
-    public function clientIp(Request $request): JsonResponse
-    {
+    public function clientIp(
+    Request $request,
+    NetworkFingerprintService $fingerprints,
+    ): JsonResponse {
+        $ipAddress = $this->clientIpAddress($request);
+
         return response()->json([
-            'client_ip' => $this->clientIpAddress($request),
+            'client_ip' => $ipAddress,
+            'network_fingerprint' => $fingerprints->forNetwork($ipAddress),
         ])->header('Cache-Control', 'no-store, private');
+    }
+    public function networkAblyToken(
+        Request $request,
+        AblyTokenService $tokens,
+    ): Response {
+        $clientId = $request->query('client_id');
+
+        abort_unless(
+            is_string($clientId) && Str::isUuid($clientId),
+            422,
+            'Identitas browser tidak valid.',
+        );
+
+        $ipAddress = $this->clientIpAddress($request);
+
+        return response($tokens->issueForNetwork($clientId, $ipAddress))
+            ->header('Content-Type', 'text/plain; charset=UTF-8')
+            ->header('Cache-Control', 'no-store, private');
     }
 
     public function networkFingerprint(

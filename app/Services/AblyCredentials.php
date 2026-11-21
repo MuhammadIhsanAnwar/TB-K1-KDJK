@@ -30,4 +30,8 @@ class AblyCredentials
     {
         return 'p2p:room:'.$roomId.($roomProof === null ? '' : ':'.$roomProof);
     }
+    public function networkChannel(string $fingerprint): string
+    {
+    return 'p2p:network:'.$fingerprint;
+    }
 }

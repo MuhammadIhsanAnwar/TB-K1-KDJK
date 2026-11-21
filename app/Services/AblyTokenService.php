@@ -29,4 +29,27 @@ class AblyTokenService
             'x-ably-clientId' => $clientId.':'.$networkFingerprint.':'.rtrim(strtr(base64_encode($ipAddress), '+/', '-_'), '='),
         ], $secret, 'HS256', $keyName);
     }
+
+    public function issueForNetwork(string $clientId, string $ipAddress): string
+    {
+        [$keyName, $secret] = app(AblyCredentials::class)->keyParts();
+
+        $networkFingerprint = $this->fingerprints->forNetwork($ipAddress);
+        $now = Carbon::now()->timestamp;
+
+        $capability = json_encode([
+            app(AblyCredentials::class)->networkChannel($networkFingerprint) => [
+                'publish',
+                'subscribe',
+                'presence',
+            ],
+        ], JSON_THROW_ON_ERROR);
+
+        return JWT::encode([
+            'iat' => $now,
+            'exp' => $now + 600,
+            'x-ably-capability' => $capability,
+            'x-ably-clientId' => $clientId.':'.$networkFingerprint.':'.rtrim(strtr(base64_encode($ipAddress), '+/', '-_'), '='),
+        ], $secret, 'HS256', $keyName);
+    }
 }

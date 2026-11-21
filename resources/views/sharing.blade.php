@@ -104,6 +104,14 @@
                         <div id="recent-rooms" class="recent-rooms">
                             <p class="empty-note">Sesi yang pernah kamu ikuti di browser ini akan tampil di sini.</p>
                         </div>
+                        <div class="recent-heading private-users-heading">
+                        <span>Pengguna satu jaringan</span>
+                        <span class="recent-count" id="private-online-count">0</span>
+                    </div>
+
+                    <div id="private-online-users" class="private-online-users">
+                        <p class="empty-note">Memeriksa pengguna online...</p>
+                    </div>
                     </aside>
 
                     <section class="room-panel">
@@ -201,6 +209,29 @@
                     </section>
                 </div>
             </section>
+                <section id="private-chat-panel" class="private-chat-panel" hidden>
+        <div class="private-chat-header">
+            <div>
+                <span class="eyebrow">CHAT PRIBADI · SATU IP PUBLIK</span>
+                <h2 id="private-chat-title">Percakapan pribadi</h2>
+                <span id="private-chat-status">Menunggu koneksi P2P</span>
+            </div>
+            <button id="close-private-chat" class="button button-outline button-small" type="button">
+                Tutup chat
+            </button>
+        </div>
+
+        <div id="private-chat-messages" class="chat-messages private-chat-messages" role="log" aria-live="polite">
+            <div class="chat-empty">Belum ada pesan pribadi. Mulai percakapan.</div>
+        </div>
+
+        <p class="chat-local-note">Pesan dikirim langsung melalui WebRTC. Riwayat tersimpan di browser ini.</p>
+
+        <form id="private-chat-form" class="chat-form">
+            <input id="private-chat-input" name="body" type="text" maxlength="2000" autocomplete="off" placeholder="Tulis pesan pribadi..." required>
+            <button class="send-button" type="submit" aria-label="Kirim pesan pribadi">↑</button>
+        </form>
+    </section>
         </main>
 
         <footer class="page-footer">

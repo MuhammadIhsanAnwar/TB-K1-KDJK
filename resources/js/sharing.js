@@ -91,6 +91,15 @@ const state = {
     selectedFile: null,
     transferSubmitting: false,
     pendingTransferRequest: null,
+    privateAbly: null,
+    privateChannel: null,
+    privateNetworkFingerprint: null,
+    privateOnlineUsers: new Map(),
+    privateChatPeers: new Map(),
+    privateChatCandidates: new Map(),
+    selectedPrivateUser: null,
+    privateMessageHistory: [],
+    privateMessages: new Set(),
 };
 
 const el = (selector) => document.querySelector(selector);
@@ -142,13 +151,588 @@ async function api(url, options = {}) {
 async function loadPublicIp() {
     try {
         const network = await api('/api/network');
-        if (typeof network.client_ip !== 'string') {
-            throw new Error('Alamat IP publik tidak valid.');
+
+        if (
+            typeof network.client_ip !== 'string'
+            || typeof network.network_fingerprint !== 'string'
+            || network.network_fingerprint.length !== 64
+        ) {
+            throw new Error('Identitas jaringan tidak valid.');
         }
+
         state.publicIp = network.client_ip;
         el('#public-ip').textContent = `IP publik kamu: ${state.publicIp}`;
-    } catch {
+
+        await connectPrivateNetwork(network.network_fingerprint);
+    } catch (error) {
         el('#public-ip').textContent = 'IP publik belum dapat diperiksa.';
+        el('#private-online-users').textContent =
+            'Pengguna satu jaringan belum dapat dimuat.';
+        console.error('Koneksi chat pribadi gagal:', error);
+    }
+}
+async function connectPrivateNetwork(fingerprint) {
+    if (
+        state.privateChannel
+        && state.privateNetworkFingerprint === fingerprint
+    ) return;
+
+    state.privateAbly?.close();
+
+    state.privateAbly = null;
+    state.privateChannel = null;
+    state.privateNetworkFingerprint = fingerprint;
+    state.privateOnlineUsers.clear();
+
+    renderPrivateOnlineUsers();
+
+    const tokenUrl = new URL(
+        '/api/network/ably-token',
+        window.location.origin,
+    );
+
+    tokenUrl.searchParams.set('client_id', state.user.id);
+
+    const client = createClient({
+        authUrl: tokenUrl.toString(),
+        authMethod: 'GET',
+        autoConnect: true,
+    });
+
+    const channel = client.channels.get(`p2p:network:${fingerprint}`);
+
+    state.privateAbly = client;
+    state.privateChannel = channel;
+
+    await channel.attach();
+
+    await Promise.all([
+        channel.subscribe('signal', (message) => {
+            void handlePrivateSignal(message);
+        }),
+        channel.presence.subscribe((member) => {
+            handlePrivatePresence(member);
+        }),
+    ]);
+
+    const members = await channel.presence.get();
+
+    for (const member of members) {
+        handlePrivatePresence(member);
+    }
+
+    await channel.presence.enter({
+        name: state.user.name,
+    });
+
+    const updatedMembers = await channel.presence.get();
+
+    for (const member of updatedMembers) {
+        handlePrivatePresence(member);
+    }
+}
+
+function handlePrivatePresence(member) {
+    if (!member?.clientId) return;
+
+    const identity = parseRoomClientId(member.clientId);
+    if (!identity) return;
+
+    const userId = identity.userId;
+
+    if (userId === String(state.user.id)) return;
+
+    if (
+        member.action === 'leave'
+        || identity.fingerprint !== state.privateNetworkFingerprint
+    ) {
+        state.privateOnlineUsers.delete(userId);
+        closePrivateChatPeer(userId);
+
+        if (state.selectedPrivateUser?.id === userId) {
+            state.selectedPrivateUser = null;
+            el('#private-chat-panel').hidden = true;
+        }
+    } else {
+        state.privateOnlineUsers.set(userId, {
+            id: userId,
+            name: member.data?.name || `Pengguna ${userId}`,
+            ipAddress: identity.ipAddress,
+        });
+    }
+
+    renderPrivateOnlineUsers();
+}
+
+function renderPrivateOnlineUsers() {
+    const list = el('#private-online-users');
+    const count = el('#private-online-count');
+
+    if (!list || !count) return;
+
+    const users = [...state.privateOnlineUsers.values()]
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+    count.textContent = String(users.length);
+    list.replaceChildren();
+
+    if (!users.length) {
+        const empty = document.createElement('p');
+        empty.className = 'empty-note';
+        empty.textContent =
+            'Belum ada pengguna lain yang online di IP publik yang sama.';
+
+        list.append(empty);
+        return;
+    }
+
+    for (const user of users) {
+        const button = document.createElement('button');
+
+        button.type = 'button';
+        button.className = 'private-user-button';
+        button.classList.toggle(
+            'is-selected',
+            state.selectedPrivateUser?.id === user.id,
+        );
+
+        const avatar = document.createElement('span');
+        avatar.className = 'avatar';
+        avatar.textContent = user.name.slice(0, 1).toUpperCase();
+
+        const copy = document.createElement('span');
+        copy.className = 'member-copy';
+
+        const name = document.createElement('strong');
+        name.textContent = user.name;
+
+        const status = document.createElement('small');
+        status.textContent =
+            state.privateChatPeers.get(user.id)?.channel?.readyState === 'open'
+                ? 'Chat terhubung'
+                : 'Online';
+
+        copy.append(name, status);
+        button.append(avatar, copy);
+
+        button.addEventListener('click', () => {
+            void selectPrivateUser(user);
+        });
+
+        list.append(button);
+    }
+}
+async function selectPrivateUser(user) {
+    state.selectedPrivateUser = user;
+    el('#private-chat-panel').hidden = false;
+    el('#private-chat-title').textContent = user.name;
+    el('#private-chat-status').textContent = 'Menyiapkan koneksi langsung...';
+
+    renderPrivateOnlineUsers();
+    loadPrivateMessages(user.id);
+
+    const existing = state.privateChatPeers.get(user.id);
+
+    if (existing?.channel?.readyState === 'open') {
+        el('#private-chat-status').textContent = 'P2P terhubung';
+        return;
+    }
+
+    if (String(state.user.id) < String(user.id)) {
+        await startPrivateChatOffer(user);
+    } else {
+        await sendPrivateSignal(user.id, 'private-chat-invite', {});
+    }
+}
+
+function privateConversationKey(userId) {
+    return `sharing-private-chat:${[
+        String(state.user.id),
+        String(userId),
+    ].sort().join(':')}`;
+}
+
+function loadPrivateMessages(userId) {
+    state.privateMessages.clear();
+    state.privateMessageHistory = [];
+
+    const list = el('#private-chat-messages');
+    list.replaceChildren();
+
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem(privateConversationKey(userId)) ?? '[]'
+        );
+
+        if (Array.isArray(saved)) {
+            state.privateMessageHistory = saved.slice(-100);
+
+            for (const message of state.privateMessageHistory) {
+                state.privateMessages.add(String(message.id));
+                renderPrivateMessage(message);
+            }
+        }
+    } catch {
+        showToast('Riwayat chat pribadi tidak dapat dibaca.', true);
+    }
+
+    if (!state.privateMessageHistory.length) {
+        const empty = document.createElement('div');
+        empty.className = 'chat-empty';
+        empty.textContent = 'Belum ada pesan pribadi. Mulai percakapan.';
+        list.append(empty);
+    }
+}
+
+function savePrivateMessages() {
+    if (!state.selectedPrivateUser) return;
+
+    try {
+        localStorage.setItem(
+            privateConversationKey(state.selectedPrivateUser.id),
+            JSON.stringify(state.privateMessageHistory.slice(-100)),
+        );
+    } catch {
+        showToast('Riwayat chat pribadi tidak dapat disimpan.', true);
+    }
+}
+
+function renderPrivateMessage(message) {
+    const list = el('#private-chat-messages');
+    list.querySelector('.chat-empty')?.remove();
+
+    const own = String(message.user_id) === String(state.user.id);
+
+    const row = document.createElement('article');
+    row.className = `chat-message${own ? ' is-own' : ''}`;
+
+    const meta = document.createElement('div');
+    meta.className = 'message-meta';
+
+    const name = document.createElement('strong');
+    name.textContent = own ? 'Kamu' : (message.user_name || 'Pengguna');
+
+    const time = document.createElement('span');
+    time.textContent = formatTime(message.created_at);
+
+    meta.append(name, time);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    bubble.textContent = message.body;
+
+    row.append(meta, bubble);
+    list.append(row);
+    list.scrollTop = list.scrollHeight;
+}
+
+function addPrivateMessage(message, fromUserId) {
+    if (
+        !message?.id
+        || String(message.user_id) !== String(fromUserId)
+        || typeof message.body !== 'string'
+        || message.body.length > 2000
+        || state.privateMessages.has(String(message.id))
+    ) return;
+
+    state.privateMessages.add(String(message.id));
+
+    if (state.selectedPrivateUser?.id === String(fromUserId)) {
+        state.privateMessageHistory.push(message);
+        state.privateMessageHistory =
+            state.privateMessageHistory.slice(-100);
+
+        renderPrivateMessage(message);
+        savePrivateMessages();
+    } else {
+        try {
+            const key = privateConversationKey(fromUserId);
+            const history = JSON.parse(localStorage.getItem(key) ?? '[]');
+            const next = Array.isArray(history) ? history : [];
+
+            next.push(message);
+            localStorage.setItem(key, JSON.stringify(next.slice(-100)));
+        } catch {
+            showToast('Pesan masuk, tetapi riwayat lokal gagal disimpan.', true);
+        }
+    }
+}
+
+function makePrivateChatPeer(user, initiator) {
+    const userId = String(user.id);
+    const existing = state.privateChatPeers.get(userId);
+
+    if (existing) return existing;
+
+    const peer = {
+        user,
+        pc: new RTCPeerConnection({ iceServers: ICE_SERVERS }),
+        channel: null,
+        initiator,
+        offering: false,
+    };
+
+    state.privateChatPeers.set(userId, peer);
+
+    peer.pc.addEventListener('icecandidate', (event) => {
+        if (!event.candidate) return;
+
+        void sendPrivateSignal(userId, 'private-chat-candidate', {
+            candidate: event.candidate.toJSON(),
+        }).catch((error) => showToast(error.message, true));
+    });
+
+    peer.pc.addEventListener('datachannel', (event) => {
+        if (event.channel.label === 'private-chat') {
+            bindPrivateChatChannel(userId, event.channel);
+        }
+    });
+
+    peer.pc.addEventListener('connectionstatechange', () => {
+        if (peer.pc.connectionState === 'failed') {
+            closePrivateChatPeer(userId);
+
+            if (state.selectedPrivateUser?.id === userId) {
+                el('#private-chat-status').textContent =
+                    'Koneksi gagal. Coba pilih pengguna lagi.';
+            }
+        }
+    });
+
+    if (initiator) {
+        bindPrivateChatChannel(
+            userId,
+            peer.pc.createDataChannel('private-chat', { ordered: true }),
+        );
+    }
+
+    return peer;
+}
+
+function bindPrivateChatChannel(userId, channel) {
+    const peer = state.privateChatPeers.get(String(userId));
+
+    if (!peer || channel.label !== 'private-chat') return;
+
+    peer.channel = channel;
+
+    channel.addEventListener('message', (event) => {
+        let frame;
+
+        try {
+            frame = JSON.parse(event.data);
+        } catch {
+            return;
+        }
+
+        if (frame.type === 'private.chat.message') {
+            addPrivateMessage(frame.message, String(userId));
+        }
+    });
+
+    channel.addEventListener('open', () => {
+        renderPrivateOnlineUsers();
+
+        if (state.selectedPrivateUser?.id === String(userId)) {
+            el('#private-chat-status').textContent = 'P2P terhubung';
+        }
+    });
+
+    channel.addEventListener('close', renderPrivateOnlineUsers);
+}
+
+function closePrivateChatPeer(userId) {
+    const peer = state.privateChatPeers.get(String(userId));
+
+    if (!peer) return;
+
+    peer.channel?.close();
+    peer.pc.close();
+
+    state.privateChatPeers.delete(String(userId));
+    state.privateChatCandidates.delete(String(userId));
+
+    renderPrivateOnlineUsers();
+}
+
+async function startPrivateChatOffer(user) {
+    const peer = makePrivateChatPeer(user, true);
+
+    if (!peer.initiator || peer.offering || peer.pc.localDescription) {
+        return;
+    }
+
+    peer.offering = true;
+
+    try {
+        const offer = await peer.pc.createOffer();
+
+        await peer.pc.setLocalDescription(offer);
+
+        await sendPrivateSignal(user.id, 'private-chat-offer', {
+            description: peer.pc.localDescription,
+        });
+    } catch (error) {
+        closePrivateChatPeer(user.id);
+        showToast(`Chat pribadi gagal dimulai: ${error.message}`, true);
+    }
+}
+
+async function sendPrivateSignal(to, type, payload) {
+    if (!state.privateChannel) {
+        throw new Error('Koneksi jaringan untuk chat pribadi belum tersedia.');
+    }
+
+    return state.privateChannel.publish('signal', {
+        scope: 'private-chat',
+        to: String(to),
+        type,
+        payload,
+    });
+}
+
+async function handlePrivateSignal(message) {
+    const signal = message?.data;
+    const identity = parseRoomClientId(message?.clientId);
+    const from = identity?.userId;
+
+    if (
+        !signal
+        || signal.scope !== 'private-chat'
+        || !identity
+        || identity.fingerprint !== state.privateNetworkFingerprint
+        || signal.to !== String(state.user.id)
+        || from === String(state.user.id)
+    ) return;
+
+    const user = state.privateOnlineUsers.get(from);
+
+    if (!user) return;
+
+    try {
+        let peer = state.privateChatPeers.get(from);
+
+        if (signal.type === 'private-chat-invite') {
+            if (String(state.user.id) < from && !peer?.pc.localDescription) {
+                await startPrivateChatOffer(user);
+            }
+            return;
+        }
+
+        if (signal.type === 'private-chat-offer') {
+            if (from > String(state.user.id) || peer?.pc.remoteDescription) {
+                return;
+            }
+
+            if (!peer) {
+            peer = makePrivateChatPeer(user, false);
+            }
+
+            if (peer.pc.remoteDescription) return;
+
+            await peer.pc.setRemoteDescription(signal.payload.description);
+            await drainPrivateChatCandidates(from, peer);
+
+            const answer = await peer.pc.createAnswer();
+            await peer.pc.setLocalDescription(answer);
+
+            await sendPrivateSignal(from, 'private-chat-answer', {
+                description: peer.pc.localDescription,
+            });
+
+            if (!state.selectedPrivateUser) {
+            state.selectedPrivateUser = user;
+
+            el('#private-chat-panel').hidden = false;
+            el('#private-chat-title').textContent = user.name;
+            el('#private-chat-status').textContent = 'P2P terhubung';
+
+            renderPrivateOnlineUsers();
+            loadPrivateMessages(user.id);
+        }
+        } else if (signal.type === 'private-chat-answer') {
+            if (!peer?.initiator || peer.pc.remoteDescription) return;
+
+            await peer.pc.setRemoteDescription(signal.payload.description);
+            await drainPrivateChatCandidates(from, peer);
+        } else if (signal.type === 'private-chat-candidate') {
+            const candidate = signal.payload?.candidate;
+
+            if (!candidate) return;
+
+            if (!peer || !peer.pc.remoteDescription) {
+                const candidates =
+                    state.privateChatCandidates.get(from) ?? [];
+
+                candidates.push(candidate);
+                state.privateChatCandidates.set(from, candidates);
+            } else {
+                await peer.pc.addIceCandidate(candidate);
+            }
+        }
+    } catch (error) {
+        closePrivateChatPeer(from);
+        showToast(`Signaling chat pribadi gagal: ${error.message}`, true);
+    }
+}
+
+async function drainPrivateChatCandidates(userId, peer) {
+    const candidates =
+        state.privateChatCandidates.get(String(userId)) ?? [];
+
+    state.privateChatCandidates.delete(String(userId));
+
+    for (const candidate of candidates) {
+        await peer.pc.addIceCandidate(candidate);
+    }
+}
+
+async function sendPrivateChat(event) {
+    event.preventDefault();
+
+    const user = state.selectedPrivateUser;
+
+    if (!user) return;
+
+    const peer = state.privateChatPeers.get(user.id);
+
+    if (peer?.channel?.readyState !== 'open') {
+        showToast('Koneksi P2P belum siap. Tunggu sebentar.', true);
+        return;
+    }
+
+    const input = el('#private-chat-input');
+    const body = input.value.trim();
+
+    if (!body) return;
+
+    const message = {
+        id: crypto.randomUUID(),
+        user_id: state.user.id,
+        user_name: state.user.name,
+        body,
+        created_at: new Date().toISOString(),
+    };
+
+    try {
+        peer.channel.send(JSON.stringify({
+            type: 'private.chat.message',
+            message,
+        }));
+
+        if (!state.privateMessages.has(message.id)) {
+            state.privateMessages.add(message.id);
+            state.privateMessageHistory.push(message);
+            state.privateMessageHistory =
+                state.privateMessageHistory.slice(-100);
+
+            renderPrivateMessage(message);
+            savePrivateMessages();
+        }
+
+        input.value = '';
+    } catch (error) {
+        showToast(`Pesan pribadi gagal dikirim: ${error.message}`, true);
     }
 }
 
@@ -1727,6 +2311,7 @@ async function inspectNetwork() {
     }
 }
 
+
 async function handleUsernameSubmit(event) {
     event.preventDefault();
 
@@ -1752,17 +2337,35 @@ async function handleUsernameSubmit(event) {
 
     el('#username-dialog').close();
 
+    let roomUpdateFailed = false;
+    let privateUpdateFailed = false;
+
     if (state.channel && state.presenceEntered) {
         try {
             await state.channel.presence.update({ name });
-            showToast('Username berhasil diperbarui.');
         } catch {
-            showToast('Username tersimpan, tetapi pembaruan nama di room gagal.', true);
+            roomUpdateFailed = true;
         }
+    }
+
+    if (state.privateChannel) {
+        try {
+            await state.privateChannel.presence.update({ name });
+        } catch {
+            privateUpdateFailed = true;
+        }
+    }
+
+    if (roomUpdateFailed || privateUpdateFailed) {
+        showToast(
+            'Username tersimpan, tetapi pembaruan nama pada sebagian koneksi gagal.',
+            true,
+        );
     } else {
         showToast('Username berhasil diperbarui.');
     }
 }
+
 
 function bindEvents() {
     const roomNameInput = el('#room-name');
@@ -1775,7 +2378,17 @@ function bindEvents() {
         void joinRoom(el('#room-code').value);
     });
     el('#chat-form').addEventListener('submit', (event) => void sendChat(event));
-    el('#file-input').addEventListener('change', onFileSelection);
+    el('#private-chat-form').addEventListener(
+    'submit',
+    (event) => void sendPrivateChat(event)
+    );
+
+    el('#close-private-chat').addEventListener('click', () => {
+        state.selectedPrivateUser = null;
+        el('#private-chat-panel').hidden = true;
+        renderPrivateOnlineUsers();
+    });
+        el('#file-input').addEventListener('change', onFileSelection);
     el('#send-file-form').addEventListener('submit', (event) => void requestFileTransfer(event));
     el('#recipient-select').addEventListener('change', () => {
     state.pendingTransferRequest = null;

@@ -10,7 +10,10 @@ class NetworkFingerprintService
     {
         return hash_hmac('sha256', $roomId.'|'.$ipAddress, $this->appKey());
     }
-
+    public function forNetwork(string $ipAddress): string
+    {
+    return hash_hmac('sha256', 'network|'.$ipAddress, $this->appKey());
+    }
     public function roomProof(string $roomId, string $ipAddress): string
     {
         return substr(hash_hmac('sha256', 'room-invite|'.$roomId.'|'.$ipAddress, $this->appKey()), 0, 32);

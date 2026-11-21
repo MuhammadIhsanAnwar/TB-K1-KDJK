@@ -827,3 +827,10 @@ button:disabled { cursor: not-allowed; opacity: .55; }
         align-items: flex-start;
     }
 }
+/* Rapikan tampilan card chat pribadi */
+#private-chat-panel {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}

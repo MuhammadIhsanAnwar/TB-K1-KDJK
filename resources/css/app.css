@@ -702,3 +702,128 @@ button:disabled { cursor: not-allowed; opacity: .55; }
         min-height: 190px;
     }
 }
+.private-file-section {
+    margin: 14px 0;
+    padding: 14px;
+    border: 1px solid #dce5eb;
+    border-radius: 5px;
+    background: #f8fafc;
+}
+
+.private-file-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.private-file-heading strong {
+    color: #24455d;
+    font-size: 12px;
+}
+
+.private-file-heading span {
+    color: #718696;
+    font-size: 10px;
+}
+
+.private-file-picker {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.private-file-picker > span {
+    flex: 1;
+    min-width: 120px;
+    overflow-wrap: anywhere;
+    color: #61798b;
+    font-size: 11px;
+}
+
+.private-file-send,
+.private-file-accept {
+    border: 1px solid #17658f;
+    color: #fff;
+    background: #17658f;
+}
+
+.private-file-send:hover,
+.private-file-accept:hover {
+    background: #104d70;
+}
+
+.private-file-transfers {
+    display: grid;
+    gap: 9px;
+    margin-top: 13px;
+}
+
+.private-file-empty {
+    margin: 0;
+    color: #718696;
+    font-size: 11px;
+}
+
+.private-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 11px;
+    border: 1px solid #dce5eb;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.private-file-info {
+    flex: 1;
+    min-width: 150px;
+    display: grid;
+    gap: 6px;
+}
+
+.private-file-info strong {
+    overflow-wrap: anywhere;
+    color: #24455d;
+    font-size: 11px;
+}
+
+.private-file-info small {
+    color: #718696;
+    font-size: 10px;
+}
+
+.private-file-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.private-file-download {
+    color: #17658f;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+    .private-file-picker {
+        align-items: stretch;
+    }
+
+    .private-file-picker > span {
+        flex-basis: 100%;
+    }
+
+    .private-file-picker > button {
+        flex: 1;
+    }
+
+    .private-file-item {
+        align-items: flex-start;
+    }
+}

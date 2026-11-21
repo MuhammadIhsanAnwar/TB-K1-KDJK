@@ -373,9 +373,47 @@
                             </div>
 
                             <p class="chat-local-note">
-                                Pesan dikirim langsung melalui WebRTC.
-                                Riwayat tersimpan di browser ini.
-                            </p>
+                            Pesan dan file dikirim langsung melalui WebRTC.
+                            Riwayat pesan tersimpan di browser ini.
+                        </p>
+
+                        <div class="private-file-section">
+                            <div class="private-file-heading">
+                                <strong>Berbagi file pribadi</strong>
+                                <span>Maksimal 100 MB</span>
+                            </div>
+
+                            <div class="private-file-picker">
+                                <input
+                                    id="private-file-input"
+                                    type="file"
+                                    hidden
+                                >
+
+                                <label for="private-file-input" class="button button-outline button-small">
+                                    Pilih file
+                                </label>
+
+                                <span id="private-file-selected">
+                                    Belum ada file yang dipilih.
+                                </span>
+
+                                <button
+                                    id="private-send-file"
+                                    type="button"
+                                    class="button button-small private-file-send"
+                                >
+                                    Kirim file
+                                </button>
+                            </div>
+
+                            <div
+                                id="private-file-transfers"
+                                class="private-file-transfers"
+                            >
+                                <p class="private-file-empty">Belum ada transfer file.</p>
+                            </div>
+                        </div>
 
                             <form id="private-chat-form" class="chat-form">
                                 <input

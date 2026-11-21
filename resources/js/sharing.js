@@ -100,6 +100,8 @@ const state = {
     selectedPrivateUser: null,
     privateMessageHistory: [],
     privateMessages: new Set(),
+    privateSelectedFile: null,
+    privateFileTransfers: new Map(),
 };
 
 const el = (selector) => document.querySelector(selector);
@@ -362,6 +364,7 @@ async function selectPrivateUser(user) {
 
     renderPrivateOnlineUsers();
     loadPrivateMessages(user.id);
+    renderPrivateFileTransfers();
 
     try {
         const existing = state.privateChatPeers.get(user.id);
@@ -509,8 +512,10 @@ function makePrivateChatPeer(user, initiator) {
         user,
         pc: new RTCPeerConnection({ iceServers: ICE_SERVERS }),
         channel: null,
+        fileChannel: null,
         initiator,
         offering: false,
+        receivingPrivateFile: null,
     };
 
     state.privateChatPeers.set(userId, peer);
@@ -526,6 +531,10 @@ function makePrivateChatPeer(user, initiator) {
     peer.pc.addEventListener('datachannel', (event) => {
         if (event.channel.label === 'private-chat') {
             bindPrivateChatChannel(userId, event.channel);
+        }
+
+        if (event.channel.label === 'private-file') {
+            bindPrivateFileChannel(userId, event.channel);
         }
     });
 
@@ -544,6 +553,11 @@ function makePrivateChatPeer(user, initiator) {
         bindPrivateChatChannel(
             userId,
             peer.pc.createDataChannel('private-chat', { ordered: true }),
+        );
+
+        bindPrivateFileChannel(
+            userId,
+            peer.pc.createDataChannel('private-file', { ordered: true }),
         );
     }
 
@@ -566,8 +580,12 @@ function bindPrivateChatChannel(userId, channel) {
             return;
         }
 
-        if (frame.type === 'private.chat.message') {
+       if (frame.type === 'private.chat.message') {
             addPrivateMessage(frame.message, String(userId));
+        }
+
+        if (frame.type?.startsWith('private.file.')) {
+            handlePrivateFileControl(String(userId), frame);
         }
     });
 
@@ -580,6 +598,503 @@ function bindPrivateChatChannel(userId, channel) {
     });
 
     channel.addEventListener('close', renderPrivateOnlineUsers);
+}
+
+function bindPrivateFileChannel(userId, channel) {
+    const peer = state.privateChatPeers.get(String(userId));
+
+    if (!peer || channel.label !== 'private-file') return;
+
+    peer.fileChannel = channel;
+    channel.binaryType = 'arraybuffer';
+    channel.bufferedAmountLowThreshold = 256 * 1024;
+
+    channel.addEventListener('message', (event) => {
+        void receivePrivateFileData(peer, event.data);
+    });
+
+    channel.addEventListener('error', () => {
+        showToast('Koneksi transfer file pribadi mengalami error.', true);
+    });
+}
+
+function handlePrivateFileControl(userId, frame) {
+    const transfer = frame.transfer;
+    const peer = state.privateChatPeers.get(userId);
+
+    if (frame.type === 'private.file.request') {
+        if (
+            !transfer?.id
+            || typeof transfer.file_name !== 'string'
+            || transfer.file_name.length > 255
+            || !Number.isSafeInteger(transfer.file_size)
+            || transfer.file_size < 1
+            || transfer.file_size > MAX_FILE_SIZE
+            || typeof transfer.mime_type !== 'string'
+        ) return;
+
+        if (state.privateFileTransfers.has(transfer.id)) return;
+
+        state.privateFileTransfers.set(transfer.id, {
+            ...transfer,
+            senderId: userId,
+            receiverId: String(state.user.id),
+            direction: 'incoming',
+            status: 'pending',
+            percent: 0,
+            chunks: [],
+            receivedBytes: 0,
+        });
+
+        renderPrivateFileTransfers();
+        showToast(`${transfer.file_name} meminta izin untuk dikirim.`);
+        return;
+    }
+
+    if (frame.type === 'private.file.response') {
+        const current = state.privateFileTransfers.get(frame.transferId);
+
+        if (
+            !current
+            || current.direction !== 'outgoing'
+            || current.receiverId !== userId
+            || current.status !== 'pending'
+        ) return;
+
+        if (frame.accepted !== true) {
+            current.status = 'declined';
+            renderPrivateFileTransfers();
+            showToast('Penerima menolak file.');
+            return;
+        }
+
+        current.status = 'accepted';
+        renderPrivateFileTransfers();
+
+        if (peer) {
+            void sendPrivateFile(peer, current);
+        }
+
+        return;
+    }
+
+    if (frame.type === 'private.file.complete') {
+        const current = state.privateFileTransfers.get(frame.transferId);
+
+        if (!current || current.direction !== 'outgoing') return;
+
+        current.status = 'completed';
+        current.percent = 100;
+        renderPrivateFileTransfers();
+        showToast('File berhasil diterima pengguna tujuan.');
+    }
+}
+
+function onPrivateFileSelection(event) {
+    const file = event.currentTarget.files?.[0] ?? null;
+
+    if (file && file.size > MAX_FILE_SIZE) {
+        event.currentTarget.value = '';
+        state.privateSelectedFile = null;
+        el('#private-file-selected').textContent =
+            'Ukuran file maksimal 100 MB.';
+        showToast('Ukuran file melebihi batas 100 MB.', true);
+        return;
+    }
+
+    state.privateSelectedFile = file;
+
+    el('#private-file-selected').textContent = file
+        ? `${file.name} (${formatBytes(file.size)})`
+        : 'Belum ada file yang dipilih.';
+}
+
+function sendPrivateFileRequest() {
+    const user = state.selectedPrivateUser;
+    const file = state.privateSelectedFile;
+
+    if (!user || !file) {
+        showToast('Pilih file terlebih dahulu.', true);
+        return;
+    }
+
+    const peer = state.privateChatPeers.get(String(user.id));
+
+    if (peer?.channel?.readyState !== 'open') {
+        showToast('Koneksi chat pribadi belum siap.', true);
+        return;
+    }
+
+    const transfer = {
+        id: crypto.randomUUID(),
+        file_name: file.name,
+        file_size: file.size,
+        mime_type: file.type || 'application/octet-stream',
+        senderId: String(state.user.id),
+        receiverId: String(user.id),
+        direction: 'outgoing',
+        status: 'pending',
+        percent: 0,
+        file,
+    };
+
+    try {
+        peer.channel.send(JSON.stringify({
+            type: 'private.file.request',
+            transfer: {
+                id: transfer.id,
+                file_name: transfer.file_name,
+                file_size: transfer.file_size,
+                mime_type: transfer.mime_type,
+            },
+        }));
+
+        state.privateFileTransfers.set(transfer.id, transfer);
+        state.privateSelectedFile = null;
+
+        el('#private-file-input').value = '';
+        el('#private-file-selected').textContent =
+            'Belum ada file yang dipilih.';
+
+        renderPrivateFileTransfers();
+        showToast('Permintaan pengiriman file berhasil dikirim.');
+    } catch (error) {
+        showToast(`Permintaan file gagal: ${error.message}`, true);
+    }
+}
+
+function respondPrivateFile(transferId, accepted) {
+    const transfer = state.privateFileTransfers.get(transferId);
+
+    if (
+        !transfer
+        || transfer.direction !== 'incoming'
+        || transfer.status !== 'pending'
+    ) return;
+
+    const peer = state.privateChatPeers.get(transfer.senderId);
+
+    if (peer?.channel?.readyState !== 'open') {
+        showToast('Koneksi chat pengirim terputus.', true);
+        return;
+    }
+
+    try {
+        peer.channel.send(JSON.stringify({
+            type: 'private.file.response',
+            transferId,
+            accepted,
+        }));
+
+        transfer.status = accepted ? 'accepted' : 'declined';
+        renderPrivateFileTransfers();
+
+        if (accepted) {
+            showToast('Kamu menerima permintaan file.');
+        } else {
+            showToast('Permintaan file ditolak.');
+        }
+    } catch (error) {
+        showToast(`Gagal mengirim respons: ${error.message}`, true);
+    }
+}
+
+function waitForPrivateFileChannel(channel) {
+    if (channel.readyState === 'open') {
+        return Promise.resolve();
+    }
+
+    if (channel.readyState === 'closed') {
+        return Promise.reject(new Error('Koneksi file sudah terputus.'));
+    }
+
+    return new Promise((resolve, reject) => {
+        const cleanup = () => {
+            channel.removeEventListener('open', onOpen);
+            channel.removeEventListener('close', onClose);
+        };
+
+        const onOpen = () => {
+            cleanup();
+            resolve();
+        };
+
+        const onClose = () => {
+            cleanup();
+            reject(new Error('Koneksi file terputus.'));
+        };
+
+        channel.addEventListener('open', onOpen, { once: true });
+        channel.addEventListener('close', onClose, { once: true });
+    });
+}
+
+async function sendPrivateFile(peer, transfer) {
+    const channel = peer.fileChannel;
+    const file = transfer.file;
+
+    if (!channel || !file) {
+        transfer.status = 'failed';
+        renderPrivateFileTransfers();
+        showToast('Data file atau koneksi file tidak tersedia.', true);
+        return;
+    }
+
+    try {
+        await waitForPrivateFileChannel(channel);
+
+        channel.send(JSON.stringify({
+            type: 'start',
+            transferId: transfer.id,
+            fileName: transfer.file_name,
+            fileSize: transfer.file_size,
+            mimeType: transfer.mime_type,
+        }));
+
+        let sent = 0;
+
+        while (sent < file.size) {
+            if (channel.readyState !== 'open') {
+                throw new Error('Koneksi transfer terputus.');
+            }
+
+            if (channel.bufferedAmount > 1024 * 1024) {
+                await waitForBufferedAmount(channel);
+            }
+
+            const chunk = await file.slice(
+                sent,
+                sent + CHUNK_SIZE,
+            ).arrayBuffer();
+
+            channel.send(chunk);
+            sent += chunk.byteLength;
+
+            transfer.percent = Math.min(
+                99,
+                Math.floor((sent / file.size) * 100),
+            );
+
+            renderPrivateFileTransfers();
+        }
+
+        channel.send(JSON.stringify({
+            type: 'end',
+            transferId: transfer.id,
+        }));
+
+        transfer.status = 'sent';
+        transfer.percent = 100;
+
+        renderPrivateFileTransfers();
+        showToast('File selesai dikirim. Menunggu konfirmasi penerima.');
+    } catch (error) {
+        transfer.status = 'failed';
+        renderPrivateFileTransfers();
+        showToast(`Transfer file gagal: ${error.message}`, true);
+    }
+}
+
+async function receivePrivateFileData(peer, data) {
+    if (typeof data === 'string') {
+        let frame;
+
+        try {
+            frame = JSON.parse(data);
+        } catch {
+            showToast('Metadata file pribadi tidak valid.', true);
+            return;
+        }
+
+        if (frame.type === 'start') {
+            const transfer = state.privateFileTransfers.get(frame.transferId);
+
+            if (
+                !transfer
+                || transfer.direction !== 'incoming'
+                || transfer.status !== 'accepted'
+                || frame.fileSize !== transfer.file_size
+                || frame.fileName !== transfer.file_name
+            ) {
+                showToast('Data file tidak sesuai permintaan.', true);
+                return;
+            }
+
+            transfer.chunks = [];
+            transfer.receivedBytes = 0;
+            peer.receivingPrivateFile = transfer.id;
+
+            renderPrivateFileTransfers();
+            return;
+        }
+
+        if (frame.type === 'end') {
+            const transfer = state.privateFileTransfers.get(frame.transferId);
+
+            if (
+                !transfer
+                || peer.receivingPrivateFile !== transfer.id
+                || transfer.receivedBytes !== transfer.file_size
+            ) {
+                showToast('Ukuran file yang diterima tidak sesuai.', true);
+                return;
+            }
+
+            const blob = new Blob(transfer.chunks, {
+                type: transfer.mime_type,
+            });
+
+            transfer.downloadUrl = URL.createObjectURL(blob);
+            transfer.downloadName = transfer.file_name;
+            transfer.status = 'completed';
+            transfer.percent = 100;
+
+            peer.receivingPrivateFile = null;
+
+            renderPrivateFileTransfers();
+
+            if (peer.channel?.readyState === 'open') {
+                peer.channel.send(JSON.stringify({
+                    type: 'private.file.complete',
+                    transferId: transfer.id,
+                }));
+            }
+
+            showToast(`File ${transfer.file_name} berhasil diterima.`);
+        }
+
+        return;
+    }
+
+    if (!(data instanceof ArrayBuffer)) return;
+
+    const transferId = peer.receivingPrivateFile;
+    const transfer = transferId
+        ? state.privateFileTransfers.get(transferId)
+        : null;
+
+    if (!transfer || transfer.status !== 'accepted') return;
+
+    if (
+        data.byteLength > CHUNK_SIZE
+        || transfer.receivedBytes + data.byteLength > transfer.file_size
+    ) {
+        transfer.status = 'failed';
+        peer.receivingPrivateFile = null;
+        renderPrivateFileTransfers();
+        showToast('Ukuran potongan file tidak valid.', true);
+        return;
+    }
+
+    transfer.chunks.push(data);
+    transfer.receivedBytes += data.byteLength;
+
+    transfer.percent = Math.min(
+        99,
+        Math.floor((transfer.receivedBytes / transfer.file_size) * 100),
+    );
+
+    renderPrivateFileTransfers();
+}
+
+function renderPrivateFileTransfers() {
+    const container = el('#private-file-transfers');
+
+    if (!container) return;
+
+    container.replaceChildren();
+
+    const transfers = [...state.privateFileTransfers.values()]
+        .filter((transfer) => (
+            transfer.senderId === String(state.selectedPrivateUser?.id)
+            || transfer.receiverId === String(state.selectedPrivateUser?.id)
+        ));
+
+    if (!transfers.length) {
+        const empty = document.createElement('p');
+        empty.className = 'private-file-empty';
+        empty.textContent = 'Belum ada transfer file.';
+        container.append(empty);
+        return;
+    }
+
+    for (const transfer of transfers) {
+        const item = document.createElement('article');
+        item.className = 'private-file-item';
+
+        const info = document.createElement('div');
+        info.className = 'private-file-info';
+
+        const name = document.createElement('strong');
+        name.textContent = transfer.file_name;
+
+        const details = document.createElement('small');
+        details.textContent =
+            `${formatBytes(transfer.file_size)} · ${privateFileStatus(transfer)}`;
+
+        const progress = document.createElement('div');
+        progress.className = 'transfer-progress';
+
+        const bar = document.createElement('span');
+        bar.style.width = `${transfer.percent || 0}%`;
+        progress.append(bar);
+
+        info.append(name, details, progress);
+        item.append(info);
+
+        if (
+            transfer.direction === 'incoming'
+            && transfer.status === 'pending'
+        ) {
+            const controls = document.createElement('div');
+            controls.className = 'private-file-controls';
+
+            const accept = document.createElement('button');
+            accept.type = 'button';
+            accept.className = 'button button-small private-file-accept';
+            accept.textContent = 'Terima';
+            accept.addEventListener('click', () => {
+                respondPrivateFile(transfer.id, true);
+            });
+
+            const decline = document.createElement('button');
+            decline.type = 'button';
+            decline.className = 'button button-outline button-small';
+            decline.textContent = 'Tolak';
+            decline.addEventListener('click', () => {
+                respondPrivateFile(transfer.id, false);
+            });
+
+            controls.append(accept, decline);
+            item.append(controls);
+        }
+
+        if (transfer.downloadUrl && transfer.status === 'completed') {
+            const download = document.createElement('a');
+            download.href = transfer.downloadUrl;
+            download.download = transfer.downloadName;
+            download.className = 'private-file-download';
+            download.textContent = 'Unduh file';
+            item.append(download);
+        }
+
+        container.append(item);
+    }
+}
+
+function privateFileStatus(transfer) {
+    const labels = {
+        pending: transfer.direction === 'incoming'
+            ? 'Menunggu keputusanmu'
+            : 'Menunggu penerima',
+        accepted: 'Diterima, memulai transfer',
+        sent: 'Terkirim, menunggu konfirmasi',
+        completed: 'Selesai',
+        declined: 'Ditolak',
+        failed: 'Gagal',
+    };
+
+    return labels[transfer.status] || transfer.status;
 }
 
 function closePrivateChatPeer(userId) {
@@ -2424,6 +2939,15 @@ function bindEvents() {
     el('#private-chat-form').addEventListener(
     'submit',
     (event) => void sendPrivateChat(event)
+    );
+    el('#private-file-input').addEventListener(
+    'change',
+    onPrivateFileSelection,
+    );
+
+    el('#private-send-file').addEventListener(
+        'click',
+        sendPrivateFileRequest,
     );
 
     el('#close-private-chat').addEventListener('click', () => {

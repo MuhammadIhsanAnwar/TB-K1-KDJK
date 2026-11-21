@@ -322,26 +322,37 @@ function renderPrivateOnlineUsers() {
         list.append(button);
     }
 }
+
 async function selectPrivateUser(user) {
     state.selectedPrivateUser = user;
-    el('#private-chat-panel').hidden = false;
+
+    const panel = el('#private-chat-panel');
+
+    panel.hidden = false;
     el('#private-chat-title').textContent = user.name;
-    el('#private-chat-status').textContent = 'Menyiapkan koneksi langsung...';
+    el('#private-chat-status').textContent = 'Menghubungkan ke pengguna...';
 
     renderPrivateOnlineUsers();
     loadPrivateMessages(user.id);
 
-    const existing = state.privateChatPeers.get(user.id);
+    try {
+        const existing = state.privateChatPeers.get(user.id);
 
-    if (existing?.channel?.readyState === 'open') {
-        el('#private-chat-status').textContent = 'P2P terhubung';
-        return;
-    }
+        if (existing?.channel?.readyState === 'open') {
+            el('#private-chat-status').textContent = 'P2P terhubung';
+            return;
+        }
 
-    if (String(state.user.id) < String(user.id)) {
-        await startPrivateChatOffer(user);
-    } else {
-        await sendPrivateSignal(user.id, 'private-chat-invite', {});
+        if (String(state.user.id) < String(user.id)) {
+            await startPrivateChatOffer(user);
+        } else {
+            await sendPrivateSignal(user.id, 'private-chat-invite', {});
+        }
+    } catch (error) {
+        console.error('Gagal membuka chat pribadi:', error);
+        el('#private-chat-status').textContent =
+            'Gagal menghubungkan. Coba pilih pengguna lagi.';
+        showToast(`Chat pribadi gagal: ${error.message}`, true);
     }
 }
 
@@ -624,32 +635,32 @@ async function handlePrivateSignal(message) {
                 return;
             }
 
-            if (!peer) {
+        if (!peer) {
             peer = makePrivateChatPeer(user, false);
-            }
+        }
 
-            if (peer.pc.remoteDescription) return;
+        if (peer.pc.remoteDescription) return;
 
-            await peer.pc.setRemoteDescription(signal.payload.description);
-            await drainPrivateChatCandidates(from, peer);
+        await peer.pc.setRemoteDescription(signal.payload.description);
+        await drainPrivateChatCandidates(from, peer);
 
-            const answer = await peer.pc.createAnswer();
-            await peer.pc.setLocalDescription(answer);
+        const answer = await peer.pc.createAnswer();
+        await peer.pc.setLocalDescription(answer);
 
-            await sendPrivateSignal(from, 'private-chat-answer', {
-                description: peer.pc.localDescription,
-            });
+        await sendPrivateSignal(from, 'private-chat-answer', {
+            description: peer.pc.localDescription,
+        });
 
-            if (!state.selectedPrivateUser) {
+        if (!state.selectedPrivateUser) {
             state.selectedPrivateUser = user;
-
             el('#private-chat-panel').hidden = false;
             el('#private-chat-title').textContent = user.name;
-            el('#private-chat-status').textContent = 'P2P terhubung';
+            el('#private-chat-status').textContent = 'Menghubungkan...';
 
             renderPrivateOnlineUsers();
             loadPrivateMessages(user.id);
         }
+
         } else if (signal.type === 'private-chat-answer') {
             if (!peer?.initiator || peer.pc.remoteDescription) return;
 

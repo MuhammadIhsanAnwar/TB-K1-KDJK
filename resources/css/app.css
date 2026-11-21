@@ -278,70 +278,191 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .qr-dialog-card h2 { margin: 7px 0 18px; color: #24455d; font-size: 19px; }
 .qr-dialog-card canvas { width: 240px; height: 240px; border: 7px solid #fff; border-radius: 4px; box-shadow: 0 0 0 1px #dce5eb; }
 .qr-room-code { margin: 14px 0 0; color: #15577f; font-family: Consolas, monospace; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+
 .top-user {
-    padding: 6px 10px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 190px;
+    padding: 8px 13px;
+    overflow: hidden;
+    border: 1px solid #dce5eb;
+    border-radius: 7px;
+    color: #24455d;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     cursor: pointer;
+    transition: all .2s ease;
+}
+
+.top-user::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #3bbd83;
+    box-shadow: 0 0 0 3px #3bbd831a;
 }
 
 .top-user:hover {
     color: #17658f;
-    border-color: #dce5eb;
-    background: #fff;
+    border-color: #a9c9dc;
+    background: #f4f9fc;
+    box-shadow: 0 3px 10px #1732470d;
+}
+
+.top-user:focus-visible {
+    outline: 3px solid #17658f30;
+    outline-offset: 2px;
+}
+
+.qr-dialog {
+    overflow: hidden;
+    border: 1px solid #d6e1e8;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px #17324730;
+}
+
+.qr-dialog::backdrop {
+    background: #102b3d80;
+    backdrop-filter: blur(3px);
 }
 
 .username-dialog-card {
     width: 100%;
     align-items: stretch;
+    padding: 34px;
     text-align: left;
+    background: #fff;
+}
+
+.username-dialog-card .eyebrow {
+    margin-bottom: 5px;
+    color: #17658f;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .12em;
 }
 
 .username-dialog-card h2 {
-    margin-bottom: 20px;
+    margin: 5px 0 25px;
+    color: #173247;
+    font-size: 23px;
+    font-weight: 750;
+    letter-spacing: -.025em;
+}
+
+.username-dialog-card .dialog-close {
+    top: 16px;
+    right: 16px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #e1e9ee;
+    border-radius: 8px;
+    color: #61798b;
+    background: #f7f9fb;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.username-dialog-card .dialog-close:hover {
+    color: #b43b3b;
+    border-color: #edcccc;
+    background: #fff5f5;
 }
 
 .username-form {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 10px;
 }
 
 .username-form label {
-    color: #526a7c;
-    font-size: 13px;
-    font-weight: 600;
+    color: #36556c;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .username-form input {
+    box-sizing: border-box;
     width: 100%;
-    padding: 11px 12px;
-    border: 1px solid #cddbe4;
-    border-radius: 5px;
+    padding: 13px 14px;
+    border: 1px solid #d3e0e8;
+    border-radius: 8px;
     color: #24455d;
-    font: inherit;
+    background: #fbfdfe;
+    font-family: inherit;
+    font-size: 14px;
     outline: none;
+    transition: all .2s ease;
+}
+
+.username-form input::placeholder {
+    color: #9aabb7;
+}
+
+.username-form input:hover {
+    border-color: #a9c9dc;
 }
 
 .username-form input:focus {
     border-color: #17658f;
-    box-shadow: 0 0 0 3px #17658f1a;
+    background: #fff;
+    box-shadow: 0 0 0 4px #17658f16;
 }
 
 .username-error {
     min-height: 16px;
     margin: 0;
     color: #b43b3b;
-    font-size: 12px;
+    font-size: 11px;
+    line-height: 1.5;
 }
 
 .username-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 10px;
+    margin-top: 10px;
 }
+
+.username-actions .button {
+    min-width: 90px;
+    padding: 11px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.username-actions .button-primary {
+    box-shadow: 0 3px 8px #17658f25;
+}
+
+.username-actions .button-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px #17658f30;
+}
+
+@media (max-width: 760px) {
+    .username-dialog-card {
+        padding: 28px 22px;
+    }
+
+    .username-dialog-card h2 {
+        font-size: 21px;
+    }
+
+    .top-user {
+        max-width: 145px;
+        padding: 7px 10px;
+        font-size: 11px;
+    }
+}
+
 
 @media (max-width: 1000px) {
     .auth-layout { gap: 4vw; padding-right: 2vw; padding-left: 2vw; }

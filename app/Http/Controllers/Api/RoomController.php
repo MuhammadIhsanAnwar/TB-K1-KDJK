@@ -10,16 +10,52 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Cache;
 
 class RoomController extends Controller
 {
     public function createInvitation(Request $request, NetworkFingerprintService $fingerprints): JsonResponse
     {
         $roomId = $request->input('room_id');
-        abort_unless(is_string($roomId) && preg_match('/\A[A-Z0-9]{12}\z/', $roomId) === 1, 422, 'Kode room tidak valid.');
+
+        abort_unless(
+            is_string($roomId) && preg_match('/\A[A-Z0-9]{12}\z/', $roomId) === 1,
+            422,
+            'Kode room tidak valid.'
+        );
+
+        $roomName = $request->input('room_name');
+
+        if ($roomName !== null) {
+            abort_unless(
+                is_string($roomName),
+                422,
+                'Nama room tidak valid.'
+            );
+
+            $roomName = trim(preg_replace('/\s+/u', ' ', $roomName));
+
+            abort_unless(
+                $roomName !== ''
+                && mb_strlen($roomName) <= 40
+                && preg_match('/[\x00-\x1F\x7F]/u', $roomName) !== 1,
+                422,
+                'Nama room tidak valid.'
+            );
+
+            Cache::put(
+                'nonovshare:room-name:' . $roomId,
+                $roomName,
+                now()->addDays(30)
+            );
+        }
 
         return response()->json([
-            'room_proof' => $fingerprints->roomProof($roomId, $this->clientIpAddress($request)),
+            'room_proof' => $fingerprints->roomProof(
+                $roomId,
+                $this->clientIpAddress($request)
+            ),
+            'room_name' => Cache::get('nonovshare:room-name:' . $roomId),
         ])->header('Cache-Control', 'no-store, private');
     }
 

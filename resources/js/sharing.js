@@ -1484,10 +1484,12 @@ async function createRoom(event) {
     try {
         const id = generateRoomCode();
 
+        const invitation = await requestRoomProof(id, name);
+
         const room = {
             id,
             name,
-            proof: await requestRoomProof(id)
+            proof: invitation.room_proof
         };
 
         rememberRoom(room);
@@ -1502,16 +1504,28 @@ async function createRoom(event) {
     }
 }
 
-async function requestRoomProof(roomId) {
+async function requestRoomProof(roomId, roomName = null) {
+    const body = {
+        room_id: roomId,
+    };
+
+    if (roomName !== null) {
+        body.room_name = roomName;
+    }
+
     const invitation = await api('/api/rooms/invitation', {
         method: 'POST',
-        body: { room_id: roomId },
+        body,
     });
-    if (typeof invitation.room_proof !== 'string' || !/^[a-f0-9]{32}$/i.test(invitation.room_proof)) {
+
+    if (
+        typeof invitation.room_proof !== 'string'
+        || !/^[a-f0-9]{32}$/i.test(invitation.room_proof)
+    ) {
         throw new Error('Bukti undangan room tidak valid.');
     }
 
-    return invitation.room_proof.toLowerCase();
+    return invitation;
 }
 
 async function joinRoom(invitation) {
@@ -1535,16 +1549,27 @@ async function joinRoom(invitation) {
     }
 
     try {
-        const roomProof = proof?.toLowerCase() ?? await requestRoomProof(roomCode);
-        const invitedName = typeof invitation === 'object' && invitation !== null
-            ? normalizeRoomName(invitation.name)
-            : null;
+        const serverInvitation = proof === null
+    ? await requestRoomProof(roomCode)
+    : null;
 
-        const room = {
-            id: roomCode,
-            name: savedRoom?.name ?? invitedName ?? `NonovShare-${roomCode.slice(-4)}`,
-            proof: roomProof,
-        };
+    const roomProof = proof?.toLowerCase()
+        ?? serverInvitation.room_proof;
+
+    const invitedName = typeof invitation === 'object' && invitation !== null
+        ? normalizeRoomName(invitation.name)
+        : null;
+
+    const serverRoomName = normalizeRoomName(serverInvitation?.room_name);
+
+    const room = {
+        id: roomCode,
+        name: serverRoomName
+            ?? invitedName
+            ?? savedRoom?.name
+            ?? `NonovShare-${roomCode.slice(-4)}`,
+        proof: roomProof,
+    };
         rememberRoom(room);
         await openRoom(room);
         if (state.room?.id === roomCode) updateRoomUrl(room);

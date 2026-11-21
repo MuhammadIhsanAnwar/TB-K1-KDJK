@@ -1554,6 +1554,8 @@ async function joinRoom(invitation) {
 }
 
 async function openRoom(room, allowEmpty = false) {
+    showPublicRoomView();
+
     if (state.room?.id === room.id && state.room?.proof === room.proof) return;
     if (state.room) await leaveRoom();
 
@@ -1607,6 +1609,22 @@ async function openRoom(room, allowEmpty = false) {
         setRoomStatus(`Realtime belum tersedia: ${error.message}`, false);
         showToast(error.message, true);
     }
+}
+
+function showPublicRoomView() {
+    const privatePanel = el('#private-chat-panel');
+    const activeRoom = el('#active-room');
+    const roomEmpty = el('#room-empty');
+
+    if (privatePanel) privatePanel.hidden = true;
+
+    const hasRoom = Boolean(state.room);
+
+    if (activeRoom) activeRoom.hidden = !hasRoom;
+    if (roomEmpty) roomEmpty.hidden = hasRoom;
+
+    state.selectedPrivateUser = null;
+    state.privatePreviousView = null;
 }
 
 async function connectRealtime(room, allowEmpty) {

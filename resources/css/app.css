@@ -278,6 +278,70 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .qr-dialog-card h2 { margin: 7px 0 18px; color: #24455d; font-size: 19px; }
 .qr-dialog-card canvas { width: 240px; height: 240px; border: 7px solid #fff; border-radius: 4px; box-shadow: 0 0 0 1px #dce5eb; }
 .qr-room-code { margin: 14px 0 0; color: #15577f; font-family: Consolas, monospace; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+.top-user {
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.top-user:hover {
+    color: #17658f;
+    border-color: #dce5eb;
+    background: #fff;
+}
+
+.username-dialog-card {
+    width: 100%;
+    align-items: stretch;
+    text-align: left;
+}
+
+.username-dialog-card h2 {
+    margin-bottom: 20px;
+}
+
+.username-form {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.username-form label {
+    color: #526a7c;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.username-form input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cddbe4;
+    border-radius: 5px;
+    color: #24455d;
+    font: inherit;
+    outline: none;
+}
+
+.username-form input:focus {
+    border-color: #17658f;
+    box-shadow: 0 0 0 3px #17658f1a;
+}
+
+.username-error {
+    min-height: 16px;
+    margin: 0;
+    color: #b43b3b;
+    font-size: 12px;
+}
+
+.username-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
 
 @media (max-width: 1000px) {
     .auth-layout { gap: 4vw; padding-right: 2vw; padding-left: 2vw; }

@@ -30,6 +30,43 @@ function loadOrCreateLocalUser() {
     return user;
 }
 
+function normalizeUsername(value) {
+    return value.trim().replace(/\s+/g, ' ');
+}
+
+function saveUsername(value) {
+    const name = normalizeUsername(value);
+
+    if (!name) {
+        throw new Error('Username tidak boleh kosong.');
+    }
+
+    if (name.length < 3 || name.length > 20) {
+        throw new Error('Username harus terdiri dari 3 sampai 20 karakter.');
+    }
+
+    if (/[\u0000-\u001F\u007F]/.test(name)) {
+        throw new Error('Username mengandung karakter yang tidak valid.');
+    }
+
+    const updatedUser = {
+        ...state.user,
+        name,
+    };
+
+    try {
+        window.localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(updatedUser));
+    } catch {
+        localStorageAvailable = false;
+        throw new Error('Username tidak dapat disimpan di browser.');
+    }
+
+    state.user.name = name;
+    el('#top-user').textContent = name;
+
+    return name;
+}
+
 const state = {
     user: loadOrCreateLocalUser(),
     room: null,
@@ -1690,6 +1727,43 @@ async function inspectNetwork() {
     }
 }
 
+async function handleUsernameSubmit(event) {
+    event.preventDefault();
+
+    const errorElement = el('#username-error');
+    errorElement.textContent = '';
+
+    let name;
+
+    try {
+        name = saveUsername(el('#username-input').value);
+    } catch (error) {
+        errorElement.textContent = error.message;
+        return;
+    }
+
+    const currentUser = state.onlineUsers.get(String(state.user.id));
+
+    if (currentUser) {
+        currentUser.name = name;
+        state.onlineUsers.set(String(state.user.id), currentUser);
+        renderOnlineUsers();
+    }
+
+    el('#username-dialog').close();
+
+    if (state.channel && state.presenceEntered) {
+        try {
+            await state.channel.presence.update({ name });
+            showToast('Username berhasil diperbarui.');
+        } catch {
+            showToast('Username tersimpan, tetapi pembaruan nama di room gagal.', true);
+        }
+    } else {
+        showToast('Username berhasil diperbarui.');
+    }
+}
+
 function bindEvents() {
     const roomNameInput = el('#room-name');
     if (roomNameInput) {
@@ -1727,6 +1801,30 @@ function bindEvents() {
 
     el('#copy-invite').addEventListener('click', () => void copyInvite());
     el('#show-qr').addEventListener('click', () => void showQrCode());
+    el('#top-user').addEventListener('click', () => {
+    el('#username-input').value = state.user.name;
+    el('#username-error').textContent = '';
+    el('#username-dialog').showModal();
+    el('#username-input').focus();
+    });
+
+    el('#close-username').addEventListener('click', () => {
+        el('#username-dialog').close();
+    });
+
+    el('#cancel-username').addEventListener('click', () => {
+        el('#username-dialog').close();
+    });
+
+    el('#username-form').addEventListener('submit', (event) => {
+        void handleUsernameSubmit(event);
+    });
+
+    el('#username-dialog').addEventListener('click', (event) => {
+        if (event.target === el('#username-dialog')) {
+            el('#username-dialog').close();
+        }
+    });
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

@@ -27,7 +27,13 @@
             </a>
             <div class="topbar-meta">
                 <span class="secure-pill"><span class="secure-dot"></span> Transfer langsung antar browser</span>
-                <span id="top-user" class="top-user"></span>
+                <button
+                id="top-user"
+                class="top-user"
+                type="button"
+                title="Ubah username"
+                aria-label="Ubah username"
+            ></button>
             </div>
         </header>
 
@@ -212,7 +218,43 @@
             <p id="qr-room-code" class="qr-room-code"></p>
         </div>
     </dialog>
+    <dialog id="username-dialog" class="qr-dialog">
+    <div class="qr-dialog-card username-dialog-card">
+        <button
+            id="close-username"
+            class="dialog-close"
+            type="button"
+            aria-label="Tutup"
+        >×</button>
 
+        <span class="eyebrow">PROFIL PENGGUNA</span>
+        <h2>Ubah Username</h2>
+
+        <form id="username-form" class="username-form">
+            <label for="username-input">Username baru</label>
+            <input
+                id="username-input"
+                type="text"
+                minlength="3"
+                maxlength="20"
+                autocomplete="nickname"
+                placeholder="Masukkan username"
+                required
+            >
+
+            <p id="username-error" class="username-error" aria-live="polite"></p>
+
+            <div class="username-actions">
+                <button id="cancel-username" class="button button-outline" type="button">
+                    Batal
+                </button>
+                <button class="button button-primary" type="submit">
+                    Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</dialog>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 </body>

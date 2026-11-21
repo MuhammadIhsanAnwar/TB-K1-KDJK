@@ -3,27 +3,27 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f5f7fb">
-    <title>Ruang — berbagi langsung</title>
+    <meta name="theme-color" content="#ffffff">
+    <title>NonovShare — berbagi file langsung</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <div id="page-loader" class="page-loader">
         <div class="loader-content">
-            <div class="loader-logo">R<span>.</span></div>
-            <h2>ruang<span>.</span></h2>
-            <p>Menyiapkan ruang untukmu...</p>
+            <div class="loader-logo" aria-hidden="true">N</div>
+            <h2>NonovShare</h2>
+            <p>Menyiapkan koneksi berbagi...</p>
             <div class="loader-progress">
-            <div class="loader-progress-bar"></div>
-        </div>
+                <div class="loader-progress-bar"></div>
+            </div>
         </div>
     </div>
 
     <div class="page-shell">
         <header class="topbar">
-            <a class="brand" href="/" aria-label="Ruang - beranda">
-                <span class="brand-mark" aria-hidden="true">R</span>
-                <span>ruang<span class="brand-dot">.</span></span>
+            <a class="brand" href="/" aria-label="NonovShare - beranda">
+                <span class="brand-mark" aria-hidden="true">N</span>
+                <span>NonovShare</span>
             </a>
             <div class="topbar-meta">
                 <span class="secure-pill"><span class="secure-dot"></span> Transfer langsung antar browser</span>
@@ -35,8 +35,8 @@
             <section id="workspace" class="workspace">
                 <div class="welcome-row">
                     <div>
-                        <span class="eyebrow">RUANG KOLABORASI</span>
-                        <h1>Semua yang kamu bagikan,<br><span>tetap di antara kalian.</span></h1>
+                        <span class="eyebrow">BERBAGI LANGSUNG</span>
+                        <h1>Kirim file tanpa<br><span>unggah ke cloud.</span></h1>
                     </div>
                     <div class="network-card" id="network-card" aria-live="polite">
                         <span id="network-icon" class="network-icon">⌁</span>
@@ -78,21 +78,16 @@
 
                         <div class="recent-heading"><span>Room terakhir</span><span class="recent-count" id="room-count">0</span></div>
                         <div id="recent-rooms" class="recent-rooms">
-                            <p class="empty-note">Room yang pernah kamu ikuti di browser ini akan tampil di sini.</p>
+                            <p class="empty-note">Sesi yang pernah kamu ikuti di browser ini akan tampil di sini.</p>
                         </div>
                     </aside>
 
                     <section class="room-panel">
                         <div id="room-empty" class="room-empty">
-                            <div class="empty-illustration" aria-hidden="true">
-                                <span class="empty-window window-back"></span>
-                                <span class="empty-window window-front"><i>↗</i></span>
-                                <span class="empty-spark spark-one">✦</span>
-                                <span class="empty-spark spark-two">✦</span>
-                            </div>
+                            <div class="empty-illustration" aria-hidden="true"><span>↗</span></div>
                             <span class="eyebrow">BELUM ADA ROOM AKTIF</span>
                             <h2>Siap berbagi?</h2>
-                            <p>Buat room baru atau gabung dengan kode undangan untuk mulai ngobrol dan mengirim file.</p>
+                            <p>Buat sesi atau gabung dengan kode undangan untuk mengirim pesan dan file antar-browser.</p>
                         </div>
 
                         <div id="active-room" class="active-room" hidden>
@@ -156,27 +151,22 @@
                                     </label>
                                     <input id="file-input" type="file" hidden>
                                     <div class="recipient-picker">
-                                    <span>Kirim kepada</span>
-
-                                    <div class="recipient-actions">
-                                        <button
-                                            type="button"
-                                            id="select-all-recipients"
-                                            class="button button-outline"
-                                        >
-                                            Pilih Semua
-                                        </button>
-
+                                        <span>Kirim kepada</span>
+                                        <div class="recipient-actions">
+                                            <button
+                                                type="button"
+                                                id="select-all-recipients"
+                                                class="button button-outline"
+                                            >
+                                                Pilih Semua
+                                            </button>
+                                        </div>
+                                        <select id="recipient-select" required multiple size="4"></select>
+                                        <small id="recipient-count">0 penerima dipilih</small>
+                                        <small id="recipient-status">
+                                            Pilih penerima atau gunakan tombol Pilih Semua.
+                                        </small>
                                     </div>
-
-                                    <select id="recipient-select" required multiple size="4"></select>
-
-                                    <small id="recipient-count">0 penerima dipilih</small>
-
-                                    <small id="recipient-status">
-                                        Pilih penerima atau gunakan tombol Pilih Semua.
-                                    </small>
-                                </div>
                                     <button id="send-file-button" class="button button-primary" type="submit" disabled>Kirim file <span>→</span></button>
                                 </form>
                                 <div id="transfers-list" class="transfers-list">
@@ -190,7 +180,7 @@
         </main>
 
         <footer class="page-footer">
-            <span>ruang<span class="brand-dot">.</span> <span>Berbagi langsung, tetap privat.</span></span>
+            <span>NonovShare <span>Berbagi file langsung, tanpa unggah ke cloud.</span></span>
             <span class="footer-tech">WebRTC <i>·</i> Ably Realtime <i>·</i> HTTPS</span>
         </footer>
     </div>

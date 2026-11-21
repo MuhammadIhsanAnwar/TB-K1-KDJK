@@ -323,14 +323,42 @@ function renderPrivateOnlineUsers() {
     }
 }
 
+
+function showPrivateChatView() {
+    if (el('#private-chat-panel').hidden) {
+        state.privatePreviousView = {
+            roomEmptyHidden: el('#room-empty').hidden,
+            activeRoomHidden: el('#active-room').hidden,
+        };
+    }
+
+    el('#room-empty').hidden = true;
+    el('#active-room').hidden = true;
+    el('#private-chat-panel').hidden = false;
+}
+
+function restorePreviousChatView() {
+    const previous = state.privatePreviousView;
+
+    el('#private-chat-panel').hidden = true;
+
+    el('#room-empty').hidden =
+        previous?.roomEmptyHidden ?? false;
+
+    el('#active-room').hidden =
+        previous?.activeRoomHidden ?? true;
+
+    state.privatePreviousView = null;
+}
+
+
 async function selectPrivateUser(user) {
     state.selectedPrivateUser = user;
 
-    const panel = el('#private-chat-panel');
+    showPrivateChatView();
 
-    panel.hidden = false;
     el('#private-chat-title').textContent = user.name;
-    el('#private-chat-status').textContent = 'Menghubungkan ke pengguna...';
+    el('#private-chat-status').textContent = 'Menghubungkan...';
 
     renderPrivateOnlineUsers();
     loadPrivateMessages(user.id);
@@ -350,8 +378,10 @@ async function selectPrivateUser(user) {
         }
     } catch (error) {
         console.error('Gagal membuka chat pribadi:', error);
+
         el('#private-chat-status').textContent =
-            'Gagal menghubungkan. Coba pilih pengguna lagi.';
+            'Gagal menghubungkan. Coba lagi.';
+
         showToast(`Chat pribadi gagal: ${error.message}`, true);
     }
 }
@@ -652,14 +682,16 @@ async function handlePrivateSignal(message) {
         });
 
         if (!state.selectedPrivateUser) {
-            state.selectedPrivateUser = user;
-            el('#private-chat-panel').hidden = false;
-            el('#private-chat-title').textContent = user.name;
-            el('#private-chat-status').textContent = 'Menghubungkan...';
+        state.selectedPrivateUser = user;
 
-            renderPrivateOnlineUsers();
-            loadPrivateMessages(user.id);
-        }
+        showPrivateChatView();
+
+        el('#private-chat-title').textContent = user.name;
+        el('#private-chat-status').textContent = 'Menghubungkan...';
+
+        renderPrivateOnlineUsers();
+        loadPrivateMessages(user.id);
+    }
 
         } else if (signal.type === 'private-chat-answer') {
             if (!peer?.initiator || peer.pc.remoteDescription) return;
@@ -2395,9 +2427,10 @@ function bindEvents() {
     );
 
     el('#close-private-chat').addEventListener('click', () => {
-        state.selectedPrivateUser = null;
-        el('#private-chat-panel').hidden = true;
-        renderPrivateOnlineUsers();
+    state.selectedPrivateUser = null;
+
+    restorePreviousChatView();
+    renderPrivateOnlineUsers();
     });
         el('#file-input').addEventListener('change', onFileSelection);
     el('#send-file-form').addEventListener('submit', (event) => void requestFileTransfer(event));

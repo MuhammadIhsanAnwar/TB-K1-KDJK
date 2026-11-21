@@ -129,6 +129,29 @@
                                     <h2 id="active-room-name">Room</h2>
                                     <span class="room-code">Kode <strong id="active-room-code"></strong></span>
                                 </div>
+                                <section id="private-chat-panel" class="private-chat-panel" hidden>
+                            <div class="private-chat-header">
+                                <div>
+                                    <span class="eyebrow">CHAT PRIBADI · SATU IP PUBLIK</span>
+                                    <h2 id="private-chat-title">Percakapan pribadi</h2>
+                                    <span id="private-chat-status">Menunggu koneksi P2P</span>
+                                </div>
+                                <button id="close-private-chat" class="button button-outline button-small" type="button">
+                                    Tutup chat
+                                </button>
+                            </div>
+
+                            <div id="private-chat-messages" class="chat-messages private-chat-messages" role="log" aria-live="polite">
+                                <div class="chat-empty">Belum ada pesan pribadi. Mulai percakapan.</div>
+                            </div>
+
+                            <p class="chat-local-note">Pesan dikirim langsung melalui WebRTC. Riwayat tersimpan di browser ini.</p>
+
+                            <form id="private-chat-form" class="chat-form">
+                                <input id="private-chat-input" name="body" type="text" maxlength="2000" autocomplete="off" placeholder="Tulis pesan pribadi..." required>
+                                <button class="send-button" type="submit" aria-label="Kirim pesan pribadi">↑</button>
+                            </form>
+                        </section>
                                 <div class="room-actions">
                                     <button id="copy-invite" class="button button-outline button-small" type="button" disabled>⧉ <span>Salin undangan</span></button>
                                     <button id="show-qr" class="button button-outline button-small" type="button" disabled>▦ <span>QR</span></button>
@@ -209,29 +232,7 @@
                     </section>
                 </div>
             </section>
-                <section id="private-chat-panel" class="private-chat-panel" hidden>
-        <div class="private-chat-header">
-            <div>
-                <span class="eyebrow">CHAT PRIBADI · SATU IP PUBLIK</span>
-                <h2 id="private-chat-title">Percakapan pribadi</h2>
-                <span id="private-chat-status">Menunggu koneksi P2P</span>
-            </div>
-            <button id="close-private-chat" class="button button-outline button-small" type="button">
-                Tutup chat
-            </button>
-        </div>
 
-        <div id="private-chat-messages" class="chat-messages private-chat-messages" role="log" aria-live="polite">
-            <div class="chat-empty">Belum ada pesan pribadi. Mulai percakapan.</div>
-        </div>
-
-        <p class="chat-local-note">Pesan dikirim langsung melalui WebRTC. Riwayat tersimpan di browser ini.</p>
-
-        <form id="private-chat-form" class="chat-form">
-            <input id="private-chat-input" name="body" type="text" maxlength="2000" autocomplete="off" placeholder="Tulis pesan pribadi..." required>
-            <button class="send-button" type="submit" aria-label="Kirim pesan pribadi">↑</button>
-        </form>
-    </section>
         </main>
 
         <footer class="page-footer">

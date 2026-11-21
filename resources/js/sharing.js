@@ -63,6 +63,7 @@ const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }];
 let toastTimer;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 let inviteProof = new URL(window.location.href).searchParams.get('proof');
+let inviteRoomName = new URL(window.location.href).searchParams.get('room_name');
 
 async function api(url, options = {}) {
     const headers = new Headers(options.headers ?? {});
@@ -132,9 +133,15 @@ function initializeApp() {
     void loadPublicIp();
     if (inviteCode) {
         el('#room-code').value = inviteProof ? `${inviteCode}.${inviteProof}` : inviteCode;
-        void joinRoom({ id: inviteCode, proof: inviteProof });
-        inviteCode = null;
-        inviteProof = null;
+        void joinRoom({
+        id: inviteCode,
+        proof: inviteProof,
+        name: inviteRoomName
+    });
+
+    inviteCode = null;
+    inviteProof = null;
+    inviteRoomName = null;
     }
 }
 
@@ -208,6 +215,32 @@ function generateRoomCode() {
     return [...bytes].map((byte) => alphabet[byte & 31]).join('');
 }
 
+function normalizeRoomName(value) {
+    if (typeof value !== 'string') return null;
+
+    const name = value.trim().replace(/\s+/g, ' ');
+
+    if (!name || name.length > 40 || /[\u0000-\u001f\u007f]/.test(name)) {
+        return null;
+    }
+
+    return name;
+}
+
+function suggestedRoomName() {
+    const prefix = 'NonovShare';
+
+    const highestNumber = readRecentRooms().reduce((highest, room) => {
+        const match = room.name.match(/^NonovShare(\d+)$/i);
+
+        return match
+            ? Math.max(highest, Number(match[1]))
+            : highest;
+    }, 0);
+
+    return `${prefix}${highestNumber + 1}`;
+}
+
 function updateRoomUrl(room) {
     const url = new URL(window.location.href);
     url.searchParams.set('room', room.id);
@@ -216,6 +249,7 @@ function updateRoomUrl(room) {
     } else {
         url.searchParams.delete('proof');
     }
+    url.searchParams.set('room_name', room.name);
     window.history.replaceState({}, '', url);
 }
 
@@ -259,12 +293,31 @@ function renderRecentRooms(rooms) {
 
 async function createRoom(event) {
     event.preventDefault();
+
+    const name = normalizeRoomName(el('#room-name').value);
+
+    if (!name) {
+        showToast('Nama room wajib diisi dan maksimal 40 karakter.', true);
+        el('#room-name').focus();
+        return;
+    }
+
     try {
         const id = generateRoomCode();
-        const room = { id, name: `Room ${id}`, proof: await requestRoomProof(id) };
+
+        const room = {
+            id,
+            name,
+            proof: await requestRoomProof(id)
+        };
+
         rememberRoom(room);
         await openRoom(room, true);
-        if (state.room?.id === room.id) updateRoomUrl(room);
+
+        if (state.room?.id === room.id) {
+            updateRoomUrl(room);
+            el('#room-name').value = suggestedRoomName();
+        }
     } catch (error) {
         showToast(error.message, true);
     }
@@ -304,9 +357,13 @@ async function joinRoom(invitation) {
 
     try {
         const roomProof = proof?.toLowerCase() ?? await requestRoomProof(roomCode);
+        const invitedName = typeof invitation === 'object' && invitation !== null
+            ? normalizeRoomName(invitation.name)
+            : null;
+
         const room = {
             id: roomCode,
-            name: savedRoom?.name ?? `Room ${roomCode}`,
+            name: savedRoom?.name ?? invitedName ?? `NonovShare-${roomCode.slice(-4)}`,
             proof: roomProof,
         };
         rememberRoom(room);
@@ -1490,6 +1547,7 @@ async function copyInvite() {
     invite.searchParams.set('room', state.room.id);
     if (state.room.proof) invite.searchParams.set('proof', state.room.proof);
     else invite.searchParams.delete('proof');
+    invite.searchParams.set('room_name', state.room.name);
     try {
         await navigator.clipboard.writeText(invite.toString());
         showToast('Tautan undangan disalin.');
@@ -1504,15 +1562,15 @@ async function showQrCode() {
     invite.searchParams.set('room', state.room.id);
     if (state.room.proof) invite.searchParams.set('proof', state.room.proof);
     else invite.searchParams.delete('proof');
+    invite.searchParams.set('room_name', state.room.name);
     try {
         await QRCode.toCanvas(el('#qr-canvas'), invite.toString(), {
             width: 240,
             margin: 1,
             color: { dark: '#17233c', light: '#ffffff' },
         });
-        el('#qr-room-code').textContent = state.room.proof
-            ? `${state.room.id}.${state.room.proof}`
-            : state.room.id;
+        el('#qr-room-code').textContent =
+        `${state.room.name} · ${state.room.id}`;
         el('#qr-dialog').showModal();
     } catch (error) {
         showToast(`QR tidak dapat dibuat: ${error.message}`, true);
@@ -1633,6 +1691,10 @@ async function inspectNetwork() {
 }
 
 function bindEvents() {
+    const roomNameInput = el('#room-name');
+    if (roomNameInput) {
+        roomNameInput.value = suggestedRoomName();
+    }
     el('#create-room-form').addEventListener('submit', (event) => void createRoom(event));
     el('#join-room-form').addEventListener('submit', (event) => {
         event.preventDefault();

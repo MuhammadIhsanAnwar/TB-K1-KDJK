@@ -60,13 +60,31 @@
                         </div>
 
                         <form id="create-room-form" class="room-action-card">
-                            <span class="action-icon create-icon">＋</span>
-                            <div class="action-copy">
-                                <strong>Buat room baru</strong>
-                                <span>Undang teman dengan kode unik.</span>
-                            </div>
-                            <button class="button button-primary button-small" type="submit">Buat</button>
-                        </form>
+                    <div class="room-create-heading">
+                        <span class="action-icon create-icon">＋</span>
+                        <div class="action-copy">
+                            <strong>Buat room baru</strong>
+                            <span>Atur nama sebelum mengundang teman.</span>
+                        </div>
+                    </div>
+
+                    <label class="room-name-field" for="room-name">
+                        <span>Nama room</span>
+                        <input
+                            id="room-name"
+                            name="room_name"
+                            type="text"
+                            maxlength="40"
+                            autocomplete="off"
+                            placeholder="Contoh: NonovShare1"
+                            required
+                        >
+                    </label>
+
+                    <button class="button button-primary room-create-button" type="submit">
+                        Buat room
+                    </button>
+                </form>
 
                         <form id="join-room-form" class="join-form">
                             <label for="room-code">Punya kode room?</label>

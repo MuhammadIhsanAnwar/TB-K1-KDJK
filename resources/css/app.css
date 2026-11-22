@@ -888,3 +888,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-dialog.has-remote-video .call-identity h2 { font-size: 16px; }
 .call-controls { display: flex; justify-content: center; gap: 26px; padding: 16px 20px 22px; background: #0f2333; }
 .call-action { display: grid; justify-items: center; gap: 7px; color: #b9cad6; font-size: 11px; }
+.call-control { width: 54px; height: 54px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; color: #fff; background: #ffffff1f; transition: background .15s ease; }

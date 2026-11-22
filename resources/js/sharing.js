@@ -1409,6 +1409,7 @@ function base64ToBytes(data) {
 }
 
 function voiceNoteChannels(context, targetUserId) {
+    if (context === 'room') {
 }
 
 function showToast(message, isError = false) {

@@ -2074,6 +2074,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     stopMediaStream(call.localStream);
 
     el('#call-remote-video').srcObject = null;
+    el('#call-local-video').srcObject = null;
 }
 
 function showToast(message, isError = false) {

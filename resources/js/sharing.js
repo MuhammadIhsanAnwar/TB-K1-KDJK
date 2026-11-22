@@ -2325,6 +2325,7 @@ function renderCallDialog() {
     if (!call) return;
 
     const dialog = el('#call-dialog');
+    const isVideo = call.kind === 'video';
 }
 
 function showToast(message, isError = false) {

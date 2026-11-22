@@ -2019,6 +2019,7 @@ async function acceptIncomingCall() {
     }
 
     try {
+        createCallPeer(call);
 }
 
 function showToast(message, isError = false) {

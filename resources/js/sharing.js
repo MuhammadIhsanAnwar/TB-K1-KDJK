@@ -2410,6 +2410,7 @@ function toggleCallCamera() {
         track.enabled = !call.cameraOff;
     }
 
+    sendCallMediaState(call);
 }
 
 function showToast(message, isError = false) {

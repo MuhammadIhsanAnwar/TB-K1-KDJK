@@ -1397,6 +1397,7 @@ function bytesToBase64(bytes) {
     return btoa(binary);
 }
 
+function base64ToBytes(data) {
 }
 
 function showToast(message, isError = false) {

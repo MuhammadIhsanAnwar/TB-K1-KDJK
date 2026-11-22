@@ -1345,6 +1345,8 @@ async function sendPrivateChat(event) {
     }
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

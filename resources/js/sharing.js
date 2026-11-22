@@ -1951,6 +1951,7 @@ async function startCall(kind) {
 
     if (!user || state.call) return;
 
+    if (!state.privateOnlineUsers.has(user.id)) {
 }
 
 function showToast(message, isError = false) {

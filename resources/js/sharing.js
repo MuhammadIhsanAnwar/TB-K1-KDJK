@@ -1677,6 +1677,7 @@ function isValidVoiceNoteMessage(message, fromUserId) {
         && /^[0-9a-f-]{36}$/i.test(message.id)
         && String(message.user_id) === fromUserId
         && typeof message.user_name === 'string'
+        && message.user_name.length <= 40
 }
 
 function showToast(message, isError = false) {

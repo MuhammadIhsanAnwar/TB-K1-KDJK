@@ -1443,6 +1443,7 @@ function renderVoiceRecorder(context, recording) {
     const form = el(context === 'room' ? '#chat-form' : '#private-chat-form');
 
     form.classList.toggle('is-recording', recording);
+    el(`#${context}-voice-recorder`).hidden = !recording;
 }
 
 function showToast(message, isError = false) {

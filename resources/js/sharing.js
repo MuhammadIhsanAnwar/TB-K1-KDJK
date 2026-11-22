@@ -2148,6 +2148,7 @@ function createCallPeer(call) {
         }
     });
 
+    return pc;
 }
 
 function showToast(message, isError = false) {

@@ -2284,6 +2284,7 @@ async function handleCallSignal(from, user, signal) {
         } else if (signal.type === 'call-media') {
             call.remoteMicMuted = payload.micMuted === true;
             call.remoteCameraOff = payload.cameraOff === true;
+            renderCallDialog();
 }
 
 function showToast(message, isError = false) {

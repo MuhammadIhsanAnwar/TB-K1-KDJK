@@ -1611,6 +1611,8 @@ async function sendVoiceNote(session, blob, duration) {
         created_at: new Date().toISOString(),
     };
 
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+
 }
 
 function showToast(message, isError = false) {

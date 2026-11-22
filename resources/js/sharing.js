@@ -3979,6 +3979,8 @@ async function leaveRoom() {
 
     if (state.voiceRecorder?.context === 'room') {
         await finishVoiceRecording(false);
+    }
+
     for (const transferId of [...state.peers.keys()]) closePeer(transferId);
     for (const userId of [...state.chatPeers.keys()]) closeChatPeer(userId);
     const channel = state.channel;

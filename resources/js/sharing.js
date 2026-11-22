@@ -1529,6 +1529,8 @@ async function startVoiceRecording(context) {
     session.timer = window.setInterval(() => {
         const elapsed = (performance.now() - session.startedAt) / 1000;
 
+        el(`#${context}-voice-timer`).textContent = formatDuration(elapsed);
+
 }
 
 function showToast(message, isError = false) {

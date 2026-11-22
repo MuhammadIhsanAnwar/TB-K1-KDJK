@@ -2020,6 +2020,7 @@ async function acceptIncomingCall() {
 
     try {
         createCallPeer(call);
+        await sendCallSignal(call, 'call-accept');
 }
 
 function showToast(message, isError = false) {

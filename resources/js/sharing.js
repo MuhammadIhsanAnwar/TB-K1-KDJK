@@ -1926,6 +1926,7 @@ async function getCallMedia(kind) {
             video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
         });
     } catch (error) {
+        if (!['NotFoundError', 'OverconstrainedError', 'NotReadableError'].includes(error?.name)) {
 }
 
 function showToast(message, isError = false) {

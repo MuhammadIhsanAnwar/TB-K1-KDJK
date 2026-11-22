@@ -1418,6 +1418,7 @@ function voiceNoteChannels(context, targetUserId) {
             .filter((userId) => userId !== String(state.user.id));
 
         if (!recipientIds.length) {
+            throw new Error('Tidak ada pengguna online di room untuk menerima voice note.');
 }
 
 function showToast(message, isError = false) {

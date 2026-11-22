@@ -1828,6 +1828,7 @@ function createVoiceNotePlayer(url, duration) {
     audio.addEventListener('pause', showPaused);
 
     audio.addEventListener('timeupdate', () => {
+        // Rekaman WebM dari MediaRecorder sering tidak punya durasi, jadi pakai durasi rekaman sebagai cadangan.
 }
 
 function showToast(message, isError = false) {

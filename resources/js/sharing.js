@@ -2324,6 +2324,7 @@ function renderCallDialog() {
 
     if (!call) return;
 
+    const dialog = el('#call-dialog');
 }
 
 function showToast(message, isError = false) {

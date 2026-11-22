@@ -2108,6 +2108,7 @@ function createCallPeer(call) {
 
         void sendCallSignal(call, 'call-candidate', {
             candidate: event.candidate.toJSON(),
+        }).catch(() => {});
 }
 
 function showToast(message, isError = false) {

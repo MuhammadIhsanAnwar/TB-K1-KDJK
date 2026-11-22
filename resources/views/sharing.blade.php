@@ -384,6 +384,7 @@
                                         class="button button-outline button-small call-start-button"
                                         type="button"
                                         title="Video call"
+                                    >
                             </div>
 
                             <div

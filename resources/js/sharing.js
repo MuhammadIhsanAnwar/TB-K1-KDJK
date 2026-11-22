@@ -2354,6 +2354,7 @@ function renderCallDialog() {
     el('#call-avatar').textContent = call.peerName.trim().charAt(0).toUpperCase() || '?';
     el('#call-peer-name').textContent = call.peerName;
     el('#call-status').textContent = callStatusText(call);
+    el('#call-incoming-controls').hidden = !isIncomingRing;
 }
 
 function showToast(message, isError = false) {

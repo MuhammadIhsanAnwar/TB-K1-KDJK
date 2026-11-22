@@ -1602,6 +1602,7 @@ async function sendVoiceNote(session, blob, duration) {
         user_id: state.user.id,
         user_name: state.user.name,
         body: '',
+        kind: 'voice',
 }
 
 function showToast(message, isError = false) {

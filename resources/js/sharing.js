@@ -2091,6 +2091,7 @@ function createCallPeer(call) {
 
     call.pc = pc;
 
+    for (const track of call.localStream.getTracks()) {
 }
 
 function showToast(message, isError = false) {

@@ -1693,6 +1693,8 @@ function isValidVoiceNoteMessage(message, fromUserId) {
 }
 
 function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
+    const prefix = `${context}:${fromUserId}:`;
+
 }
 
 function showToast(message, isError = false) {

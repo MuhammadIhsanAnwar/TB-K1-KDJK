@@ -2119,6 +2119,7 @@ function createCallPeer(call) {
         if (stream) {
             call.remoteStream = stream;
         } else {
+            call.remoteStream ??= new MediaStream();
 }
 
 function showToast(message, isError = false) {

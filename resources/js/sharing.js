@@ -1730,6 +1730,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             && frame.data.length <= Math.ceil(VOICE_NOTE_CHUNK_SIZE / 3) * 4
         ) {
             try {
+                bytes = base64ToBytes(frame.data);
 }
 
 function showToast(message, isError = false) {

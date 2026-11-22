@@ -2395,6 +2395,7 @@ function toggleCallMicrophone() {
     }
 
     sendCallMediaState(call);
+    renderCallDialog();
 }
 
 function showToast(message, isError = false) {

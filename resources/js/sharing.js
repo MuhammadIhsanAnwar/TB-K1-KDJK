@@ -2433,6 +2433,7 @@ function startRingtone() {
 
                 oscillator.type = 'sine';
                 oscillator.frequency.value = 740;
+                gain.gain.setValueAtTime(0, now + offset);
 }
 
 function showToast(message, isError = false) {

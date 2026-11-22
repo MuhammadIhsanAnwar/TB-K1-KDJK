@@ -1598,6 +1598,7 @@ async function sendVoiceNote(session, blob, duration) {
     }
 
     const message = {
+        id: crypto.randomUUID(),
 }
 
 function showToast(message, isError = false) {

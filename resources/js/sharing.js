@@ -1550,6 +1550,8 @@ async function finishVoiceRecording(send) {
     const duration = Math.min(
         (performance.now() - session.startedAt) / 1000,
         MAX_VOICE_NOTE_SECONDS,
+    );
+
 }
 
 function showToast(message, isError = false) {

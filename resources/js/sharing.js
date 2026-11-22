@@ -2422,6 +2422,8 @@ function startRingtone() {
     if (!AudioContextClass) return;
 
     try {
+        const context = new AudioContextClass();
+
 }
 
 function showToast(message, isError = false) {

@@ -2263,6 +2263,8 @@ async function handleCallSignal(from, user, signal) {
             await call.pc.setRemoteDescription(payload.description);
             await drainCallCandidates(call);
 
+            const answer = await call.pc.createAnswer();
+
 }
 
 function showToast(message, isError = false) {

@@ -1706,6 +1706,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             .length;
 
         if (
+            inProgress >= 2
 }
 
 function showToast(message, isError = false) {

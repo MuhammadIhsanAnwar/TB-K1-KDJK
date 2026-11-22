@@ -2200,6 +2200,8 @@ async function handleCallSignal(from, user, signal) {
                 void sendCallSignal({ id: callId, peerId: from }, 'call-busy').catch(() => {});
             }
             return;
+        }
+
 }
 
 function showToast(message, isError = false) {

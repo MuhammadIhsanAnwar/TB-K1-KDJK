@@ -2000,6 +2000,7 @@ async function acceptIncomingCall() {
 
     stopRingtone();
     window.clearTimeout(call.timeoutTimer);
+    call.status = 'connecting';
 }
 
 function showToast(message, isError = false) {

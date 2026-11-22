@@ -2376,6 +2376,8 @@ function renderCallDialog() {
         : call.cameraOff ? 'Kamera mati' : 'Kamera';
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

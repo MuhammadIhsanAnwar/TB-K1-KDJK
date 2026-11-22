@@ -1849,6 +1849,7 @@ function createVoiceNotePlayer(url, duration) {
             return;
         }
 
+        if (activeVoiceAudio && activeVoiceAudio !== audio) {
 }
 
 function showToast(message, isError = false) {

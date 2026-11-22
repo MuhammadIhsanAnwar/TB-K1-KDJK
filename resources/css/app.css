@@ -880,3 +880,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-local-video { position: absolute; right: 14px; bottom: 14px; z-index: 2; width: min(28%, 170px); aspect-ratio: 4 / 3; object-fit: cover; border: 2px solid #ffffff38; border-radius: 6px; background: #000; transform: scaleX(-1); }
 .call-identity { position: relative; z-index: 1; display: grid; justify-items: center; gap: 6px; padding: 36px 20px; text-align: center; }
 .call-avatar { width: 84px; height: 84px; display: grid; place-items: center; margin-bottom: 10px; border-radius: 50%; color: #fff; background: #17658f; font-size: 32px; font-weight: 700; }
+.call-dialog.is-ringing .call-avatar { animation: call-ring 1.8s ease-out infinite; }

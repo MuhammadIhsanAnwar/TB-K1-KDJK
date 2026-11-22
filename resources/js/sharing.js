@@ -1996,6 +1996,8 @@ async function startCall(kind) {
 async function acceptIncomingCall() {
     const call = state.call;
 
+    if (!call || call.direction !== 'incoming' || call.status !== 'ringing') return;
+
 }
 
 function showToast(message, isError = false) {

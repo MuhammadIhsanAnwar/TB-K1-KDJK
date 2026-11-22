@@ -2039,6 +2039,8 @@ function declineIncomingCall() {
     endCall('Panggilan ditolak.');
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

@@ -2070,6 +2070,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     window.clearTimeout(call.timeoutTimer);
     window.clearInterval(call.durationTimer);
     stopRingtone();
+    call.pc?.close();
 }
 
 function showToast(message, isError = false) {

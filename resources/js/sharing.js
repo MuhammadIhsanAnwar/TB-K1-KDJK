@@ -2136,6 +2136,7 @@ function createCallPeer(call) {
     pc.addEventListener('connectionstatechange', () => {
         if (state.call !== call) return;
 
+        if (pc.connectionState === 'connected') {
 }
 
 function showToast(message, isError = false) {

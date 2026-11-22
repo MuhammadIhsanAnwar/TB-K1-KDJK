@@ -1748,6 +1748,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
     }
 
     if (frame.type === 'voice.end') {
+        state.incomingVoiceNotes.delete(key);
+
 }
 
 function showToast(message, isError = false) {

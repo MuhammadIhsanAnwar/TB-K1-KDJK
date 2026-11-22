@@ -2174,6 +2174,7 @@ function markCallConnected(call) {
     call.status = 'active';
     call.connectedAt = Date.now();
     call.durationTimer = window.setInterval(() => {
+        if (state.call === call) {
 }
 
 function showToast(message, isError = false) {

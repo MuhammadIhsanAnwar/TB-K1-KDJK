@@ -1965,6 +1965,7 @@ async function startCall(kind) {
         peerName: user.name,
     });
 
+    state.call = call;
 }
 
 function showToast(message, isError = false) {

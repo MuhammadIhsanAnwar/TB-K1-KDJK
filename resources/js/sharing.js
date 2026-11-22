@@ -2050,6 +2050,7 @@ function hangUpCall() {
     }
 
     const duration = call.connectedAt
+        ? ` · ${formatDuration((Date.now() - call.connectedAt) / 1000)}`
 }
 
 function showToast(message, isError = false) {

@@ -2172,6 +2172,7 @@ function markCallConnected(call) {
     if (call.connectedAt) return;
 
     call.status = 'active';
+    call.connectedAt = Date.now();
 }
 
 function showToast(message, isError = false) {

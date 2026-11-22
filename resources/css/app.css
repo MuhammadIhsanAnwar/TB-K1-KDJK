@@ -865,3 +865,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .voice-time { min-width: 30px; font-size: 11px; font-variant-numeric: tabular-nums; text-align: right; }
 .voice-unavailable { font-size: 11px; font-style: italic; opacity: .85; }
 
+/* Tombol panggilan di chat pribadi */

@@ -1954,6 +1954,8 @@ async function startCall(kind) {
     if (!state.privateOnlineUsers.has(user.id)) {
         showToast(`${user.name} sedang offline.`, true);
         return;
+    }
+
 }
 
 function showToast(message, isError = false) {

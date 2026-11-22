@@ -2153,6 +2153,8 @@ function createCallPeer(call) {
 
 function attachRemoteStream(call) {
     const audio = el('#call-remote-audio');
+    const video = el('#call-remote-video');
+
 }
 
 function showToast(message, isError = false) {

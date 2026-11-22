@@ -2217,6 +2217,7 @@ async function handleCallSignal(from, user, signal) {
         startRingtone();
         navigator.vibrate?.([400, 200, 400]);
 
+        call.timeoutTimer = window.setTimeout(() => {
 }
 
 function showToast(message, isError = false) {

@@ -1765,6 +1765,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 function discardIncomingVoiceNotes(context, userId) {
     const prefix = `${context}:${userId}:`;
 
+    for (const key of [...state.incomingVoiceNotes.keys()]) {
 }
 
 function showToast(message, isError = false) {

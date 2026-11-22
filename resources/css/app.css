@@ -894,3 +894,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-control svg { width: 22px; height: 22px; }
 .call-control .icon-off,
 .call-control[aria-pressed="true"] .icon-on { display: none; }
+.call-control[aria-pressed="true"] .icon-off { display: block; }

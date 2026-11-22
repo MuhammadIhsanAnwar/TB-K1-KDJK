@@ -2143,6 +2143,7 @@ function createCallPeer(call) {
         } else if (pc.connectionState === 'disconnected') {
             call.unstable = true;
             renderCallDialog();
+        } else if (pc.connectionState === 'failed') {
 }
 
 function showToast(message, isError = false) {

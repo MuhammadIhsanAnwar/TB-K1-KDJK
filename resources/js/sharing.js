@@ -2001,6 +2001,8 @@ async function acceptIncomingCall() {
     stopRingtone();
     window.clearTimeout(call.timeoutTimer);
     call.status = 'connecting';
+    renderCallDialog();
+
 }
 
 function showToast(message, isError = false) {

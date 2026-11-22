@@ -1709,6 +1709,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             inProgress >= 2
             || state.incomingVoiceNotes.has(key)
             || state.voiceNoteUrls.has(message.id)
+        ) return;
+
 }
 
 function showToast(message, isError = false) {

@@ -1545,6 +1545,8 @@ async function finishVoiceRecording(send) {
     if (!session || session.stopping) return;
 
     session.stopping = true;
+    window.clearInterval(session.timer);
+
 }
 
 function showToast(message, isError = false) {

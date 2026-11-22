@@ -1671,6 +1671,8 @@ function storeOwnPrivateMessage(message, userId) {
 }
 
 function isValidVoiceNoteMessage(message, fromUserId) {
+    const voice = message?.voice;
+
 }
 
 function showToast(message, isError = false) {

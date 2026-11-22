@@ -1640,6 +1640,8 @@ function sendVoiceNoteFrames(channel, message, bytes) {
             id: message.id,
             data: bytesToBase64(bytes.subarray(offset, offset + VOICE_NOTE_CHUNK_SIZE)),
         }));
+    }
+
 }
 
 function showToast(message, isError = false) {

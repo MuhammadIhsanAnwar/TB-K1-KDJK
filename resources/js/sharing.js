@@ -1474,6 +1474,7 @@ async function startVoiceRecording(context) {
     let stream;
 
     try {
+        ensureMediaSupport();
 }
 
 function showToast(message, isError = false) {

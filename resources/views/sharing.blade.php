@@ -9,6 +9,20 @@
     <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('images/favicon-192.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon-180.png') }}">
     <title>NonovShare | Berbagi File Langsung</title>
+    <script>
+        // Terapkan tema sebelum render agar tidak berkedip putih.
+        (function () {
+            try {
+                var saved = localStorage.getItem('sharing-theme-v1');
+                var dark = saved
+                    ? saved === 'dark'
+                    : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+            } catch (e) {
+                document.documentElement.dataset.theme = 'light';
+            }
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
@@ -39,6 +53,15 @@
                     <span class="secure-dot"></span>
                     Transfer langsung antar browser
                 </span>
+
+                <button
+                    id="theme-toggle"
+                    class="theme-toggle"
+                    type="button"
+                    title="Ganti tema terang/gelap"
+                    aria-label="Ganti tema terang/gelap"
+                    aria-pressed="false"
+                ><span id="theme-icon" aria-hidden="true">☾</span></button>
 
                 <button
                     id="top-user"

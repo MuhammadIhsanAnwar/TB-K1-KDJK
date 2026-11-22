@@ -3,6 +3,7 @@ import QRCode from 'qrcode';
 
 const LOCAL_USER_KEY = 'sharing-user-v1';
 const LOCAL_ROOMS_KEY = 'sharing-rooms-v1';
+const THEME_KEY = 'sharing-theme-v1';
 let localStorageAvailable = true;
 
 function loadOrCreateLocalUser() {
@@ -4208,6 +4209,40 @@ async function handleUsernameSubmit(event) {
 }
 
 
+function preferredTheme() {
+    try {
+        const saved = window.localStorage.getItem(THEME_KEY);
+        if (saved === 'dark' || saved === 'light') return saved;
+    } catch {
+        // localStorage tidak tersedia; ikuti preferensi sistem.
+    }
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function applyTheme(theme) {
+    const isDark = theme === 'dark';
+    document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    const icon = el('#theme-icon');
+    const toggle = el('#theme-toggle');
+    if (icon) icon.textContent = isDark ? '☀' : '☾';
+    if (toggle) {
+        toggle.setAttribute('aria-pressed', String(isDark));
+        toggle.setAttribute('aria-label', isDark ? 'Aktifkan tema terang' : 'Aktifkan tema gelap');
+        toggle.title = isDark ? 'Aktifkan tema terang' : 'Aktifkan tema gelap';
+    }
+    el('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#0d1820' : '#ffffff');
+}
+
+function toggleTheme() {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try {
+        window.localStorage.setItem(THEME_KEY, next);
+    } catch {
+        // Tidak bisa menyimpan pilihan; tema tetap berlaku untuk sesi ini.
+    }
+}
+
 function bindEvents() {
     const roomNameInput = el('#room-name');
     if (roomNameInput) {
@@ -4307,6 +4342,7 @@ function bindEvents() {
         if (state.call) void sendCallSignal(state.call, 'call-end').catch(() => {});
     });
 
+    el('#theme-toggle').addEventListener('click', toggleTheme);
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#qr-download').addEventListener('click', () => void downloadQrCode());
     el('#qr-copy').addEventListener('click', (event) => void copyInvite(event.currentTarget));
@@ -4327,5 +4363,6 @@ function bindEvents() {
 }
 
 bindEvents();
+applyTheme(preferredTheme());
 initializeApp();
 void inspectNetwork();

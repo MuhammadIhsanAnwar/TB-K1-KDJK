@@ -2015,6 +2015,7 @@ async function acceptIncomingCall() {
 
     if (state.call !== call) {
         stopMediaStream(call.localStream);
+        return;
 }
 
 function showToast(message, isError = false) {

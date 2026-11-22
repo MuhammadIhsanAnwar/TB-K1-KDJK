@@ -268,6 +268,8 @@ function handlePrivatePresence(member) {
         member.action === 'leave'
         || identity.fingerprint !== state.privateNetworkFingerprint
     ) {
+        const leavingName = state.privateOnlineUsers.get(userId)?.name;
+
         state.privateOnlineUsers.delete(userId);
         closePrivateChatPeer(userId);
 

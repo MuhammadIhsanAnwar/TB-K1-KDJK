@@ -2129,6 +2129,7 @@ function createCallPeer(call) {
             });
         }
 
+        attachRemoteStream(call);
 }
 
 function showToast(message, isError = false) {

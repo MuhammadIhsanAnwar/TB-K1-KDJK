@@ -2146,6 +2146,8 @@ function createCallPeer(call) {
         } else if (pc.connectionState === 'failed') {
             endCall('Koneksi panggilan terputus.', true, true);
         }
+    });
+
 }
 
 function showToast(message, isError = false) {

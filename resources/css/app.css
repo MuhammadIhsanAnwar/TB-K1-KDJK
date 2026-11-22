@@ -902,3 +902,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-control.is-accept:hover:not(:disabled) { background: #1b6a4a; }
 @keyframes call-ring {
     0% { box-shadow: 0 0 0 0 #3bbd8366; }
+    100% { box-shadow: 0 0 0 24px #3bbd8300; }

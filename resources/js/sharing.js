@@ -1740,6 +1740,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             state.incomingVoiceNotes.delete(key);
             showToast('Voice note yang diterima rusak dan diabaikan.', true);
             return;
+        }
+
 }
 
 function showToast(message, isError = false) {

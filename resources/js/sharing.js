@@ -1843,6 +1843,7 @@ function createVoiceNotePlayer(url, duration) {
         showPaused();
     });
 
+    button.addEventListener('click', () => {
 }
 
 function showToast(message, isError = false) {

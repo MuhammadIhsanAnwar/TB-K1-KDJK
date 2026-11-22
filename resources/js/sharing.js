@@ -1557,6 +1557,8 @@ async function finishVoiceRecording(send) {
             session.recorder.addEventListener('stop', resolve, { once: true });
             session.recorder.stop();
         });
+    }
+
 }
 
 function showToast(message, isError = false) {

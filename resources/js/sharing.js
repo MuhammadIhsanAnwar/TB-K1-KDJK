@@ -2331,6 +2331,7 @@ function renderCallDialog() {
     const remoteVideoTrack = call.remoteStream?.getVideoTracks()[0];
     const remoteShowsVideo = isVideo
         && call.status === 'active'
+        && !call.remoteCameraOff
 }
 
 function showToast(message, isError = false) {

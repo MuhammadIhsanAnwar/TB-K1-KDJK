@@ -2242,6 +2242,7 @@ async function handleCallSignal(from, user, signal) {
                 : `${call.peerName} mengakhiri panggilan.`);
         } else if (
             signal.type === 'call-accept'
+            && call.direction === 'outgoing'
 }
 
 function showToast(message, isError = false) {

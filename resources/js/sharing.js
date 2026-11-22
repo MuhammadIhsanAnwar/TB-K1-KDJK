@@ -127,6 +127,7 @@ const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l
 const PAUSE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor" stroke="none"/></svg>';
 let toastTimer;
 let voiceRecorderStarting = false;
+let activeVoiceAudio = null;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 let inviteProof = new URL(window.location.href).searchParams.get('proof');
 let inviteRoomName = new URL(window.location.href).searchParams.get('room_name');

@@ -1791,6 +1791,7 @@ function renderMessageContent(bubble, message) {
     bubble.append(createVoiceNotePlayer(url, Number(message.voice?.duration) || 0));
 }
 
+function createVoiceNotePlayer(url, duration) {
 }
 
 function showToast(message, isError = false) {

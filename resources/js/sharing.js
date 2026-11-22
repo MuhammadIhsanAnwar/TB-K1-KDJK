@@ -1439,6 +1439,7 @@ function voiceNoteChannels(context, targetUserId) {
     return [channel];
 }
 
+function renderVoiceRecorder(context, recording) {
 }
 
 function showToast(message, isError = false) {

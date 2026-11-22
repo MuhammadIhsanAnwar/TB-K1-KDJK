@@ -1868,6 +1868,7 @@ function renderCallButtons() {
     const available = Boolean(state.selectedPrivateUser) && !state.call;
 
     el('#private-voice-call').disabled = !available;
+    el('#private-video-call').disabled = !available;
 }
 
 function showToast(message, isError = false) {

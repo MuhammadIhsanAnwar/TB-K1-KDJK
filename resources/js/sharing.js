@@ -2289,6 +2289,7 @@ async function handleCallSignal(from, user, signal) {
     } catch (error) {
         if (state.call === call) {
             endCall(`Panggilan gagal tersambung: ${error.message}`, true, true);
+        }
 }
 
 function showToast(message, isError = false) {

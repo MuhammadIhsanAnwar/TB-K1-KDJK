@@ -1725,6 +1725,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
     if (frame.type === 'voice.chunk') {
         let bytes = null;
 
+        if (
 }
 
 function showToast(message, isError = false) {

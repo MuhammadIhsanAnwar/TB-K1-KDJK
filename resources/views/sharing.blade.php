@@ -475,6 +475,7 @@
                                 </button>
 
                                 <div id="private-voice-recorder" class="voice-recorder" hidden>
+                                    <span class="voice-recorder-dot" aria-hidden="true"></span>
 
                                 <button
                                     class="send-button"

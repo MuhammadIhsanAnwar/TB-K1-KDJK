@@ -1455,6 +1455,7 @@ async function startVoiceRecording(context) {
     if (state.voiceRecorder || voiceRecorderStarting) return;
 
     const targetUserId = context === 'private'
+        ? state.selectedPrivateUser?.id ?? null
 }
 
 function showToast(message, isError = false) {

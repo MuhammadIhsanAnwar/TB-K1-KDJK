@@ -4228,6 +4228,7 @@ function bindEvents() {
         }
     });
     for (const context of ['room', 'private']) {
+        el(`#${context}-voice-button`).addEventListener('click', () => void startVoiceRecording(context));
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

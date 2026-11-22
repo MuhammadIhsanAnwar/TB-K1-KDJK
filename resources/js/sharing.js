@@ -2269,6 +2269,7 @@ async function handleCallSignal(from, user, signal) {
             await sendCallSignal(call, 'call-answer', { description: call.pc.localDescription });
         } else if (
             signal.type === 'call-answer'
+            && call.direction === 'outgoing'
 }
 
 function showToast(message, isError = false) {

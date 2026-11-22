@@ -1647,6 +1647,8 @@ function sendVoiceNoteFrames(channel, message, bytes) {
 
 function storeOwnPrivateMessage(message, userId) {
     if (state.selectedPrivateUser?.id === String(userId)) {
+        if (state.privateMessages.has(message.id)) return;
+
 }
 
 function showToast(message, isError = false) {

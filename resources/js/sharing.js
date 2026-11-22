@@ -1664,6 +1664,7 @@ function storeOwnPrivateMessage(message, userId) {
         const next = Array.isArray(history) ? history : [];
 
         next.push(message);
+        localStorage.setItem(key, JSON.stringify(next.slice(-100)));
 }
 
 function showToast(message, isError = false) {

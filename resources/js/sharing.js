@@ -1759,6 +1759,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 
         state.voiceNoteUrls.set(incoming.message.id, URL.createObjectURL(blob));
         deliver(incoming.message);
+    }
 }
 
 function showToast(message, isError = false) {

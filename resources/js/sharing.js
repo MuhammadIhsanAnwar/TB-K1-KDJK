@@ -2018,6 +2018,7 @@ async function acceptIncomingCall() {
         return;
     }
 
+    try {
 }
 
 function showToast(message, isError = false) {

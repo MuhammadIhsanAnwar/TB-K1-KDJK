@@ -1705,6 +1705,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             .filter((pendingKey) => pendingKey.startsWith(prefix))
             .length;
 
+        if (
 }
 
 function showToast(message, isError = false) {

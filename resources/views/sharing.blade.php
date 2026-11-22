@@ -577,6 +577,7 @@
 
             <div class="call-identity">
                 <span id="call-avatar" class="call-avatar" aria-hidden="true"></span>
+                <h2 id="call-peer-name">Panggilan</h2>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

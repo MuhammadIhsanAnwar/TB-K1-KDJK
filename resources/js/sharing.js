@@ -1908,6 +1908,7 @@ function sendCallSignal(call, type, payload = {}) {
 }
 
 function callDeviceLabel(kind) {
+    return kind === 'video' ? 'kamera dan mikrofon' : 'mikrofon';
 }
 
 function showToast(message, isError = false) {

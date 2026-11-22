@@ -2227,6 +2227,8 @@ async function handleCallSignal(from, user, signal) {
 
     const call = state.call;
 
+    if (!call || call.id !== callId || call.peerId !== from) return;
+
 }
 
 function showToast(message, isError = false) {

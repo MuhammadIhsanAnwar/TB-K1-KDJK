@@ -1415,6 +1415,8 @@ function voiceNoteChannels(context, targetUserId) {
         }
 
         const recipientIds = [...state.onlineUsers.keys()]
+            .filter((userId) => userId !== String(state.user.id));
+
 }
 
 function showToast(message, isError = false) {

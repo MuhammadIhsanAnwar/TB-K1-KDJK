@@ -2063,6 +2063,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
 
     state.call = null;
 
+    if (notifyPeer) {
 }
 
 function showToast(message, isError = false) {

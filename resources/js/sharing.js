@@ -1665,6 +1665,7 @@ function storeOwnPrivateMessage(message, userId) {
 
         next.push(message);
         localStorage.setItem(key, JSON.stringify(next.slice(-100)));
+    } catch {
 }
 
 function showToast(message, isError = false) {

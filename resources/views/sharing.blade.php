@@ -594,6 +594,7 @@
                 Tolak
             </span>
             <span class="call-action">
+                <button id="call-accept" class="call-control is-accept" type="button" aria-label="Terima panggilan">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

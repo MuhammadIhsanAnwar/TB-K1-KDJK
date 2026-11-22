@@ -3112,6 +3112,7 @@ async function handlePeerMessage(fromUserId, rawData) {
         return;
     }
 
+    if (frame.type?.startsWith('voice.')) {
         return;
     }
 

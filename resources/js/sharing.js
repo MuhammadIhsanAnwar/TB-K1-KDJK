@@ -2071,6 +2071,8 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     window.clearInterval(call.durationTimer);
     stopRingtone();
     call.pc?.close();
+    stopMediaStream(call.localStream);
+
 }
 
 function showToast(message, isError = false) {

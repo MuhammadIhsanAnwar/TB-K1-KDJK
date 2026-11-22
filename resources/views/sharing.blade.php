@@ -468,6 +468,7 @@
                                     id="private-voice-button"
                                     class="voice-button"
                                     type="button"
+                                    aria-label="Rekam voice note"
 
                                 <button
                                     class="send-button"

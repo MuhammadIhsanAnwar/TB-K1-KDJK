@@ -1487,6 +1487,8 @@ async function startVoiceRecording(context) {
 
     const contextChanged = context === 'room'
         ? !state.room
+        : state.selectedPrivateUser?.id !== targetUserId;
+
 }
 
 function showToast(message, isError = false) {

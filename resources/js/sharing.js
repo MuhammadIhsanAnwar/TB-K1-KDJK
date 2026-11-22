@@ -1792,6 +1792,7 @@ function renderMessageContent(bubble, message) {
 }
 
 function createVoiceNotePlayer(url, duration) {
+    const player = document.createElement('div');
 }
 
 function showToast(message, isError = false) {

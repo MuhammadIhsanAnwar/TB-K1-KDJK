@@ -3110,6 +3110,8 @@ async function handlePeerMessage(fromUserId, rawData) {
         ) return;
         addChatMessage(message);
         return;
+    }
+
         return;
     }
 

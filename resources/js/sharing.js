@@ -1383,6 +1383,7 @@ function mediaErrorMessage(error, device) {
 
 function stopMediaStream(stream) {
     for (const track of stream?.getTracks() ?? []) {
+        track.stop();
 }
 
 function showToast(message, isError = false) {

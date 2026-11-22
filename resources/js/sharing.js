@@ -123,6 +123,7 @@ const VOICE_NOTE_MIME_TYPES = [
     'audio/ogg;codecs=opus',
 ];
 const CALL_RING_TIMEOUT = 30 * 1000;
+const PLAY_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z" fill="currentColor" stroke="none"/></svg>';
 let toastTimer;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 let inviteProof = new URL(window.location.href).searchParams.get('proof');

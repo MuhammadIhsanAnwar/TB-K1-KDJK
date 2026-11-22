@@ -1917,6 +1917,7 @@ async function getCallMedia(kind) {
     const audio = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
 
     if (kind === 'audio') {
+        return navigator.mediaDevices.getUserMedia({ audio });
 }
 
 function showToast(message, isError = false) {

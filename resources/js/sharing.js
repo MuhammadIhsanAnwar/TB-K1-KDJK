@@ -1667,6 +1667,7 @@ function storeOwnPrivateMessage(message, userId) {
         localStorage.setItem(key, JSON.stringify(next.slice(-100)));
     } catch {
         showToast('Voice note terkirim, tetapi riwayat lokal gagal disimpan.', true);
+    }
 }
 
 function showToast(message, isError = false) {

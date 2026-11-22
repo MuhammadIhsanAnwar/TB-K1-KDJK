@@ -2394,6 +2394,7 @@ function toggleCallMicrophone() {
         track.enabled = !call.micMuted;
     }
 
+    sendCallMediaState(call);
 }
 
 function showToast(message, isError = false) {

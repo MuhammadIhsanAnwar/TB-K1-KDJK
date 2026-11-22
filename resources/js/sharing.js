@@ -2011,6 +2011,8 @@ async function acceptIncomingCall() {
             endCall(mediaErrorMessage(error, callDeviceLabel(call.kind)), false, true);
         }
         return;
+    }
+
 }
 
 function showToast(message, isError = false) {

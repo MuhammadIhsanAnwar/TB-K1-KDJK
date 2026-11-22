@@ -2056,6 +2056,8 @@ function hangUpCall() {
     endCall(call.connectedAt ? `Panggilan selesai${duration}.` : 'Panggilan dibatalkan.', true);
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

@@ -374,6 +374,8 @@ function restorePreviousChatView() {
 
     if (state.voiceRecorder?.context === 'private') {
         void finishVoiceRecording(false);
+    }
+
     el('#private-chat-panel').hidden = true;
 
     el('#room-empty').hidden =

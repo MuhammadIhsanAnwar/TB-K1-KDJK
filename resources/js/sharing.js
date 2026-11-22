@@ -2086,6 +2086,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     if (message) showToast(message, isError);
 }
 
+function createCallPeer(call) {
 }
 
 function showToast(message, isError = false) {

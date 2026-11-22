@@ -2180,6 +2180,8 @@ function markCallConnected(call) {
     }, 1000);
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

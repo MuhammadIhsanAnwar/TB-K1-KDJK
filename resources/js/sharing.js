@@ -2004,6 +2004,7 @@ async function acceptIncomingCall() {
     renderCallDialog();
 
     try {
+        call.localStream = await getCallMedia(call.kind);
 }
 
 function showToast(message, isError = false) {

@@ -1458,6 +1458,7 @@ async function startVoiceRecording(context) {
         ? state.selectedPrivateUser?.id ?? null
         : null;
 
+    try {
 }
 
 function showToast(message, isError = false) {

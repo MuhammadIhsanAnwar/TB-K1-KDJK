@@ -1565,6 +1565,7 @@ async function finishVoiceRecording(send) {
 
     if (!send) return;
 
+    if (duration < MIN_VOICE_NOTE_SECONDS) {
 }
 
 function showToast(message, isError = false) {

@@ -1659,6 +1659,7 @@ function storeOwnPrivateMessage(message, userId) {
     }
 
     try {
+        const key = privateConversationKey(userId);
 }
 
 function showToast(message, isError = false) {

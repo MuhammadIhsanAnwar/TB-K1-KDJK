@@ -1867,6 +1867,7 @@ function createVoiceNotePlayer(url, duration) {
 function renderCallButtons() {
     const available = Boolean(state.selectedPrivateUser) && !state.call;
 
+    el('#private-voice-call').disabled = !available;
 }
 
 function showToast(message, isError = false) {

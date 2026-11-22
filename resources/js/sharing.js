@@ -1486,6 +1486,7 @@ async function startVoiceRecording(context) {
     }
 
     const contextChanged = context === 'room'
+        ? !state.room
 }
 
 function showToast(message, isError = false) {

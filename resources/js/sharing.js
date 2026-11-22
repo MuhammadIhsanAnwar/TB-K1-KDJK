@@ -1814,6 +1814,7 @@ function createVoiceNotePlayer(url, duration) {
     audio.preload = 'metadata';
 
     const showPaused = () => {
+        button.innerHTML = PLAY_ICON;
 }
 
 function showToast(message, isError = false) {

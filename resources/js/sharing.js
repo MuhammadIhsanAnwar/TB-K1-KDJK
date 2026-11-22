@@ -1491,6 +1491,7 @@ async function startVoiceRecording(context) {
 
     if (state.voiceRecorder || contextChanged) {
         stopMediaStream(stream);
+        return;
 }
 
 function showToast(message, isError = false) {

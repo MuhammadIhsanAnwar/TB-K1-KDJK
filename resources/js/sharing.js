@@ -2237,6 +2237,7 @@ async function handleCallSignal(from, user, signal) {
                 ? `${call.peerName} tidak dapat memakai mikrofon atau kamera.`
                 : `${call.peerName} menolak panggilan.`);
         } else if (signal.type === 'call-end') {
+            endCall(call.status === 'ringing'
 }
 
 function showToast(message, isError = false) {

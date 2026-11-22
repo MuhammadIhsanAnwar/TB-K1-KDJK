@@ -1388,6 +1388,8 @@ function stopMediaStream(stream) {
 }
 
 function bytesToBase64(bytes) {
+    let binary = '';
+
 }
 
 function showToast(message, isError = false) {

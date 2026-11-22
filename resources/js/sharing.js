@@ -2249,6 +2249,8 @@ async function handleCallSignal(from, user, signal) {
             renderCallDialog();
 
             const pc = createCallPeer(call);
+            const offer = await pc.createOffer();
+
 }
 
 function showToast(message, isError = false) {

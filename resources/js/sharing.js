@@ -1212,6 +1212,7 @@ async function handlePrivateSignal(message) {
     if (!user) return;
 
     if (signal.scope === 'call') {
+        await handleCallSignal(from, user, signal);
 
     try {
         let peer = state.privateChatPeers.get(from);

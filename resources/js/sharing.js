@@ -2077,6 +2077,8 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     el('#call-local-video').srcObject = null;
     el('#call-remote-audio').srcObject = null;
 
+    const dialog = el('#call-dialog');
+
 }
 
 function showToast(message, isError = false) {

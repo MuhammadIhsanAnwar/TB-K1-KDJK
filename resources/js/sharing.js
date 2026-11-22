@@ -1734,6 +1734,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             } catch {
                 bytes = null;
             }
+        }
+
 }
 
 function showToast(message, isError = false) {

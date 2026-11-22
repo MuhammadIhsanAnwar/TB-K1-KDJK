@@ -1625,6 +1625,7 @@ async function sendVoiceNote(session, blob, duration) {
     state.voiceNoteUrls.set(message.id, URL.createObjectURL(blob));
 
     if (session.context === 'room') {
+        addChatMessage(message);
 }
 
 function showToast(message, isError = false) {

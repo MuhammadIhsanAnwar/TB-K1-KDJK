@@ -2225,6 +2225,8 @@ async function handleCallSignal(from, user, signal) {
         return;
     }
 
+    const call = state.call;
+
 }
 
 function showToast(message, isError = false) {

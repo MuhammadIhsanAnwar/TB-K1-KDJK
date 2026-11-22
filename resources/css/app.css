@@ -915,3 +915,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .voice-recorder-dot,

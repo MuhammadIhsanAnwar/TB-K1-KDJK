@@ -2133,6 +2133,7 @@ function createCallPeer(call) {
         renderCallDialog();
     });
 
+    pc.addEventListener('connectionstatechange', () => {
 }
 
 function showToast(message, isError = false) {

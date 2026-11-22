@@ -371,6 +371,7 @@
                                 <div class="private-chat-actions">
                                     <button
                                         id="private-voice-call"
+                                        class="button button-outline button-small call-start-button"
                             </div>
 
                             <div

@@ -1921,6 +1921,7 @@ async function getCallMedia(kind) {
     }
 
     try {
+        return await navigator.mediaDevices.getUserMedia({
 }
 
 function showToast(message, isError = false) {

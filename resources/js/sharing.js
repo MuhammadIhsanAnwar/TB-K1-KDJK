@@ -1890,6 +1890,7 @@ function createCallState({ id, kind, direction, status, peerId, peerName }) {
         unstable: false,
         timeoutTimer: null,
         durationTimer: null,
+        connectedAt: null,
 }
 
 function showToast(message, isError = false) {

@@ -279,6 +279,7 @@ function handlePrivatePresence(member) {
 
         if (state.voiceRecorder?.targetUserId === userId) {
             void finishVoiceRecording(false);
+        }
 
         if (state.selectedPrivateUser?.id === userId) {
             state.selectedPrivateUser = null;

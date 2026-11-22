@@ -1961,6 +1961,7 @@ async function startCall(kind) {
         kind,
         direction: 'outgoing',
         status: 'preparing',
+        peerId: user.id,
 }
 
 function showToast(message, isError = false) {

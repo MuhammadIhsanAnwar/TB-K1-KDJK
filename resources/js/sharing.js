@@ -1717,6 +1717,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 
     if (typeof frame.id !== 'string') return;
 
+    const key = `${prefix}${frame.id}`;
 }
 
 function showToast(message, isError = false) {

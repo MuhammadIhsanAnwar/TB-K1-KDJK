@@ -1701,6 +1701,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
         if (!isValidVoiceNoteMessage(message, fromUserId)) return;
 
         const key = `${prefix}${message.id}`;
+        const inProgress = [...state.incomingVoiceNotes.keys()]
 }
 
 function showToast(message, isError = false) {

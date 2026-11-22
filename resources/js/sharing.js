@@ -391,6 +391,8 @@ function restorePreviousChatView() {
 async function selectPrivateUser(user) {
     if (state.voiceRecorder) {
         await finishVoiceRecording(false);
+    }
+
     state.selectedPrivateUser = user;
 
     showPrivateChatView();

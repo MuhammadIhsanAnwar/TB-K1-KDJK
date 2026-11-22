@@ -370,6 +370,7 @@
 
                                 <div class="private-chat-actions">
                                     <button
+                                        id="private-voice-call"
                             </div>
 
                             <div

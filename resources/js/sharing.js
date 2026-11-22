@@ -2406,6 +2406,7 @@ function toggleCallCamera() {
 
     call.cameraOff = !call.cameraOff;
 
+    for (const track of videoTracks) {
 }
 
 function showToast(message, isError = false) {

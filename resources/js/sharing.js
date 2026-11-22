@@ -1684,6 +1684,7 @@ function isValidVoiceNoteMessage(message, fromUserId) {
         && typeof voice?.mime_type === 'string'
         && voice.mime_type.length <= 100
         && /^audio\/[a-z0-9.+-]+(;[\w=.,+ -]*)?$/i.test(voice.mime_type)
+        && Number.isSafeInteger(voice.size)
 }
 
 function showToast(message, isError = false) {

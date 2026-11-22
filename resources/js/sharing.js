@@ -116,6 +116,7 @@ const MAX_VOICE_NOTE_SECONDS = 120;
 const MIN_VOICE_NOTE_SECONDS = 1;
 const MAX_VOICE_NOTE_SIZE = 3 * 1024 * 1024;
 const VOICE_NOTE_CHUNK_SIZE = 12 * 1024;
+const VOICE_NOTE_MIME_TYPES = [
 let toastTimer;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 let inviteProof = new URL(window.location.href).searchParams.get('proof');

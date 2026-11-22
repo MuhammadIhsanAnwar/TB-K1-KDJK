@@ -1925,6 +1925,7 @@ async function getCallMedia(kind) {
             audio,
             video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
         });
+    } catch (error) {
 }
 
 function showToast(message, isError = false) {

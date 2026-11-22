@@ -2454,6 +2454,7 @@ function stopRingtone() {
     if (!ringtone) return;
 
     window.clearInterval(ringtone.timer);
+    void ringtone.context.close().catch(() => {});
 }
 
 function showToast(message, isError = false) {

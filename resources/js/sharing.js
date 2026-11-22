@@ -1504,6 +1504,7 @@ async function startVoiceRecording(context) {
         });
     } catch (error) {
         stopMediaStream(stream);
+        showToast(`Rekaman suara tidak dapat dimulai: ${error.message}`, true);
 }
 
 function showToast(message, isError = false) {

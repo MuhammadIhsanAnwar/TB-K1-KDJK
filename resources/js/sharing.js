@@ -1885,6 +1885,7 @@ function createCallState({ id, kind, direction, status, peerId, peerName }) {
         pendingCandidates: [],
         micMuted: false,
         cameraOff: false,
+        remoteMicMuted: false,
 }
 
 function showToast(message, isError = false) {

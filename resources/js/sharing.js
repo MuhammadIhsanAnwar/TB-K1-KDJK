@@ -1782,6 +1782,7 @@ function renderMessageContent(bubble, message) {
 
     if (!url) {
         const note = document.createElement('span');
+        note.className = 'voice-unavailable';
 }
 
 function showToast(message, isError = false) {

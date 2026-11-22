@@ -1674,6 +1674,7 @@ function isValidVoiceNoteMessage(message, fromUserId) {
     const voice = message?.voice;
 
     return typeof message?.id === 'string'
+        && /^[0-9a-f-]{36}$/i.test(message.id)
 }
 
 function showToast(message, isError = false) {

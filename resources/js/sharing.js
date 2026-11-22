@@ -1500,6 +1500,7 @@ async function startVoiceRecording(context) {
     try {
         recorder = new MediaRecorder(stream, {
             ...(mimeType ? { mimeType } : {}),
+            audioBitsPerSecond: 32000,
 }
 
 function showToast(message, isError = false) {

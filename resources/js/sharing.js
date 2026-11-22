@@ -1534,6 +1534,8 @@ async function startVoiceRecording(context) {
         if (elapsed >= MAX_VOICE_NOTE_SECONDS) {
             void finishVoiceRecording(true);
         }
+    }, 250);
+
 }
 
 function showToast(message, isError = false) {

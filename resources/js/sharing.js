@@ -2251,6 +2251,7 @@ async function handleCallSignal(from, user, signal) {
             const pc = createCallPeer(call);
             const offer = await pc.createOffer();
 
+            await pc.setLocalDescription(offer);
 }
 
 function showToast(message, isError = false) {

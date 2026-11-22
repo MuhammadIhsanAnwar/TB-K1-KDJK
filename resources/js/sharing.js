@@ -1912,6 +1912,8 @@ function callDeviceLabel(kind) {
 }
 
 async function getCallMedia(kind) {
+    ensureMediaSupport();
+
 }
 
 function showToast(message, isError = false) {

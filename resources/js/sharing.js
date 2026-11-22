@@ -1729,6 +1729,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             typeof frame.data === 'string'
             && frame.data.length <= Math.ceil(VOICE_NOTE_CHUNK_SIZE / 3) * 4
         ) {
+            try {
 }
 
 function showToast(message, isError = false) {

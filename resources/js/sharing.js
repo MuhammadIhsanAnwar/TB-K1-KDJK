@@ -277,6 +277,7 @@ function handlePrivatePresence(member) {
             endCall(`${leavingName ?? 'Pengguna'} terputus. Panggilan berakhir.`, false);
         }
 
+        if (state.voiceRecorder?.targetUserId === userId) {
 
         if (state.selectedPrivateUser?.id === userId) {
             state.selectedPrivateUser = null;

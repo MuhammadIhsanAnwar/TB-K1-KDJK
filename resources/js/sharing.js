@@ -4230,6 +4230,7 @@ function bindEvents() {
     for (const context of ['room', 'private']) {
         el(`#${context}-voice-button`).addEventListener('click', () => void startVoiceRecording(context));
         el(`#${context}-voice-cancel`).addEventListener('click', () => void finishVoiceRecording(false));
+        el(`#${context}-voice-send`).addEventListener('click', () => void finishVoiceRecording(true));
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

@@ -1608,6 +1608,7 @@ async function sendVoiceNote(session, blob, duration) {
             mime_type: blob.type.slice(0, 100),
             size: blob.size,
         },
+        created_at: new Date().toISOString(),
 }
 
 function showToast(message, isError = false) {

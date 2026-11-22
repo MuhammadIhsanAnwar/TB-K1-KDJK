@@ -1934,6 +1934,7 @@ async function getCallMedia(kind) {
         showToast('Kamera tidak tersedia. Panggilan berjalan dengan suara saja.', true);
 
         return stream;
+    }
 }
 
 function showToast(message, isError = false) {

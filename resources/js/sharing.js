@@ -1452,6 +1452,8 @@ function renderVoiceRecorder(context, recording) {
 }
 
 async function startVoiceRecording(context) {
+    if (state.voiceRecorder || voiceRecorderStarting) return;
+
 }
 
 function showToast(message, isError = false) {

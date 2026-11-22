@@ -2042,6 +2042,8 @@ function declineIncomingCall() {
 function hangUpCall() {
     const call = state.call;
 
+    if (!call) return;
+
 }
 
 function showToast(message, isError = false) {

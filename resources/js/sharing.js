@@ -2445,6 +2445,7 @@ function startRingtone() {
         void context.resume().catch(() => {});
         playRing();
         ringtone = { context, timer: window.setInterval(playRing, 2200) };
+    } catch {
 }
 
 function showToast(message, isError = false) {

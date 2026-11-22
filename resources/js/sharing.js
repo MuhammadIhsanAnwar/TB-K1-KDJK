@@ -2424,6 +2424,7 @@ function startRingtone() {
     try {
         const context = new AudioContextClass();
 
+        const playRing = () => {
 }
 
 function showToast(message, isError = false) {

@@ -1466,6 +1466,7 @@ async function startVoiceRecording(context) {
     }
 
     if (!window.MediaRecorder) {
+        showToast('Browser ini belum mendukung rekaman suara.', true);
 }
 
 function showToast(message, isError = false) {

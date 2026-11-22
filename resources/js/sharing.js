@@ -1791,6 +1791,8 @@ function renderMessageContent(bubble, message) {
     bubble.append(createVoiceNotePlayer(url, Number(message.voice?.duration) || 0));
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

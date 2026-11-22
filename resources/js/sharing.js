@@ -1815,6 +1815,7 @@ function createVoiceNotePlayer(url, duration) {
 
     const showPaused = () => {
         button.innerHTML = PLAY_ICON;
+        button.setAttribute('aria-label', 'Putar voice note');
 }
 
 function showToast(message, isError = false) {

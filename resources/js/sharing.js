@@ -2371,6 +2371,7 @@ function renderCallDialog() {
     camera.disabled = !localHasVideo;
     camera.setAttribute('aria-pressed', String(call.cameraOff || cameraUnavailable));
     camera.setAttribute('aria-label', call.cameraOff ? 'Nyalakan kamera' : 'Matikan kamera');
+    el('#call-camera-caption').textContent = cameraUnavailable
 }
 
 function showToast(message, isError = false) {

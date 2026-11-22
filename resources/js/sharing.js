@@ -2104,6 +2104,8 @@ function createCallPeer(call) {
     }
 
     pc.addEventListener('icecandidate', (event) => {
+        if (!event.candidate || state.call !== call) return;
+
 }
 
 function showToast(message, isError = false) {

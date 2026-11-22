@@ -1523,6 +1523,7 @@ async function startVoiceRecording(context) {
         if (event.data.size > 0) session.chunks.push(event.data);
     });
 
+    recorder.start();
 }
 
 function showToast(message, isError = false) {

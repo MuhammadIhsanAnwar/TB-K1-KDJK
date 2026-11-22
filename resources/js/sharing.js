@@ -120,6 +120,7 @@ const VOICE_NOTE_MIME_TYPES = [
     'audio/webm;codecs=opus',
     'audio/webm',
     'audio/mp4',
+    'audio/ogg;codecs=opus',
 let toastTimer;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 let inviteProof = new URL(window.location.href).searchParams.get('proof');

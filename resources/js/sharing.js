@@ -1897,6 +1897,8 @@ function createCallState({ id, kind, direction, status, peerId, peerName }) {
 function sendCallSignal(call, type, payload = {}) {
     if (!state.privateChannel) {
         return Promise.reject(new Error('Koneksi signaling belum tersedia.'));
+    }
+
 }
 
 function showToast(message, isError = false) {

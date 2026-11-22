@@ -1653,6 +1653,7 @@ function storeOwnPrivateMessage(message, userId) {
         state.privateMessageHistory.push(message);
         state.privateMessageHistory = state.privateMessageHistory.slice(-100);
 
+        renderPrivateMessage(message);
 }
 
 function showToast(message, isError = false) {

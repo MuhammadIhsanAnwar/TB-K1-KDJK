@@ -1808,6 +1808,8 @@ function createVoiceNotePlayer(url, duration) {
 
     const time = document.createElement('span');
     time.className = 'voice-time';
+    time.textContent = formatDuration(duration);
+
 }
 
 function showToast(message, isError = false) {

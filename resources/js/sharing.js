@@ -1408,6 +1408,8 @@ function base64ToBytes(data) {
     return bytes;
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

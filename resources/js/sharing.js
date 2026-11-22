@@ -2336,6 +2336,7 @@ function renderCallDialog() {
         && !remoteVideoTrack.muted;
     const isIncomingRing = call.direction === 'incoming' && call.status === 'ringing';
 
+    dialog.classList.toggle('is-video', isVideo);
 }
 
 function showToast(message, isError = false) {

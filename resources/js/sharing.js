@@ -1778,6 +1778,8 @@ function renderMessageContent(bubble, message) {
 
     bubble.classList.add('is-voice');
 
+    const url = state.voiceNoteUrls.get(String(message.id));
+
 }
 
 function showToast(message, isError = false) {

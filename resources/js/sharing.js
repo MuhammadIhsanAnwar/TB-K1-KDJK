@@ -2061,6 +2061,8 @@ function endCall(message = null, notifyPeer = false, isError = false) {
 
     if (!call) return;
 
+    state.call = null;
+
 }
 
 function showToast(message, isError = false) {

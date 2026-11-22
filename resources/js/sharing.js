@@ -1978,6 +1978,8 @@ async function startCall(kind) {
     if (state.call !== call) {
         stopMediaStream(call.localStream);
         return;
+    }
+
 }
 
 function showToast(message, isError = false) {

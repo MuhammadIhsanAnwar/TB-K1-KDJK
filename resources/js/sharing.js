@@ -2079,6 +2079,8 @@ function endCall(message = null, notifyPeer = false, isError = false) {
 
     const dialog = el('#call-dialog');
 
+    if (dialog.open) dialog.close();
+
 }
 
 function showToast(message, isError = false) {

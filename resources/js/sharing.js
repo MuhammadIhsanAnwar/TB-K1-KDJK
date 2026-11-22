@@ -1601,6 +1601,7 @@ async function sendVoiceNote(session, blob, duration) {
         id: crypto.randomUUID(),
         user_id: state.user.id,
         user_name: state.user.name,
+        body: '',
 }
 
 function showToast(message, isError = false) {

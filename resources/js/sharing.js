@@ -2369,6 +2369,7 @@ function renderCallDialog() {
 
     el('#call-camera-action').hidden = !isVideo;
     camera.disabled = !localHasVideo;
+    camera.setAttribute('aria-pressed', String(call.cameraOff || cameraUnavailable));
 }
 
 function showToast(message, isError = false) {

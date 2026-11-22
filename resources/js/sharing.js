@@ -1937,6 +1937,7 @@ async function getCallMedia(kind) {
     }
 }
 
+function setCallTimeout(call, delay, message) {
 }
 
 function showToast(message, isError = false) {

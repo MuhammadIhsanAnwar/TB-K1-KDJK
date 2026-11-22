@@ -2049,6 +2049,7 @@ function hangUpCall() {
         return;
     }
 
+    const duration = call.connectedAt
 }
 
 function showToast(message, isError = false) {

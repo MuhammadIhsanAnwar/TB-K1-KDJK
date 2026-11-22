@@ -2337,6 +2337,7 @@ function renderCallDialog() {
     const isIncomingRing = call.direction === 'incoming' && call.status === 'ringing';
 
     dialog.classList.toggle('is-video', isVideo);
+    dialog.classList.toggle('is-ringing', ['calling', 'ringing'].includes(call.status));
 }
 
 function showToast(message, isError = false) {

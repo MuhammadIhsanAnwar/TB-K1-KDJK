@@ -2222,6 +2222,7 @@ async function handleCallSignal(from, user, signal) {
                 endCall(`Panggilan tak terjawab dari ${call.peerName}.`);
             }
         }, CALL_RING_TIMEOUT + 5000);
+        return;
 }
 
 function showToast(message, isError = false) {

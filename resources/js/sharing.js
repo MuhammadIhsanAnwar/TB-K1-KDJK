@@ -1757,6 +1757,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 
         const blob = new Blob(incoming.chunks, { type: incoming.message.voice.mime_type });
 
+        state.voiceNoteUrls.set(incoming.message.id, URL.createObjectURL(blob));
 }
 
 function showToast(message, isError = false) {

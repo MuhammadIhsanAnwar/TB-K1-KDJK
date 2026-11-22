@@ -2116,6 +2116,7 @@ function createCallPeer(call) {
 
         const [stream] = event.streams;
 
+        if (stream) {
 }
 
 function showToast(message, isError = false) {

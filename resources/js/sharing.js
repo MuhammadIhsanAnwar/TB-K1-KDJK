@@ -1859,6 +1859,8 @@ function createVoiceNotePlayer(url, duration) {
         });
     });
 
+    player.append(button, track, time);
+
 }
 
 function showToast(message, isError = false) {

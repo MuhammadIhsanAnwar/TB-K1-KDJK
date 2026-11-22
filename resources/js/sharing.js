@@ -1381,6 +1381,8 @@ function mediaErrorMessage(error, device) {
     return `${capitalize(device)} tidak dapat diakses: ${error?.message ?? 'kesalahan tidak dikenal'}.`;
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

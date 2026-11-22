@@ -1914,6 +1914,8 @@ function callDeviceLabel(kind) {
 async function getCallMedia(kind) {
     ensureMediaSupport();
 
+    const audio = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+
 }
 
 function showToast(message, isError = false) {

@@ -905,3 +905,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
     100% { box-shadow: 0 0 0 24px #3bbd8300; }
 }
 
+@media (max-width: 760px) {

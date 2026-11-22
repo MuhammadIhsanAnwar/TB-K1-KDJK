@@ -1570,6 +1570,7 @@ async function finishVoiceRecording(send) {
         return;
     }
 
+    const blob = new Blob(session.chunks, {
 }
 
 function showToast(message, isError = false) {

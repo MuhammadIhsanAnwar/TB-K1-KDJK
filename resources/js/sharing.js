@@ -1430,6 +1430,8 @@ function voiceNoteChannels(context, targetUserId) {
         return channels;
     }
 
+    const channel = state.privateChatPeers.get(String(targetUserId))?.channel;
+
 }
 
 function showToast(message, isError = false) {

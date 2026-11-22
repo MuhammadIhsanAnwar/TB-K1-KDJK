@@ -2209,6 +2209,8 @@ async function handleCallSignal(from, user, signal) {
             status: 'ringing',
             peerId: from,
             peerName: user.name,
+        });
+
 }
 
 function showToast(message, isError = false) {

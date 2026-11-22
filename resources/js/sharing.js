@@ -1941,6 +1941,7 @@ function setCallTimeout(call, delay, message) {
     window.clearTimeout(call.timeoutTimer);
     call.timeoutTimer = window.setTimeout(() => {
         if (state.call === call && call.status !== 'active') {
+            endCall(message, true, true);
 }
 
 function showToast(message, isError = false) {

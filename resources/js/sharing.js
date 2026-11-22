@@ -1983,6 +1983,7 @@ async function startCall(kind) {
     call.status = 'calling';
     openCallDialog();
 
+    try {
 }
 
 function showToast(message, isError = false) {

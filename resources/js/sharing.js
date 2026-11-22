@@ -2282,6 +2282,7 @@ async function handleCallSignal(from, user, signal) {
                 call.pendingCandidates.push(payload.candidate);
             }
         } else if (signal.type === 'call-media') {
+            call.remoteMicMuted = payload.micMuted === true;
 }
 
 function showToast(message, isError = false) {

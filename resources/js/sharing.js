@@ -2450,6 +2450,7 @@ function startRingtone() {
     }
 }
 
+function stopRingtone() {
 }
 
 function showToast(message, isError = false) {

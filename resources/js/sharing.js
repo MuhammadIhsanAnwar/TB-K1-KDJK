@@ -1572,6 +1572,8 @@ async function finishVoiceRecording(send) {
 
     const blob = new Blob(session.chunks, {
         type: session.recorder.mimeType || session.chunks[0]?.type || 'audio/webm',
+    });
+
 }
 
 function showToast(message, isError = false) {

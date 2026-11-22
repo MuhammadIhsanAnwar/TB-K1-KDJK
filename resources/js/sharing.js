@@ -2186,6 +2186,8 @@ async function drainCallCandidates(call) {
     }
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

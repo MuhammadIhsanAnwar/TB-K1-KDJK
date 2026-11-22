@@ -2035,6 +2035,7 @@ function declineIncomingCall() {
 
     if (!call || call.direction !== 'incoming' || call.status !== 'ringing') return;
 
+    void sendCallSignal(call, 'call-reject').catch(() => {});
 }
 
 function showToast(message, isError = false) {

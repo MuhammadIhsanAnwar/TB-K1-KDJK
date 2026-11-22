@@ -2121,6 +2121,8 @@ function createCallPeer(call) {
         } else {
             call.remoteStream ??= new MediaStream();
             call.remoteStream.addTrack(event.track);
+        }
+
 }
 
 function showToast(message, isError = false) {

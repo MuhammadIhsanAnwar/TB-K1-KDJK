@@ -1700,6 +1700,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 
         if (!isValidVoiceNoteMessage(message, fromUserId)) return;
 
+        const key = `${prefix}${message.id}`;
 }
 
 function showToast(message, isError = false) {

@@ -1465,6 +1465,7 @@ async function startVoiceRecording(context) {
         return;
     }
 
+    if (!window.MediaRecorder) {
 }
 
 function showToast(message, isError = false) {

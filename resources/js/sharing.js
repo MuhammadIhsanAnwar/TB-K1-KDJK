@@ -1490,6 +1490,7 @@ async function startVoiceRecording(context) {
         : state.selectedPrivateUser?.id !== targetUserId;
 
     if (state.voiceRecorder || contextChanged) {
+        stopMediaStream(stream);
 }
 
 function showToast(message, isError = false) {

@@ -2248,6 +2248,7 @@ async function handleCallSignal(from, user, signal) {
             call.status = 'connecting';
             renderCallDialog();
 
+            const pc = createCallPeer(call);
 }
 
 function showToast(message, isError = false) {

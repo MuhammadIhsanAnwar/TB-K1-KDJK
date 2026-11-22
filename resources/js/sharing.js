@@ -1658,6 +1658,7 @@ function storeOwnPrivateMessage(message, userId) {
         return;
     }
 
+    try {
 }
 
 function showToast(message, isError = false) {

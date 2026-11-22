@@ -1427,6 +1427,7 @@ function voiceNoteChannels(context, targetUserId) {
             throw new Error('Koneksi P2P ke semua peserta belum siap. Coba lagi sebentar.');
         }
 
+        return channels;
 }
 
 function showToast(message, isError = false) {

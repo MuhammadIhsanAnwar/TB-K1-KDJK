@@ -3028,6 +3028,7 @@ function closeChatPeer(userId) {
     peer.pc.close();
     state.chatPeers.delete(String(userId));
     state.chatCandidates.delete(String(userId));
+    discardIncomingVoiceNotes('room', userId);
     updateFileButton();
 }
 

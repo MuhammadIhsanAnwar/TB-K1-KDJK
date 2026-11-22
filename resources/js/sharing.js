@@ -1776,6 +1776,8 @@ function renderMessageContent(bubble, message) {
         return;
     }
 
+    bubble.classList.add('is-voice');
+
 }
 
 function showToast(message, isError = false) {

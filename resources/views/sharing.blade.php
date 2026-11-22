@@ -575,6 +575,7 @@
         <div class="call-stage">
             <video id="call-remote-video" class="call-remote-video" autoplay playsinline muted hidden></video>
 
+            <div class="call-identity">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

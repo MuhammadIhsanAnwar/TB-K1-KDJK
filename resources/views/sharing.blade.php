@@ -581,6 +581,7 @@
                 <p id="call-status" aria-live="polite">Menghubungkan…</p>
             </div>
 
+            <video id="call-local-video" class="call-local-video" autoplay playsinline muted hidden></video>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

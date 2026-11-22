@@ -273,6 +273,8 @@ function handlePrivatePresence(member) {
         state.privateOnlineUsers.delete(userId);
         closePrivateChatPeer(userId);
 
+        if (state.call?.peerId === userId) {
+
         if (state.selectedPrivateUser?.id === userId) {
             state.selectedPrivateUser = null;
             el('#private-chat-panel').hidden = true;

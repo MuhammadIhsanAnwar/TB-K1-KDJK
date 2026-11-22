@@ -2362,6 +2362,8 @@ function renderCallDialog() {
     mic.disabled = !hasLocalStream;
     mic.setAttribute('aria-pressed', String(call.micMuted));
     mic.setAttribute('aria-label', call.micMuted ? 'Nyalakan mikrofon' : 'Matikan mikrofon');
+    el('#call-mic-caption').textContent = call.micMuted ? 'Mikrofon mati' : 'Mikrofon';
+
 }
 
 function showToast(message, isError = false) {

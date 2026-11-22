@@ -2415,6 +2415,8 @@ function toggleCallCamera() {
 }
 
 function startRingtone() {
+    stopRingtone();
+
 }
 
 function showToast(message, isError = false) {

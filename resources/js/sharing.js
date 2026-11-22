@@ -2107,6 +2107,7 @@ function createCallPeer(call) {
         if (!event.candidate || state.call !== call) return;
 
         void sendCallSignal(call, 'call-candidate', {
+            candidate: event.candidate.toJSON(),
 }
 
 function showToast(message, isError = false) {

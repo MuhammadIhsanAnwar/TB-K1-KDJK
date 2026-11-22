@@ -1381,6 +1381,7 @@ function mediaErrorMessage(error, device) {
     return `${capitalize(device)} tidak dapat diakses: ${error?.message ?? 'kesalahan tidak dikenal'}.`;
 }
 
+function stopMediaStream(stream) {
 }
 
 function showToast(message, isError = false) {

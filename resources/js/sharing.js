@@ -2118,6 +2118,7 @@ function createCallPeer(call) {
 
         if (stream) {
             call.remoteStream = stream;
+        } else {
 }
 
 function showToast(message, isError = false) {

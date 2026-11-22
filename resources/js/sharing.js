@@ -1366,6 +1366,7 @@ function ensureMediaSupport() {
 function mediaErrorMessage(error, device) {
     if (error?.name === 'InsecureContextError') return error.message;
 
+    if (['NotAllowedError', 'SecurityError'].includes(error?.name)) {
 }
 
 function showToast(message, isError = false) {

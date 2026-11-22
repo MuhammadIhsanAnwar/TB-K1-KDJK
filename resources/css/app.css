@@ -895,3 +895,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-control .icon-off,
 .call-control[aria-pressed="true"] .icon-on { display: none; }
 .call-control[aria-pressed="true"] .icon-off { display: block; }
+.call-control[aria-pressed="true"] { color: #0f2333; background: #fff; }

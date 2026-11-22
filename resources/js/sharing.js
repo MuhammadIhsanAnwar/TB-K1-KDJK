@@ -1911,6 +1911,7 @@ function callDeviceLabel(kind) {
     return kind === 'video' ? 'kamera dan mikrofon' : 'mikrofon';
 }
 
+async function getCallMedia(kind) {
 }
 
 function showToast(message, isError = false) {

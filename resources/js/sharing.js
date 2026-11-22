@@ -1713,6 +1713,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 
         state.incomingVoiceNotes.set(key, { message, chunks: [], receivedBytes: 0 });
         return;
+    }
+
 }
 
 function showToast(message, isError = false) {

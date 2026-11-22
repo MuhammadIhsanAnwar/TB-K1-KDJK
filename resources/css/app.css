@@ -853,3 +853,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .voice-recorder .button { flex: 0 0 auto; }
 @keyframes voice-pulse { 50% { opacity: .3; } }
 
+.message-bubble.is-voice { padding: 7px 10px; white-space: normal; }

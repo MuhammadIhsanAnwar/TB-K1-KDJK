@@ -2244,6 +2244,7 @@ async function handleCallSignal(from, user, signal) {
             signal.type === 'call-accept'
             && call.direction === 'outgoing'
             && call.status === 'calling'
+        ) {
 }
 
 function showToast(message, isError = false) {

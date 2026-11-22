@@ -1720,6 +1720,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
     const key = `${prefix}${frame.id}`;
     const incoming = state.incomingVoiceNotes.get(key);
 
+    if (!incoming) return;
+
 }
 
 function showToast(message, isError = false) {

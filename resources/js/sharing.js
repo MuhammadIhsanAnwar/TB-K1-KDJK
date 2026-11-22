@@ -1423,6 +1423,7 @@ function voiceNoteChannels(context, targetUserId) {
 
         const channels = recipientIds.map((userId) => state.chatPeers.get(userId)?.channel);
 
+        if (channels.some((channel) => channel?.readyState !== 'open')) {
 }
 
 function showToast(message, isError = false) {

@@ -2144,6 +2144,7 @@ function createCallPeer(call) {
             call.unstable = true;
             renderCallDialog();
         } else if (pc.connectionState === 'failed') {
+            endCall('Koneksi panggilan terputus.', true, true);
 }
 
 function showToast(message, isError = false) {

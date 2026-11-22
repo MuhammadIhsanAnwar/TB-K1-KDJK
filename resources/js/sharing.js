@@ -1503,6 +1503,7 @@ async function startVoiceRecording(context) {
             audioBitsPerSecond: 32000,
         });
     } catch (error) {
+        stopMediaStream(stream);
 }
 
 function showToast(message, isError = false) {

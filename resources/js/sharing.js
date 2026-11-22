@@ -2388,6 +2388,8 @@ function toggleCallMicrophone() {
 
     if (!call?.localStream) return;
 
+    call.micMuted = !call.micMuted;
+
 }
 
 function showToast(message, isError = false) {

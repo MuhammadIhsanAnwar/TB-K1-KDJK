@@ -2039,6 +2039,7 @@ function declineIncomingCall() {
     endCall('Panggilan ditolak.');
 }
 
+function hangUpCall() {
 }
 
 function showToast(message, isError = false) {

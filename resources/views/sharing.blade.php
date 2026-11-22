@@ -616,6 +616,7 @@
                 </button>
                 <span id="call-camera-caption">Kamera</span>
             </span>
+            <span class="call-action">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

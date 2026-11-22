@@ -2031,6 +2031,8 @@ async function acceptIncomingCall() {
 }
 
 function declineIncomingCall() {
+    const call = state.call;
+
 }
 
 function showToast(message, isError = false) {

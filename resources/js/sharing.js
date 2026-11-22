@@ -2417,6 +2417,8 @@ function toggleCallCamera() {
 function startRingtone() {
     stopRingtone();
 
+    const AudioContextClass = window.AudioContext ?? window.webkitAudioContext;
+
 }
 
 function showToast(message, isError = false) {

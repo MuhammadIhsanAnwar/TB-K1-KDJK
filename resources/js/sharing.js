@@ -2320,6 +2320,8 @@ function openCallDialog() {
 }
 
 function renderCallDialog() {
+    const call = state.call;
+
 }
 
 function showToast(message, isError = false) {

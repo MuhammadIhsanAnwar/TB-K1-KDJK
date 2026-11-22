@@ -885,3 +885,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-identity p { margin: 0; color: #b9cad6; font-size: 13px; font-variant-numeric: tabular-nums; }
 .call-dialog.has-remote-video .call-identity { position: absolute; inset: 0 0 auto; justify-items: start; gap: 2px; padding: 14px 16px 28px; text-align: left; background: linear-gradient(#0b1a26b3, transparent); }
 .call-dialog.has-remote-video .call-avatar { display: none; }
+.call-dialog.has-remote-video .call-identity h2 { font-size: 16px; }

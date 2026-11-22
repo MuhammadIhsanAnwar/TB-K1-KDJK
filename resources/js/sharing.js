@@ -2432,6 +2432,7 @@ function startRingtone() {
                 const gain = context.createGain();
 
                 oscillator.type = 'sine';
+                oscillator.frequency.value = 740;
 }
 
 function showToast(message, isError = false) {

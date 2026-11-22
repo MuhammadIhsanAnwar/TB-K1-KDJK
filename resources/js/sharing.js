@@ -2377,6 +2377,7 @@ function renderCallDialog() {
 }
 
 function sendCallMediaState(call) {
+    void sendCallSignal(call, 'call-media', {
 }
 
 function showToast(message, isError = false) {

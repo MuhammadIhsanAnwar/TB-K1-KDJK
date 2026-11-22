@@ -1907,6 +1907,8 @@ function sendCallSignal(call, type, payload = {}) {
     });
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

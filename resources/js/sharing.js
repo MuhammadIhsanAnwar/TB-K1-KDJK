@@ -1993,6 +1993,7 @@ async function startCall(kind) {
     setCallTimeout(call, CALL_RING_TIMEOUT, `${user.name} tidak menjawab.`);
 }
 
+async function acceptIncomingCall() {
 }
 
 function showToast(message, isError = false) {

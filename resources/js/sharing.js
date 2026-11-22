@@ -1698,6 +1698,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
     if (frame.type === 'voice.start') {
         const message = frame.message;
 
+        if (!isValidVoiceNoteMessage(message, fromUserId)) return;
+
 }
 
 function showToast(message, isError = false) {

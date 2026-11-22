@@ -2103,6 +2103,7 @@ function createCallPeer(call) {
         pc.addTransceiver('video', { direction: 'recvonly' });
     }
 
+    pc.addEventListener('icecandidate', (event) => {
 }
 
 function showToast(message, isError = false) {

@@ -1448,6 +1448,7 @@ function renderVoiceRecorder(context, recording) {
 
     if (recording) {
         el(`#${context}-voice-send`).focus();
+    }
 }
 
 function showToast(message, isError = false) {

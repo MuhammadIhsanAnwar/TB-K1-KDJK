@@ -1873,6 +1873,7 @@ function renderCallButtons() {
 
 function createCallState({ id, kind, direction, status, peerId, peerName }) {
     return {
+        id,
 }
 
 function showToast(message, isError = false) {

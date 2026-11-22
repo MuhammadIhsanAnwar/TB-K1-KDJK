@@ -1531,6 +1531,7 @@ async function startVoiceRecording(context) {
 
         el(`#${context}-voice-timer`).textContent = formatDuration(elapsed);
 
+        if (elapsed >= MAX_VOICE_NOTE_SECONDS) {
 }
 
 function showToast(message, isError = false) {

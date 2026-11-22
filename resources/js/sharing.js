@@ -2270,6 +2270,7 @@ async function handleCallSignal(from, user, signal) {
         } else if (
             signal.type === 'call-answer'
             && call.direction === 'outgoing'
+            && call.pc
 }
 
 function showToast(message, isError = false) {

@@ -2183,6 +2183,7 @@ function markCallConnected(call) {
 async function drainCallCandidates(call) {
     for (const candidate of call.pendingCandidates.splice(0)) {
         await call.pc.addIceCandidate(candidate);
+    }
 }
 
 function showToast(message, isError = false) {

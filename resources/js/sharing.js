@@ -2211,6 +2211,7 @@ async function handleCallSignal(from, user, signal) {
             peerName: user.name,
         });
 
+        state.call = call;
 }
 
 function showToast(message, isError = false) {

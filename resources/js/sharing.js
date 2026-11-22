@@ -2258,6 +2258,7 @@ async function handleCallSignal(from, user, signal) {
             signal.type === 'call-offer'
             && call.direction === 'incoming'
             && call.pc
+            && !call.pc.remoteDescription
 }
 
 function showToast(message, isError = false) {

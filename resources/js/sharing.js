@@ -2319,6 +2319,8 @@ function openCallDialog() {
     if (!dialog.open) dialog.showModal();
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

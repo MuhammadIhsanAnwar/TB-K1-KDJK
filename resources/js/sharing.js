@@ -1946,6 +1946,7 @@ function setCallTimeout(call, delay, message) {
     }, delay);
 }
 
+async function startCall(kind) {
 }
 
 function showToast(message, isError = false) {

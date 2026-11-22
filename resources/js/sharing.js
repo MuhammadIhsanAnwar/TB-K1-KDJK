@@ -1394,6 +1394,7 @@ function bytesToBase64(bytes) {
         binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
     }
 
+    return btoa(binary);
 }
 
 function showToast(message, isError = false) {

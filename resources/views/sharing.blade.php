@@ -586,6 +586,7 @@
 
         <audio id="call-remote-audio" autoplay></audio>
 
+        <div id="call-incoming-controls" class="call-controls" hidden>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

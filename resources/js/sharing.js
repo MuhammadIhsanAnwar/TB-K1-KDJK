@@ -1899,6 +1899,7 @@ function sendCallSignal(call, type, payload = {}) {
         return Promise.reject(new Error('Koneksi signaling belum tersedia.'));
     }
 
+    return state.privateChannel.publish('signal', {
 }
 
 function showToast(message, isError = false) {

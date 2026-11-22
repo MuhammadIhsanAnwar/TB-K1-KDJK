@@ -2326,6 +2326,7 @@ function renderCallDialog() {
 
     const dialog = el('#call-dialog');
     const isVideo = call.kind === 'video';
+    const hasLocalStream = Boolean(call.localStream);
 }
 
 function showToast(message, isError = false) {

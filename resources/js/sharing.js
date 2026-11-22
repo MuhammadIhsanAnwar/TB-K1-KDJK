@@ -1975,6 +1975,7 @@ async function startCall(kind) {
         return;
     }
 
+    if (state.call !== call) {
 }
 
 function showToast(message, isError = false) {

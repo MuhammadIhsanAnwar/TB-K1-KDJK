@@ -2316,6 +2316,7 @@ function openCallDialog() {
 
     renderCallDialog();
 
+    if (!dialog.open) dialog.showModal();
 }
 
 function showToast(message, isError = false) {

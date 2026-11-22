@@ -2195,6 +2195,7 @@ async function handleCallSignal(from, user, signal) {
     if (signal.type === 'call-invite') {
         if (!['audio', 'video'].includes(payload.kind)) return;
 
+        if (state.call) {
 }
 
 function showToast(message, isError = false) {

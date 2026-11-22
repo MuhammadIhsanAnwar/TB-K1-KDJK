@@ -1346,6 +1346,8 @@ async function sendPrivateChat(event) {
 }
 
 function formatDuration(totalSeconds) {
+    const seconds = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+
 }
 
 function showToast(message, isError = false) {

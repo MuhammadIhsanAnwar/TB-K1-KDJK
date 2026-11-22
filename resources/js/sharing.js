@@ -2355,6 +2355,8 @@ function renderCallDialog() {
     el('#call-peer-name').textContent = call.peerName;
     el('#call-status').textContent = callStatusText(call);
     el('#call-incoming-controls').hidden = !isIncomingRing;
+    el('#call-active-controls').hidden = isIncomingRing;
+
 }
 
 function showToast(message, isError = false) {

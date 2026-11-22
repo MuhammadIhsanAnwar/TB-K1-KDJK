@@ -2338,6 +2338,8 @@ function renderCallDialog() {
 
     dialog.classList.toggle('is-video', isVideo);
     dialog.classList.toggle('is-ringing', ['calling', 'ringing'].includes(call.status));
+    dialog.classList.toggle('has-remote-video', remoteShowsVideo);
+
 }
 
 function showToast(message, isError = false) {

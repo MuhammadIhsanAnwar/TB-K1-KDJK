@@ -1682,6 +1682,7 @@ function isValidVoiceNoteMessage(message, fromUserId) {
         && message.kind === 'voice'
         && message.body === ''
         && typeof voice?.mime_type === 'string'
+        && voice.mime_type.length <= 100
 }
 
 function showToast(message, isError = false) {

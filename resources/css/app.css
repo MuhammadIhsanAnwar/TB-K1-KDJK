@@ -841,3 +841,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-control svg,
 .voice-play svg { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 .voice-button { width: 36px; height: 36px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid #cddbe4; border-radius: 4px; color: #24455d; background: #fff; }
+.voice-button:hover { color: #17658f; background: #edf4f8; }

@@ -2427,6 +2427,7 @@ function startRingtone() {
         const playRing = () => {
             const now = context.currentTime;
 
+            for (const offset of [0, 0.4]) {
 }
 
 function showToast(message, isError = false) {

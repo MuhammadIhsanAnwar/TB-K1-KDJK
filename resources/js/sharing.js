@@ -1574,6 +1574,7 @@ async function finishVoiceRecording(send) {
         type: session.recorder.mimeType || session.chunks[0]?.type || 'audio/webm',
     });
 
+    if (!blob.size) {
 }
 
 function showToast(message, isError = false) {

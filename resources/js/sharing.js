@@ -401,6 +401,7 @@ async function selectPrivateUser(user) {
     el('#private-chat-status').textContent = 'Menghubungkan...';
 
     renderPrivateOnlineUsers();
+    renderCallButtons();
     loadPrivateMessages(user.id);
     renderPrivateFileTransfers();
 

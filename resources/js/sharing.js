@@ -2057,6 +2057,8 @@ function hangUpCall() {
 }
 
 function endCall(message = null, notifyPeer = false, isError = false) {
+    const call = state.call;
+
 }
 
 function showToast(message, isError = false) {

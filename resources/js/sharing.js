@@ -1911,6 +1911,8 @@ function callDeviceLabel(kind) {
     return kind === 'video' ? 'kamera dan mikrofon' : 'mikrofon';
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

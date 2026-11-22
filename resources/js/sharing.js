@@ -2351,6 +2351,7 @@ function renderCallDialog() {
 
     localVideo.hidden = !localHasVideo || call.cameraOff;
 
+    el('#call-avatar').textContent = call.peerName.trim().charAt(0).toUpperCase() || '?';
 }
 
 function showToast(message, isError = false) {

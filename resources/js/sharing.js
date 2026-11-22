@@ -2489,7 +2489,7 @@ function initializeApp() {
 }
 
 function formatBytes(bytes) {
-    if (!Number.isFinite(bytes) || bytes < 0) return '—';
+    if (!Number.isFinite(bytes) || bytes < 0) return '-';
     if (bytes < 1024) return `${bytes} B`;
     const units = ['KB', 'MB', 'GB'];
     let value = bytes / 1024;

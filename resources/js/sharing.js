@@ -1751,6 +1751,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
         state.incomingVoiceNotes.delete(key);
 
         if (incoming.receivedBytes !== incoming.message.voice.size) {
+            showToast('Voice note yang diterima tidak lengkap.', true);
 }
 
 function showToast(message, isError = false) {

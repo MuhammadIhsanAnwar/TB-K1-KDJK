@@ -2383,6 +2383,7 @@ function sendCallMediaState(call) {
     }).catch(() => {});
 }
 
+function toggleCallMicrophone() {
 }
 
 function showToast(message, isError = false) {

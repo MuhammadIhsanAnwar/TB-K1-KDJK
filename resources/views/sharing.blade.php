@@ -268,6 +268,7 @@
                                             <span id="room-voice-timer" class="voice-recorder-time">0:00</span>
                                             <span class="voice-recorder-hint">Merekam · maks. 2 menit</span>
                                             <button id="room-voice-cancel" class="button button-quiet button-small" type="button">Batal</button>
+                                            <button id="room-voice-send" class="button button-primary button-small" type="button">Kirim</button>
                                             class="send-button"
                                             type="submit"
                                             aria-label="Kirim pesan"

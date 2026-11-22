@@ -1763,6 +1763,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 }
 
 function discardIncomingVoiceNotes(context, userId) {
+    const prefix = `${context}:${userId}:`;
+
 }
 
 function showToast(message, isError = false) {

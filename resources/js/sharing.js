@@ -1470,6 +1470,7 @@ async function startVoiceRecording(context) {
         return;
     }
 
+    voiceRecorderStarting = true;
 }
 
 function showToast(message, isError = false) {

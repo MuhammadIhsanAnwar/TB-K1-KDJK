@@ -1810,6 +1810,7 @@ function createVoiceNotePlayer(url, duration) {
     time.className = 'voice-time';
     time.textContent = formatDuration(duration);
 
+    const audio = new Audio(url);
 }
 
 function showToast(message, isError = false) {

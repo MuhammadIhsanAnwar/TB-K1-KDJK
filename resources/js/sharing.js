@@ -2064,6 +2064,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     state.call = null;
 
     if (notifyPeer) {
+        void sendCallSignal(call, 'call-end').catch(() => {});
 }
 
 function showToast(message, isError = false) {

@@ -2273,6 +2273,7 @@ async function handleCallSignal(from, user, signal) {
             && call.pc
             && !call.pc.remoteDescription
         ) {
+            await call.pc.setRemoteDescription(payload.description);
 }
 
 function showToast(message, isError = false) {

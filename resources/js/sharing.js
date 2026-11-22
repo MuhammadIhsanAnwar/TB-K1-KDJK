@@ -2087,6 +2087,8 @@ function endCall(message = null, notifyPeer = false, isError = false) {
 }
 
 function createCallPeer(call) {
+    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+
 }
 
 function showToast(message, isError = false) {

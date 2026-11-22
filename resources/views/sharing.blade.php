@@ -526,6 +526,18 @@
             <h2>Pindai untuk bergabung</h2>
             <canvas id="qr-canvas" width="240" height="240"></canvas>
             <p id="qr-room-code" class="qr-room-code"></p>
+
+            <div class="qr-actions">
+                <button id="qr-download" class="button button-primary button-small" type="button">
+                    Unduh QR
+                </button>
+                <button id="qr-share" class="button button-outline button-small" type="button" hidden>
+                    Bagikan
+                </button>
+                <button id="qr-copy" class="button button-outline button-small" type="button">
+                    Salin tautan
+                </button>
+            </div>
         </div>
     </dialog>
 

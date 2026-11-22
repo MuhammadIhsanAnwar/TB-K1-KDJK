@@ -3937,41 +3937,89 @@ function closePeer(transferId) {
     }
 }
 
-async function copyInvite() {
-    if (!state.room) return;
+function inviteUrl() {
+    if (!state.room) return null;
     const invite = new URL(window.location.href);
     invite.searchParams.set('room', state.room.id);
     if (state.room.proof) invite.searchParams.set('proof', state.room.proof);
     else invite.searchParams.delete('proof');
     invite.searchParams.set('room_name', state.room.name);
+    return invite.toString();
+}
+
+async function copyInvite() {
+    const invite = inviteUrl();
+    if (!invite) return;
     try {
-        await navigator.clipboard.writeText(invite.toString());
+        await navigator.clipboard.writeText(invite);
         showToast('Tautan undangan disalin.');
     } catch {
-        showToast(invite.toString());
+        showToast(invite);
     }
 }
 
 async function showQrCode() {
     if (!state.room) return;
-    const invite = new URL(window.location.href);
-    invite.searchParams.set('room', state.room.id);
-    if (state.room.proof) invite.searchParams.set('proof', state.room.proof);
-    else invite.searchParams.delete('proof');
-    invite.searchParams.set('room_name', state.room.name);
+    const invite = inviteUrl();
+    if (!invite) return;
     try {
-        await QRCode.toCanvas(el('#qr-canvas'), invite.toString(), {
+        await QRCode.toCanvas(el('#qr-canvas'), invite, {
             width: 240,
             margin: 1,
             color: { dark: '#17233c', light: '#ffffff' },
         });
         el('#qr-room-code').textContent =
         `${state.room.name} · ${state.room.id}`;
+        el('#qr-share').hidden = typeof navigator.share !== 'function';
         el('#qr-dialog').showModal();
     } catch (error) {
         showToast(`QR tidak dapat dibuat: ${error.message}`, true);
     }
 }
+
+function qrFile() {
+    return new Promise((resolve, reject) => {
+        el('#qr-canvas').toBlob((blob) => {
+            if (!blob) {
+                reject(new Error('QR belum siap.'));
+                return;
+            }
+            const name = `nonovshare-${state.room?.id ?? 'room'}.png`;
+            resolve(new File([blob], name, { type: 'image/png' }));
+        }, 'image/png');
+    });
+}
+
+async function downloadQrCode() {
+    try {
+        const file = await qrFile();
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('QR diunduh.');
+    } catch (error) {
+        showToast(`QR gagal diunduh: ${error.message}`, true);
+    }
+}
+
+async function shareQrCode() {
+    const invite = inviteUrl();
+    if (!invite) return;
+    try {
+        const file = await qrFile();
+        if (navigator.canShare?.({ files: [file] })) {
+            await navigator.share({ files: [file], title: state.room.name, text: invite });
+        } else {
+            await navigator.share({ title: state.room.name, text: invite });
+        }
+    } catch (error) {
+        if (error.name !== 'AbortError') showToast(`Gagal membagikan: ${error.message}`, true);
+    }
+}
+
 
 async function leaveRoom() {
     const room = state.room;
@@ -4246,6 +4294,9 @@ function bindEvents() {
     });
 
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
+    el('#qr-download').addEventListener('click', () => void downloadQrCode());
+    el('#qr-copy').addEventListener('click', () => void copyInvite());
+    el('#qr-share').addEventListener('click', () => void shareQrCode());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {
         if (event.target === el('#qr-dialog')) el('#qr-dialog').close();

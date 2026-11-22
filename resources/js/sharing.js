@@ -1984,6 +1984,7 @@ async function startCall(kind) {
     openCallDialog();
 
     try {
+        await sendCallSignal(call, 'call-invite', { kind });
 }
 
 function showToast(message, isError = false) {

@@ -1,18 +1,23 @@
 import './sharing.js';
 
 // PAGE LOADER
-document.addEventListener('DOMContentLoaded', () => {
+(() => {
     const loader = document.getElementById('page-loader');
-
     if (!loader) return;
 
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            loader.classList.add('hidden');
+    const dismiss = () => {
+        loader.classList.add('hidden');
+        setTimeout(() => loader.remove(), 500);
+    };
 
-            setTimeout(() => {
-                loader.remove();
-            }, 500);
-        }, 1500);
-    });
-});
+    // ponytail: cap 6s so a stalled asset never locks the page.
+    const cap = setTimeout(dismiss, 6000);
+
+    (document.readyState === 'complete'
+        ? Promise.resolve()
+        : new Promise((resolve) => window.addEventListener('load', resolve, { once: true }))
+    ).then(() => setTimeout(() => {
+        clearTimeout(cap);
+        dismiss();
+    }, 1500));
+})();

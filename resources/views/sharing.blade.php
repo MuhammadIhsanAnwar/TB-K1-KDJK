@@ -4,14 +4,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#f1f0e9">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <title>NonovShare — berbagi file langsung</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <div id="page-loader" class="page-loader">
         <div class="loader-content">
-            <div class="loader-logo" aria-hidden="true">N</div>
+            <div class="loader-logo" aria-hidden="true"></div>
             <h2>NonovShare</h2>
             <p>Menyiapkan koneksi berbagi...</p>
             <div class="loader-progress">
@@ -23,7 +24,12 @@
     <div class="page-shell">
         <header class="topbar">
             <a class="brand" href="/" aria-label="NonovShare - beranda">
-                <span class="brand-mark" aria-hidden="true">N</span>
+                <svg class="brand-logo" viewBox="0 0 32 32" width="26" height="26" aria-hidden="true" focusable="false">
+                    <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="16" cy="11.5" r="3.4" fill="currentColor"/>
+                    <circle cx="10.5" cy="20" r="3.4" fill="currentColor"/>
+                    <circle cx="21.5" cy="20" r="3.4" fill="var(--accent)"/>
+                </svg>
                 <span>NonovShare</span>
             </a>
 
@@ -48,7 +54,7 @@
                 <div class="welcome-row">
                     <div>
                         <span class="eyebrow">BERBAGI LANGSUNG</span>
-                        <h1>Kirim file tanpa<br><span>unggah ke cloud.</span></h1>
+                        <h1>Kirim file tanpa <span>unggah ke cloud.</span></h1>
                     </div>
 
                     <div class="network-card" id="network-card" aria-live="polite">
@@ -108,7 +114,8 @@
                                     type="text"
                                     maxlength="45"
                                     autocomplete="off"
-                                    placeholder="Masukkan kode room 12 karakter"
+                                    spellcheck="false"
+                                    placeholder="KODE12KARAKTER.PROOF"
                                     required
                                 >
                                 <button class="button button-outline button-small" type="submit">

@@ -2068,6 +2068,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     }
 
     window.clearTimeout(call.timeoutTimer);
+    window.clearInterval(call.durationTimer);
 }
 
 function showToast(message, isError = false) {

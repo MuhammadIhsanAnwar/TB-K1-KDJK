@@ -256,6 +256,7 @@
                                         >
                                         <button
                                             id="room-voice-button"
+                                            class="voice-button"
                                             class="send-button"
                                             type="submit"
                                             aria-label="Kirim pesan"

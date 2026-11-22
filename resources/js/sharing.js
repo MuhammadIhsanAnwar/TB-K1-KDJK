@@ -1871,6 +1871,8 @@ function renderCallButtons() {
     el('#private-video-call').disabled = !available;
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

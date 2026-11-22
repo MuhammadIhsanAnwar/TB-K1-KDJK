@@ -1696,6 +1696,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
     const prefix = `${context}:${fromUserId}:`;
 
     if (frame.type === 'voice.start') {
+        const message = frame.message;
+
 }
 
 function showToast(message, isError = false) {

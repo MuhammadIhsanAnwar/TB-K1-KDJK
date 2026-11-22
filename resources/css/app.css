@@ -855,3 +855,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 
 .message-bubble.is-voice { padding: 7px 10px; white-space: normal; }
 .voice-player { width: min(230px, 62vw); display: flex; align-items: center; gap: 9px; }
+.voice-play { width: 28px; height: 28px; flex: 0 0 auto; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; color: #fff; background: #17658f; }

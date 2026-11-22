@@ -1994,6 +1994,8 @@ async function startCall(kind) {
 }
 
 async function acceptIncomingCall() {
+    const call = state.call;
+
 }
 
 function showToast(message, isError = false) {

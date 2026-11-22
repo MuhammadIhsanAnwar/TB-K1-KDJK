@@ -1833,6 +1833,7 @@ function createVoiceNotePlayer(url, duration) {
             ? audio.duration
             : duration;
 
+        progress.style.width = `${total ? Math.min(100, (audio.currentTime / total) * 100) : 0}%`;
 }
 
 function showToast(message, isError = false) {

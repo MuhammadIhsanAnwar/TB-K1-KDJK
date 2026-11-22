@@ -1104,10 +1104,10 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 [data-theme="dark"] .page-footer > span:first-child { color: #c6d5df; }
 [data-theme="dark"] .page-footer > span:first-child > span:last-child { color: #6b7f8c; }
 
-[data-theme="dark"] .toast { color: #d3dee6; border-color: #22333f; background: #172834; box-shadow: 0 5px 18px #00000059; }
+[data-theme="dark"] .toast { color: #d3dee6; border-color: #2b424f; background: #172834; box-shadow: 6px 6px 0 #000000a8; }
 [data-theme="dark"] .toast.is-error { color: #e8a0a0; border-color: #4a2a2a; background: #221517; }
 
-[data-theme="dark"] .qr-dialog { border-color: #22333f; background: #14222c; }
+[data-theme="dark"] .qr-dialog { border-color: #2b424f; background: #14222c; box-shadow: 10px 10px 0 #000000a8; }
 [data-theme="dark"] .qr-dialog::backdrop { background: #000000a8; }
 [data-theme="dark"] .qr-dialog-card h2 { color: #e6eef4; }
 [data-theme="dark"] .dialog-close { color: #9fb2c0; border-color: #22333f; background: #172834; }
@@ -1128,3 +1128,707 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 [data-theme="dark"] .loader-progress-bar { background: #3d8fbd; }
 
 [data-theme="dark"] .form-error { color: #e8a0a0; border-color: #4a2a2a; background: #221517; }
+
+/* ==========================================================================
+   BRUTALIS LEMBUT — v1
+   Palet TIDAK diubah. Hanya bentuk: border tebal, sudut tegas, tipografi besar.
+   Hapus blok ini untuk kembali ke tampilan sebelumnya.
+   ========================================================================== */
+
+/* --- Tipografi & ritme --- */
+:root {
+    --b-line: 2px;
+    --b-ink: #173247;
+    --b-ink-2: #24455d;
+    --b-ink-3: #526a7c;
+    --b-blue: #17658f;
+    --b-bg: #f3f7fa;
+    --b-card: #ffffff;
+}
+
+body { letter-spacing: -.005em; }
+
+h1, h2, h3, .brand span { letter-spacing: -.045em; }
+
+.eyebrow {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .18em;
+    color: var(--b-blue);
+}
+
+/* --- Header --- */
+.topbar {
+    height: 82px;
+    border-bottom: var(--b-line) solid var(--b-ink);
+}
+.brand { font-size: 23px; }
+.brand-logo { width: 38px; height: 38px; }
+
+.secure-pill {
+    padding: 8px 12px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+.top-user {
+    padding: 8px 14px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+    font-size: 12px;
+    font-weight: 800;
+}
+.top-user:hover {
+    color: #fff;
+    border-color: var(--b-ink);
+    background: var(--b-blue);
+    box-shadow: none;
+}
+.theme-toggle {
+    width: 38px;
+    height: 38px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+    font-size: 16px;
+}
+.theme-toggle:hover {
+    color: #fff;
+    border-color: var(--b-ink);
+    background: var(--b-blue);
+}
+
+/* --- Hero --- */
+.workspace { padding: 46px 0 70px; }
+.welcome-row {
+    align-items: flex-end;
+    margin-bottom: 30px;
+    padding-bottom: 26px;
+    border-bottom: var(--b-line) solid var(--b-ink);
+}
+.welcome-row h1 {
+    margin-top: 12px;
+    font-size: clamp(38px, 5.2vw, 68px);
+    font-weight: 800;
+    line-height: .94;
+    letter-spacing: -.055em;
+}
+.welcome-row h1 span { position: relative; }
+.welcome-row h1 span::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 8px;
+    background: var(--b-blue);
+    opacity: .18;
+}
+
+.network-card {
+    min-width: 300px;
+    padding: 0;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+    overflow: hidden;
+}
+.network-icon {
+    width: 46px;
+    height: 46px;
+    margin: 12px 0 12px 14px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-bg);
+    font-size: 18px;
+}
+.network-card strong {
+    color: var(--b-ink);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.network-card div span { color: var(--b-ink-3); font-size: 10px; }
+.network-indicator {
+    width: 10px;
+    height: 10px;
+    margin-right: 14px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+}
+
+/* --- Panel utama --- */
+.main-grid { gap: 20px; }
+.room-sidebar,
+.room-panel {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+}
+.room-sidebar { padding: 22px 18px; }
+
+.sidebar-heading h2 {
+    font-size: 20px;
+    font-weight: 800;
+}
+.sidebar-icon {
+    width: 34px;
+    height: 34px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-bg);
+}
+
+.room-action-card {
+    padding: 16px 14px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-bg);
+}
+.action-icon {
+    width: 32px;
+    height: 32px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+    font-size: 16px;
+}
+.create-icon {
+    color: #fff;
+    border-color: var(--b-ink);
+    background: var(--b-blue);
+}
+.action-copy strong {
+    color: var(--b-ink);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+/* --- Input --- */
+.field input,
+.join-input-row input,
+.room-name-field input,
+.chat-form input,
+.recipient-picker select {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+    font-weight: 500;
+}
+.field input:focus,
+.join-input-row input:focus,
+.room-name-field input:focus,
+.chat-form input:focus,
+.recipient-picker select:focus {
+    border-color: var(--b-blue);
+    box-shadow: 4px 4px 0 var(--b-blue);
+}
+
+/* --- Tombol --- */
+.button {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    font-weight: 800;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    transition: background .1s ease, color .1s ease, box-shadow .1s ease, transform .1s ease;
+}
+.button-primary {
+    color: #fff;
+    border-color: var(--b-ink);
+    background: var(--b-blue);
+}
+.button-primary:hover:not(:disabled) {
+    background: var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-blue);
+    transform: translate(-2px, -2px);
+}
+.button-outline {
+    color: var(--b-ink);
+    border-color: var(--b-ink);
+    background: var(--b-card);
+}
+.button-outline:hover:not(:disabled) {
+    color: #fff;
+    background: var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-blue);
+    transform: translate(-2px, -2px);
+}
+.button-quiet {
+    color: var(--b-ink-3);
+    border-color: transparent;
+}
+.button-quiet:hover:not(:disabled) {
+    color: var(--b-ink);
+    border-color: var(--b-ink);
+    background: var(--b-bg);
+}
+.button-small {
+    padding: 8px 12px;
+    font-size: 11px;
+}
+
+/* --- Daftar room terakhir --- */
+.recent-heading {
+    padding-top: 12px;
+    margin: 22px 0 10px;
+    border-top: var(--b-line) solid var(--b-ink);
+    color: var(--b-ink);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .15em;
+}
+.recent-count,
+.online-count {
+    min-width: 24px;
+    height: 22px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-bg);
+    font-weight: 800;
+}
+.recent-room-button {
+    padding: 9px 8px;
+    border-radius: 0;
+    border-left: var(--b-line) solid transparent;
+}
+.recent-room-button:hover {
+    border-left-color: var(--b-blue);
+    background: var(--b-bg);
+}
+.recent-room-icon {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+}
+.recent-room-copy strong { font-weight: 700; color: var(--b-ink); }
+
+/* --- Panel room --- */
+.room-panel { min-height: 580px; }
+.room-empty {
+    min-height: 580px;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 46px;
+    text-align: left;
+}
+.room-empty .eyebrow { margin-top: 4px; }
+.room-empty h2 {
+    margin: 10px 0 10px;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -.045em;
+}
+.room-empty p {
+    max-width: 460px;
+    color: var(--b-ink-2);
+    font-size: 14px;
+    line-height: 1.7;
+}
+.empty-illustration {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 22px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: #fff;
+    background: var(--b-blue);
+    font-size: 22px;
+}
+
+.room-header {
+    align-items: flex-start;
+    padding: 22px;
+    border-bottom: var(--b-line) solid var(--b-ink);
+}
+.room-live {
+    color: var(--b-blue);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+}
+.room-title-block h2 {
+    margin: 6px 0 6px;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--b-ink);
+}
+.room-code strong {
+    padding: 2px 6px;
+    border: var(--b-line) solid var(--b-ink);
+    color: var(--b-ink);
+    background: var(--b-bg);
+    font-weight: 800;
+}
+
+.room-status {
+    padding: 11px 22px;
+    border-bottom: var(--b-line) solid var(--b-ink);
+    background: var(--b-bg);
+    color: var(--b-ink-2);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+.status-pulse {
+    width: 8px;
+    height: 8px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+}
+
+/* --- Panel anggota --- */
+.room-content { grid-template-columns: 240px minmax(0, 1fr); }
+.members-panel {
+    padding: 20px 16px;
+    border-right: var(--b-line) solid var(--b-ink);
+    background: var(--b-bg);
+}
+.section-heading h3 {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--b-ink);
+}
+.online-members { gap: 4px; margin-top: 16px; }
+.member-row {
+    padding: 7px 6px;
+    border-left: var(--b-line) solid transparent;
+}
+.member-row:hover { border-left-color: var(--b-blue); }
+.avatar {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+    font-weight: 800;
+}
+.avatar.is-self {
+    color: #fff;
+    border-color: var(--b-ink);
+    background: var(--b-blue);
+}
+.member-copy strong { color: var(--b-ink); font-weight: 700; }
+
+.peer-note {
+    padding: 12px;
+    border: var(--b-line) solid var(--b-ink);
+    border-left-width: 6px;
+    border-left-color: var(--b-blue);
+    background: var(--b-card);
+}
+.peer-note p { color: var(--b-ink-3); font-size: 10px; line-height: 1.65; }
+.peer-note-icon { color: var(--b-blue); }
+
+/* --- Percakapan --- */
+.conversation-panel { padding: 20px 20px 16px; }
+.conversation-heading { margin-bottom: 14px; }
+.chat-encryption {
+    padding: 5px 9px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-bg);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .12em;
+}
+.chat-messages {
+    min-height: 240px;
+    padding: 4px 2px 14px;
+    gap: 14px;
+}
+.chat-message { max-width: 80%; gap: 6px; }
+.message-meta {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+.message-meta strong { color: var(--b-ink); font-weight: 800; }
+.message-bubble {
+    padding: 11px 13px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+    font-size: 13px;
+    line-height: 1.55;
+}
+.is-own .message-bubble {
+    color: #fff;
+    border-color: var(--b-ink);
+    background: var(--b-blue);
+}
+.chat-form {
+    gap: 8px;
+    padding-top: 12px;
+    border-top: var(--b-line) solid var(--b-ink);
+}
+.chat-form input {
+    padding: 12px 13px;
+    border-radius: 0;
+    background: var(--b-card);
+    font-size: 13px;
+}
+.send-button,
+.voice-button {
+    width: 42px;
+    height: 42px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+    font-size: 17px;
+    font-weight: 800;
+}
+.send-button {
+    color: #fff;
+    background: var(--b-blue);
+}
+.send-button:hover {
+    background: var(--b-ink);
+    box-shadow: 3px 3px 0 var(--b-blue);
+    transform: translate(-2px, -2px);
+}
+.voice-button:hover {
+    color: #fff;
+    background: var(--b-ink);
+}
+.voice-recorder {
+    border: var(--b-line) solid var(--b-ink);
+    background: var(--b-bg);
+}
+
+/* --- Transfer file --- */
+.transfer-section {
+    padding: 22px;
+    border-top: var(--b-line) solid var(--b-ink);
+    background: var(--b-bg);
+}
+.transfer-limit {
+    padding: 4px 8px;
+    border: var(--b-line) solid var(--b-ink);
+    color: var(--b-ink-2);
+    background: var(--b-card);
+    font-size: 10px;
+    font-weight: 700;
+}
+.file-picker {
+    padding: 14px;
+    border: var(--b-line) dashed var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+}
+.file-picker:hover {
+    border-style: solid;
+    border-color: var(--b-blue);
+    box-shadow: 4px 4px 0 var(--b-blue);
+    transform: translate(-2px, -2px);
+}
+.file-picker-icon {
+    width: 34px;
+    height: 34px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-bg);
+    font-size: 16px;
+}
+.file-picker-browse {
+    color: var(--b-ink);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+.recipient-picker select {
+    border: var(--b-line) solid var(--b-ink);
+}
+.transfer-item {
+    padding: 13px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+}
+.transfer-file-icon {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-bg);
+}
+.transfer-copy strong { color: var(--b-ink); font-weight: 700; }
+.transfer-progress {
+    height: 8px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+}
+.transfer-progress span {
+    border-radius: 0;
+    background: var(--b-blue);
+}
+
+/* --- Chat pribadi --- */
+.private-chat-panel { border: 0; }
+.private-chat-header {
+    padding-bottom: 16px;
+    border-bottom: var(--b-line) solid var(--b-ink);
+}
+.private-chat-header h2 { font-weight: 800; font-size: 22px; }
+.private-file-section {
+    padding: 16px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-bg);
+}
+.private-file-item {
+    padding: 13px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+}
+.private-user-button {
+    padding: 8px 6px;
+    border: 0;
+    border-left: var(--b-line) solid transparent;
+    border-radius: 0;
+}
+.private-user-button:hover,
+.private-user-button.is-selected {
+    border-left-color: var(--b-blue);
+    background: var(--b-bg);
+}
+
+/* --- Footer --- */
+.page-footer {
+    padding: 24px 0 32px;
+    border-top: var(--b-line) solid var(--b-ink);
+    color: var(--b-ink-3);
+}
+.page-footer > span:first-child {
+    color: var(--b-ink);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+/* --- Toast & dialog --- */
+.toast {
+    padding: 14px 18px;
+    border: var(--b-line) solid var(--b-ink);
+    border-left-width: 8px;
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+    box-shadow: 6px 6px 0 var(--b-ink);
+    font-size: 13px;
+    font-weight: 600;
+}
+.toast.is-error {
+    border-left-color: #b43b3b;
+    color: #8b3434;
+}
+.qr-dialog {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    box-shadow: 10px 10px 0 var(--b-ink);
+}
+.qr-dialog::backdrop { background: #17324780; }
+.qr-dialog-card { padding: 32px 26px; }
+.qr-dialog-card h2 { font-weight: 800; letter-spacing: -.04em; }
+.dialog-close {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    color: var(--b-ink);
+    background: var(--b-card);
+}
+.dialog-close:hover { color: #fff; background: var(--b-ink); }
+.qr-dialog-card canvas {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    box-shadow: none;
+}
+.qr-room-code {
+    padding: 6px 10px;
+    border: var(--b-line) solid var(--b-ink);
+    color: var(--b-ink);
+    background: var(--b-bg);
+    font-weight: 800;
+}
+.username-dialog-card { background: var(--b-card); }
+.username-form input {
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+}
+.username-form input:focus {
+    border-color: var(--b-blue);
+    background: var(--b-card);
+    box-shadow: 4px 4px 0 var(--b-blue);
+}
+
+/* --- Loading --- */
+.page-loader { background: var(--b-bg); }
+.loader-content h2 {
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -.045em;
+}
+.loader-progress {
+    width: 200px;
+    height: 8px;
+    border: var(--b-line) solid var(--b-ink);
+    border-radius: 0;
+    background: var(--b-card);
+}
+.loader-progress-bar {
+    width: 40%;
+    border-radius: 0;
+    background: var(--b-blue);
+}
+
+/* --- Responsif --- */
+@media (max-width: 1000px) {
+    .room-content { grid-template-columns: 200px minmax(0, 1fr); }
+}
+
+@media (max-width: 760px) {
+    .topbar { height: 68px; }
+    .brand { font-size: 19px; }
+    .brand-logo { width: 32px; height: 32px; }
+    .welcome-row {
+        align-items: flex-start;
+        padding-bottom: 20px;
+    }
+    .welcome-row h1 { font-size: 34px; line-height: .98; }
+    .network-card { width: 100%; min-width: 0; }
+    .room-empty {
+        min-height: 360px;
+        padding: 28px 22px;
+    }
+    .room-empty h2 { font-size: 26px; }
+    .room-header { padding: 18px 16px; }
+    .room-title-block h2 { font-size: 21px; }
+    .room-actions { width: 100%; }
+    .room-actions .button { flex: 1; min-width: 92px; }
+    .members-panel { border-right: 0; border-bottom: var(--b-line) solid var(--b-ink); }
+    .conversation-panel { padding: 16px 15px 12px; }
+    .chat-message { max-width: 92%; }
+    .transfer-section { padding: 18px 15px; }
+    .toast { left: 14px; right: 14px; max-width: none; bottom: 14px; }
+}

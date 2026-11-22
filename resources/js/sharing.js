@@ -2081,6 +2081,8 @@ function endCall(message = null, notifyPeer = false, isError = false) {
 
     if (dialog.open) dialog.close();
 
+    renderCallButtons();
+
 }
 
 function showToast(message, isError = false) {

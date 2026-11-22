@@ -1498,6 +1498,7 @@ async function startVoiceRecording(context) {
     let recorder;
 
     try {
+        recorder = new MediaRecorder(stream, {
 }
 
 function showToast(message, isError = false) {

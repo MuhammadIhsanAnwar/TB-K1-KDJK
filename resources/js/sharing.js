@@ -4233,6 +4233,7 @@ function bindEvents() {
         el(`#${context}-voice-send`).addEventListener('click', () => void finishVoiceRecording(true));
     }
 
+    el('#private-voice-call').addEventListener('click', () => void startCall('audio'));
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

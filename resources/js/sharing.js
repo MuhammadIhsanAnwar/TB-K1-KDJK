@@ -1676,6 +1676,7 @@ function isValidVoiceNoteMessage(message, fromUserId) {
     return typeof message?.id === 'string'
         && /^[0-9a-f-]{36}$/i.test(message.id)
         && String(message.user_id) === fromUserId
+        && typeof message.user_name === 'string'
 }
 
 function showToast(message, isError = false) {

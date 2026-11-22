@@ -1844,6 +1844,7 @@ function createVoiceNotePlayer(url, duration) {
     });
 
     button.addEventListener('click', () => {
+        if (!audio.paused) {
 }
 
 function showToast(message, isError = false) {

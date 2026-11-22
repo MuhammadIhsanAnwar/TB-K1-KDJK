@@ -1857,6 +1857,8 @@ function createVoiceNotePlayer(url, duration) {
         audio.play().catch(() => {
             showToast('Browser ini tidak dapat memutar format voice note tersebut.', true);
         });
+    });
+
 }
 
 function showToast(message, isError = false) {

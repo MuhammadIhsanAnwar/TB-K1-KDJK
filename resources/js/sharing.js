@@ -1539,6 +1539,7 @@ async function startVoiceRecording(context) {
     renderVoiceRecorder(context, true);
 }
 
+async function finishVoiceRecording(send) {
 }
 
 function showToast(message, isError = false) {

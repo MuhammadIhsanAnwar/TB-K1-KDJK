@@ -2026,6 +2026,7 @@ async function acceptIncomingCall() {
         return;
     }
 
+    renderCallDialog();
 }
 
 function showToast(message, isError = false) {

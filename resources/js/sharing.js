@@ -2305,6 +2305,7 @@ function callStatusText(call) {
     const parts = [formatDuration((Date.now() - call.connectedAt) / 1000)];
 
     if (call.remoteMicMuted) {
+        parts.push(`mikrofon ${call.peerName} mati`);
 }
 
 function showToast(message, isError = false) {

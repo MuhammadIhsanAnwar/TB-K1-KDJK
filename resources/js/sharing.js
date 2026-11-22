@@ -1726,6 +1726,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
         let bytes = null;
 
         if (
+            typeof frame.data === 'string'
 }
 
 function showToast(message, isError = false) {

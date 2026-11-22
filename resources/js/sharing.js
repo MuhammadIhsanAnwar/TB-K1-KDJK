@@ -1733,6 +1733,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
                 bytes = base64ToBytes(frame.data);
             } catch {
                 bytes = null;
+            }
 }
 
 function showToast(message, isError = false) {

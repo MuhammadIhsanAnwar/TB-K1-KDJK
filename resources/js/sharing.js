@@ -1436,6 +1436,7 @@ function voiceNoteChannels(context, targetUserId) {
         throw new Error('Koneksi chat pribadi belum siap.');
     }
 
+    return [channel];
 }
 
 function showToast(message, isError = false) {

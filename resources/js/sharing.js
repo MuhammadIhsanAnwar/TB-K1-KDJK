@@ -2045,6 +2045,7 @@ function hangUpCall() {
     if (!call) return;
 
     if (call.direction === 'incoming' && call.status === 'ringing') {
+        declineIncomingCall();
 }
 
 function showToast(message, isError = false) {

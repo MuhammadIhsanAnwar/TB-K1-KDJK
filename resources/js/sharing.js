@@ -1946,6 +1946,8 @@ function setCallTimeout(call, delay, message) {
     }, delay);
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

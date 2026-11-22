@@ -2347,6 +2347,8 @@ function renderCallDialog() {
     if (localHasVideo && localVideo.srcObject !== call.localStream) {
         localVideo.srcObject = call.localStream;
         void localVideo.play().catch(() => {});
+    }
+
 }
 
 function showToast(message, isError = false) {

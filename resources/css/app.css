@@ -290,6 +290,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .qr-room-code { margin: 14px 0 0; color: #15577f; font-family: Consolas, monospace; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
 .qr-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 18px; }
 .qr-actions .button { min-width: 96px; }
+.qr-actions .button.is-copied { color: #14532d; border-color: #86c79a; background: #dcf3e3; opacity: 1; }
 
 .top-user {
     display: inline-flex;

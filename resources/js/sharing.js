@@ -3947,11 +3947,25 @@ function inviteUrl() {
     return invite.toString();
 }
 
-async function copyInvite() {
+function markTersalin(button) {
+    if (!button) return;
+    const original = button.textContent;
+    button.textContent = 'Tersalin ✓';
+    button.classList.add('is-copied');
+    button.disabled = true;
+    window.setTimeout(() => {
+        button.textContent = original;
+        button.classList.remove('is-copied');
+        button.disabled = false;
+    }, 2000);
+}
+
+async function copyInvite(button = null) {
     const invite = inviteUrl();
     if (!invite) return;
     try {
         await navigator.clipboard.writeText(invite);
+        markTersalin(button);
         showToast('Tautan undangan disalin.');
     } catch {
         showToast(invite);
@@ -4295,7 +4309,7 @@ function bindEvents() {
 
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#qr-download').addEventListener('click', () => void downloadQrCode());
-    el('#qr-copy').addEventListener('click', () => void copyInvite());
+    el('#qr-copy').addEventListener('click', (event) => void copyInvite(event.currentTarget));
     el('#qr-share').addEventListener('click', () => void shareQrCode());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

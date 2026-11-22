@@ -128,6 +128,7 @@ const PAUSE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v
 let toastTimer;
 let voiceRecorderStarting = false;
 let activeVoiceAudio = null;
+let ringtone = null;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 let inviteProof = new URL(window.location.href).searchParams.get('proof');
 let inviteRoomName = new URL(window.location.href).searchParams.get('room_name');

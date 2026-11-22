@@ -270,6 +270,7 @@
                                             <button id="room-voice-cancel" class="button button-quiet button-small" type="button">Batal</button>
                                             <button id="room-voice-send" class="button button-primary button-small" type="button">Kirim</button>
                                         </div>
+                                        <button
                                             class="send-button"
                                             type="submit"
                                             aria-label="Kirim pesan"

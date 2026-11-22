@@ -2215,6 +2215,8 @@ async function handleCallSignal(from, user, signal) {
         renderCallButtons();
         openCallDialog();
         startRingtone();
+        navigator.vibrate?.([400, 200, 400]);
+
 }
 
 function showToast(message, isError = false) {

@@ -1563,6 +1563,8 @@ async function finishVoiceRecording(send) {
     state.voiceRecorder = null;
     renderVoiceRecorder(session.context, false);
 
+    if (!send) return;
+
 }
 
 function showToast(message, isError = false) {

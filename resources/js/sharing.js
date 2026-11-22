@@ -2006,6 +2006,7 @@ async function acceptIncomingCall() {
     try {
         call.localStream = await getCallMedia(call.kind);
     } catch (error) {
+        if (state.call === call) {
 }
 
 function showToast(message, isError = false) {

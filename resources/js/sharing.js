@@ -2414,6 +2414,8 @@ function toggleCallCamera() {
     renderCallDialog();
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

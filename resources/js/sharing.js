@@ -1971,6 +1971,7 @@ async function startCall(kind) {
     try {
         call.localStream = await getCallMedia(kind);
     } catch (error) {
+        endCall(mediaErrorMessage(error, callDeviceLabel(kind)), false, true);
 }
 
 function showToast(message, isError = false) {

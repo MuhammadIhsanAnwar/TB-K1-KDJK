@@ -2431,6 +2431,7 @@ function startRingtone() {
                 const oscillator = context.createOscillator();
                 const gain = context.createGain();
 
+                oscillator.type = 'sine';
 }
 
 function showToast(message, isError = false) {

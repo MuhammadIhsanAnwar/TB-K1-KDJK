@@ -836,3 +836,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 }
 
 /* Voice note */
+.voice-button svg,

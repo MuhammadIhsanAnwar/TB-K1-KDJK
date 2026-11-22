@@ -369,6 +369,7 @@
                                 </div>
 
                                 <div class="private-chat-actions">
+                                    <button
                             </div>
 
                             <div

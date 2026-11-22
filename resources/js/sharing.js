@@ -1378,6 +1378,7 @@ function mediaErrorMessage(error, device) {
         return `${capitalize(device)} sedang dipakai aplikasi lain.`;
     }
 
+    return `${capitalize(device)} tidak dapat diakses: ${error?.message ?? 'kesalahan tidak dikenal'}.`;
 }
 
 function showToast(message, isError = false) {

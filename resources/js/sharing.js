@@ -2196,6 +2196,7 @@ async function handleCallSignal(from, user, signal) {
         if (!['audio', 'video'].includes(payload.kind)) return;
 
         if (state.call) {
+            if (state.call.id !== callId) {
 }
 
 function showToast(message, isError = false) {

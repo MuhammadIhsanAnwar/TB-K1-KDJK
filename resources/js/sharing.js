@@ -2435,6 +2435,7 @@ function startRingtone() {
                 oscillator.frequency.value = 740;
                 gain.gain.setValueAtTime(0, now + offset);
                 gain.gain.linearRampToValueAtTime(0.12, now + offset + 0.03);
+                gain.gain.linearRampToValueAtTime(0, now + offset + 0.3);
 }
 
 function showToast(message, isError = false) {

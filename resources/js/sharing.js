@@ -1367,6 +1367,7 @@ function mediaErrorMessage(error, device) {
     if (error?.name === 'InsecureContextError') return error.message;
 
     if (['NotAllowedError', 'SecurityError'].includes(error?.name)) {
+        return `Izin ${device} ditolak. Izinkan akses ${device} di pengaturan browser.`;
 }
 
 function showToast(message, isError = false) {

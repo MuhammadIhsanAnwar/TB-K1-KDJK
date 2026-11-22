@@ -1900,6 +1900,7 @@ function sendCallSignal(call, type, payload = {}) {
     }
 
     return state.privateChannel.publish('signal', {
+        scope: 'call',
 }
 
 function showToast(message, isError = false) {

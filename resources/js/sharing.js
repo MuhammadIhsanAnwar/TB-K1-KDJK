@@ -2440,6 +2440,8 @@ function startRingtone() {
                 oscillator.start(now + offset);
                 oscillator.stop(now + offset + 0.32);
             }
+        };
+
 }
 
 function showToast(message, isError = false) {

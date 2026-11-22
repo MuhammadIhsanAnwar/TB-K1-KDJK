@@ -1871,6 +1871,7 @@ function renderCallButtons() {
     el('#private-video-call').disabled = !available;
 }
 
+function createCallState({ id, kind, direction, status, peerId, peerName }) {
 }
 
 function showToast(message, isError = false) {

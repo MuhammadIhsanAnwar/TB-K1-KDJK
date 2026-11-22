@@ -1553,6 +1553,7 @@ async function finishVoiceRecording(send) {
     );
 
     if (session.recorder.state !== 'inactive') {
+        await new Promise((resolve) => {
 }
 
 function showToast(message, isError = false) {

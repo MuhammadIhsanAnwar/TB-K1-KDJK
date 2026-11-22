@@ -2297,6 +2297,7 @@ function callStatusText(call) {
     const kindLabel = call.kind === 'video' ? 'Video call' : 'Panggilan suara';
 
     if (call.status === 'preparing') return 'Menyiapkan perangkat…';
+    if (call.status === 'calling') return `${kindLabel} · Memanggil…`;
 }
 
 function showToast(message, isError = false) {

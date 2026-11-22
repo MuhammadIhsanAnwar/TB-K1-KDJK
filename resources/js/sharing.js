@@ -2188,6 +2188,8 @@ async function drainCallCandidates(call) {
 
 async function handleCallSignal(from, user, signal) {
     const payload = signal.payload ?? {};
+    const callId = payload.callId;
+
 }
 
 function showToast(message, isError = false) {

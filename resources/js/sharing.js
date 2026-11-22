@@ -2073,6 +2073,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     call.pc?.close();
     stopMediaStream(call.localStream);
 
+    el('#call-remote-video').srcObject = null;
 }
 
 function showToast(message, isError = false) {

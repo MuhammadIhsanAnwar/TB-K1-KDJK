@@ -2279,6 +2279,7 @@ async function handleCallSignal(from, user, signal) {
             if (call.pc?.remoteDescription) {
                 await call.pc.addIceCandidate(payload.candidate);
             } else if (call.pendingCandidates.length < 100) {
+                call.pendingCandidates.push(payload.candidate);
 }
 
 function showToast(message, isError = false) {

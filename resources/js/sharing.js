@@ -1799,6 +1799,7 @@ function createVoiceNotePlayer(url, duration) {
     button.type = 'button';
     button.className = 'voice-play';
 
+    const track = document.createElement('span');
 }
 
 function showToast(message, isError = false) {

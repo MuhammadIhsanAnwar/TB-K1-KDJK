@@ -2008,6 +2008,7 @@ async function acceptIncomingCall() {
     } catch (error) {
         if (state.call === call) {
             void sendCallSignal(call, 'call-reject', { reason: 'media' }).catch(() => {});
+            endCall(mediaErrorMessage(error, callDeviceLabel(call.kind)), false, true);
 }
 
 function showToast(message, isError = false) {

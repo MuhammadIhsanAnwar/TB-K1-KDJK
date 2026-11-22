@@ -2376,6 +2376,7 @@ function renderCallDialog() {
         : call.cameraOff ? 'Kamera mati' : 'Kamera';
 }
 
+function sendCallMediaState(call) {
 }
 
 function showToast(message, isError = false) {

@@ -1594,6 +1594,7 @@ async function sendVoiceNote(session, blob, duration) {
         channels = voiceNoteChannels(session.context, session.targetUserId);
     } catch (error) {
         showToast(`Voice note belum terkirim: ${error.message}`, true);
+        return;
 }
 
 function showToast(message, isError = false) {

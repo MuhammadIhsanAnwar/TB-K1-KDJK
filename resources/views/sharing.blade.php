@@ -466,6 +466,7 @@
 
                                 <button
                                     id="private-voice-button"
+                                    class="voice-button"
 
                                 <button
                                     class="send-button"

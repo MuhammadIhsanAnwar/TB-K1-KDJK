@@ -2214,6 +2214,7 @@ async function handleCallSignal(from, user, signal) {
         state.call = call;
         renderCallButtons();
         openCallDialog();
+        startRingtone();
 }
 
 function showToast(message, isError = false) {

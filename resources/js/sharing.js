@@ -2206,6 +2206,7 @@ async function handleCallSignal(from, user, signal) {
             id: callId,
             kind: payload.kind,
             direction: 'incoming',
+            status: 'ringing',
 }
 
 function showToast(message, isError = false) {

@@ -3110,6 +3110,7 @@ async function handlePeerMessage(fromUserId, rawData) {
         ) return;
         addChatMessage(message);
         return;
+        return;
     }
 
     if (frame.type === 'transfer.request') {

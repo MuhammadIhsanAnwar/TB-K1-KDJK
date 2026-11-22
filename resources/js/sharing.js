@@ -2404,6 +2404,8 @@ function toggleCallCamera() {
 
     if (!videoTracks.length) return;
 
+    call.cameraOff = !call.cameraOff;
+
 }
 
 function showToast(message, isError = false) {

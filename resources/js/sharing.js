@@ -2453,6 +2453,7 @@ function startRingtone() {
 function stopRingtone() {
     if (!ringtone) return;
 
+    window.clearInterval(ringtone.timer);
 }
 
 function showToast(message, isError = false) {

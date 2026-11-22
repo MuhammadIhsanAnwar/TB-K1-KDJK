@@ -2067,6 +2067,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
         void sendCallSignal(call, 'call-end').catch(() => {});
     }
 
+    window.clearTimeout(call.timeoutTimer);
 }
 
 function showToast(message, isError = false) {

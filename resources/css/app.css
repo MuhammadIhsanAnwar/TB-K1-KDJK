@@ -892,3 +892,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-control:hover:not(:disabled) { background: #ffffff33; }
 .call-control:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .call-control svg { width: 22px; height: 22px; }
+.call-control .icon-off,

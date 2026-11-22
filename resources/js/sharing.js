@@ -1622,6 +1622,8 @@ async function sendVoiceNote(session, blob, duration) {
         return;
     }
 
+    state.voiceNoteUrls.set(message.id, URL.createObjectURL(blob));
+
 }
 
 function showToast(message, isError = false) {

@@ -1628,6 +1628,7 @@ async function sendVoiceNote(session, blob, duration) {
         addChatMessage(message);
     } else {
         storeOwnPrivateMessage(message, session.targetUserId);
+    }
 }
 
 function showToast(message, isError = false) {

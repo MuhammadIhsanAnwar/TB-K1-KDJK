@@ -603,6 +603,7 @@
 
         <div id="call-active-controls" class="call-controls">
             <span class="call-action">
+                <button id="call-toggle-mic" class="call-control" type="button" aria-pressed="false" aria-label="Matikan mikrofon">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

@@ -1521,6 +1521,8 @@ async function startVoiceRecording(context) {
 
     recorder.addEventListener('dataavailable', (event) => {
         if (event.data.size > 0) session.chunks.push(event.data);
+    });
+
 }
 
 function showToast(message, isError = false) {

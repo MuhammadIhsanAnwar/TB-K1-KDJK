@@ -1482,6 +1482,7 @@ async function startVoiceRecording(context) {
         showToast(mediaErrorMessage(error, 'mikrofon'), true);
         return;
     } finally {
+        voiceRecorderStarting = false;
 }
 
 function showToast(message, isError = false) {

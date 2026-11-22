@@ -2044,6 +2044,7 @@ function hangUpCall() {
 
     if (!call) return;
 
+    if (call.direction === 'incoming' && call.status === 'ringing') {
 }
 
 function showToast(message, isError = false) {

@@ -1838,6 +1838,7 @@ function createVoiceNotePlayer(url, duration) {
     });
 
     audio.addEventListener('ended', () => {
+        progress.style.width = '0%';
 }
 
 function showToast(message, isError = false) {

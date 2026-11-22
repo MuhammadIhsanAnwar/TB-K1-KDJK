@@ -1811,6 +1811,8 @@ function createVoiceNotePlayer(url, duration) {
     time.textContent = formatDuration(duration);
 
     const audio = new Audio(url);
+    audio.preload = 'metadata';
+
 }
 
 function showToast(message, isError = false) {

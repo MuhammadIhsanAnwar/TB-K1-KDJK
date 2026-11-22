@@ -1561,6 +1561,8 @@ async function finishVoiceRecording(send) {
 
     stopMediaStream(session.stream);
     state.voiceRecorder = null;
+    renderVoiceRecorder(session.context, false);
+
 }
 
 function showToast(message, isError = false) {

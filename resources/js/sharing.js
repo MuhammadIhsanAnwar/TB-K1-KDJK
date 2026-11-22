@@ -2239,6 +2239,7 @@ async function handleCallSignal(from, user, signal) {
         } else if (signal.type === 'call-end') {
             endCall(call.status === 'ringing'
                 ? `Panggilan tak terjawab dari ${call.peerName}.`
+                : `${call.peerName} mengakhiri panggilan.`);
 }
 
 function showToast(message, isError = false) {

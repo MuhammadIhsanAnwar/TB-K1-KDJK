@@ -2386,6 +2386,8 @@ function sendCallMediaState(call) {
 function toggleCallMicrophone() {
     const call = state.call;
 
+    if (!call?.localStream) return;
+
 }
 
 function showToast(message, isError = false) {

@@ -1889,6 +1889,7 @@ function createCallState({ id, kind, direction, status, peerId, peerName }) {
         remoteCameraOff: false,
         unstable: false,
         timeoutTimer: null,
+        durationTimer: null,
 }
 
 function showToast(message, isError = false) {

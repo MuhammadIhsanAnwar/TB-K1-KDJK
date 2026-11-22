@@ -390,6 +390,7 @@
                                     </button>
 
                                     <button
+                                        id="close-private-chat"
                             </div>
 
                             <div

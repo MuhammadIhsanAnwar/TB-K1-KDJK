@@ -2281,6 +2281,7 @@ async function handleCallSignal(from, user, signal) {
             } else if (call.pendingCandidates.length < 100) {
                 call.pendingCandidates.push(payload.candidate);
             }
+        } else if (signal.type === 'call-media') {
 }
 
 function showToast(message, isError = false) {

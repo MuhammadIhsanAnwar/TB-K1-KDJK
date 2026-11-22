@@ -1152,6 +1152,7 @@ function closePrivateChatPeer(userId) {
 
     state.privateChatPeers.delete(String(userId));
     state.privateChatCandidates.delete(String(userId));
+    discardIncomingVoiceNotes('private', userId);
 
     renderPrivateOnlineUsers();
 }

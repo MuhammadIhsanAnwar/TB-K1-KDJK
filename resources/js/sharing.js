@@ -2231,6 +2231,7 @@ async function handleCallSignal(from, user, signal) {
 
     try {
         if (signal.type === 'call-busy' && call.status === 'calling') {
+            endCall(`${call.peerName} sedang dalam panggilan lain.`);
 }
 
 function showToast(message, isError = false) {

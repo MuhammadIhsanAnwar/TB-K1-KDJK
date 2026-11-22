@@ -2280,6 +2280,7 @@ async function handleCallSignal(from, user, signal) {
                 await call.pc.addIceCandidate(payload.candidate);
             } else if (call.pendingCandidates.length < 100) {
                 call.pendingCandidates.push(payload.candidate);
+            }
 }
 
 function showToast(message, isError = false) {

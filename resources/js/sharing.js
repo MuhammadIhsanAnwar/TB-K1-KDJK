@@ -1626,6 +1626,7 @@ async function sendVoiceNote(session, blob, duration) {
 
     if (session.context === 'room') {
         addChatMessage(message);
+    } else {
 }
 
 function showToast(message, isError = false) {

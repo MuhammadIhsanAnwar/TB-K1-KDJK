@@ -2286,6 +2286,7 @@ async function handleCallSignal(from, user, signal) {
             call.remoteCameraOff = payload.cameraOff === true;
             renderCallDialog();
         }
+    } catch (error) {
 }
 
 function showToast(message, isError = false) {

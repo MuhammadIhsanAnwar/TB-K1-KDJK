@@ -113,6 +113,7 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const CHUNK_SIZE = 16 * 1024;
 const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }];
 const MAX_VOICE_NOTE_SECONDS = 120;
+const MIN_VOICE_NOTE_SECONDS = 1;
 let toastTimer;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 let inviteProof = new URL(window.location.href).searchParams.get('proof');

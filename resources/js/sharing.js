@@ -2125,6 +2125,7 @@ function createCallPeer(call) {
 
         for (const type of ['mute', 'unmute', 'ended']) {
             event.track.addEventListener(type, () => {
+                if (state.call === call) renderCallDialog();
 }
 
 function showToast(message, isError = false) {

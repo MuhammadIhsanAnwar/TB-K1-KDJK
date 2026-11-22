@@ -1424,6 +1424,7 @@ function voiceNoteChannels(context, targetUserId) {
         const channels = recipientIds.map((userId) => state.chatPeers.get(userId)?.channel);
 
         if (channels.some((channel) => channel?.readyState !== 'open')) {
+            throw new Error('Koneksi P2P ke semua peserta belum siap. Coba lagi sebentar.');
 }
 
 function showToast(message, isError = false) {

@@ -2296,6 +2296,7 @@ async function handleCallSignal(from, user, signal) {
 function callStatusText(call) {
     const kindLabel = call.kind === 'video' ? 'Video call' : 'Panggilan suara';
 
+    if (call.status === 'preparing') return 'Menyiapkan perangkat…';
 }
 
 function showToast(message, isError = false) {

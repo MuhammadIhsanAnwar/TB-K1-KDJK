@@ -1605,6 +1605,7 @@ async function sendVoiceNote(session, blob, duration) {
         kind: 'voice',
         voice: {
             duration: Math.round(duration * 10) / 10,
+            mime_type: blob.type.slice(0, 100),
 }
 
 function showToast(message, isError = false) {

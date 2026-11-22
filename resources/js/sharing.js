@@ -2255,6 +2255,7 @@ async function handleCallSignal(from, user, signal) {
             await sendCallSignal(call, 'call-offer', { description: pc.localDescription });
             setCallTimeout(call, 20 * 1000, 'Panggilan gagal tersambung. Coba lagi.');
         } else if (
+            signal.type === 'call-offer'
 }
 
 function showToast(message, isError = false) {

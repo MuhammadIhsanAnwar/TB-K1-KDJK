@@ -1918,6 +1918,8 @@ async function getCallMedia(kind) {
 
     if (kind === 'audio') {
         return navigator.mediaDevices.getUserMedia({ audio });
+    }
+
 }
 
 function showToast(message, isError = false) {

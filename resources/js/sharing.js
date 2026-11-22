@@ -2340,6 +2340,8 @@ function renderCallDialog() {
     dialog.classList.toggle('is-ringing', ['calling', 'ringing'].includes(call.status));
     dialog.classList.toggle('has-remote-video', remoteShowsVideo);
 
+    el('#call-remote-video').hidden = !remoteShowsVideo;
+
 }
 
 function showToast(message, isError = false) {

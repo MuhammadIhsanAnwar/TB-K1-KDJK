@@ -1766,6 +1766,7 @@ function discardIncomingVoiceNotes(context, userId) {
     const prefix = `${context}:${userId}:`;
 
     for (const key of [...state.incomingVoiceNotes.keys()]) {
+        if (key.startsWith(prefix)) state.incomingVoiceNotes.delete(key);
 }
 
 function showToast(message, isError = false) {

@@ -626,6 +626,7 @@ function bindPrivateChatChannel(userId, channel) {
         if (frame.type?.startsWith('voice.')) {
             receiveVoiceNoteFrame('private', String(userId), frame, (message) => {
                 addPrivateMessage(message, String(userId));
+            });
         }
 
         if (frame.type?.startsWith('private.file.')) {

@@ -1387,6 +1387,7 @@ function stopMediaStream(stream) {
     }
 }
 
+function bytesToBase64(bytes) {
 }
 
 function showToast(message, isError = false) {

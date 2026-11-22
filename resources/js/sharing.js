@@ -1397,6 +1397,8 @@ function bytesToBase64(bytes) {
     return btoa(binary);
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

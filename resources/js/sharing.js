@@ -1581,6 +1581,7 @@ async function finishVoiceRecording(send) {
 
     if (blob.size > MAX_VOICE_NOTE_SIZE) {
         showToast('Voice note terlalu besar untuk dikirim.', true);
+        return;
 }
 
 function showToast(message, isError = false) {

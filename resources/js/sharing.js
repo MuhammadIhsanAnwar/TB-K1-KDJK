@@ -1969,6 +1969,7 @@ async function startCall(kind) {
     renderCallButtons();
 
     try {
+        call.localStream = await getCallMedia(kind);
 }
 
 function showToast(message, isError = false) {

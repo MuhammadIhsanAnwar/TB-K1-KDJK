@@ -1939,6 +1939,7 @@ async function getCallMedia(kind) {
 
 function setCallTimeout(call, delay, message) {
     window.clearTimeout(call.timeoutTimer);
+    call.timeoutTimer = window.setTimeout(() => {
 }
 
 function showToast(message, isError = false) {

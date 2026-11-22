@@ -1960,6 +1960,7 @@ async function startCall(kind) {
         id: crypto.randomUUID(),
         kind,
         direction: 'outgoing',
+        status: 'preparing',
 }
 
 function showToast(message, isError = false) {

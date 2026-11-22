@@ -2398,6 +2398,7 @@ function toggleCallMicrophone() {
     renderCallDialog();
 }
 
+function toggleCallCamera() {
 }
 
 function showToast(message, isError = false) {

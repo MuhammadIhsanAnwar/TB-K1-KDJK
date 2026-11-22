@@ -1411,6 +1411,7 @@ function base64ToBytes(data) {
 function voiceNoteChannels(context, targetUserId) {
     if (context === 'room') {
         if (!state.room) {
+            throw new Error('Kamu belum berada di room.');
 }
 
 function showToast(message, isError = false) {

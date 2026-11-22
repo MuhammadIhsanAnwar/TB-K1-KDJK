@@ -1372,6 +1372,8 @@ function mediaErrorMessage(error, device) {
 
     if (['NotFoundError', 'OverconstrainedError'].includes(error?.name)) {
         return `${capitalize(device)} tidak ditemukan di perangkat ini.`;
+    }
+
 }
 
 function showToast(message, isError = false) {

@@ -2114,6 +2114,8 @@ function createCallPeer(call) {
     pc.addEventListener('track', (event) => {
         if (state.call !== call) return;
 
+        const [stream] = event.streams;
+
 }
 
 function showToast(message, isError = false) {

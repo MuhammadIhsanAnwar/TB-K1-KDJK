@@ -1352,6 +1352,7 @@ function formatDuration(totalSeconds) {
 }
 
 function capitalize(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 function showToast(message, isError = false) {

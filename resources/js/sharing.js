@@ -103,6 +103,7 @@ const state = {
     privateSelectedFile: null,
     privateFileTransfers: new Map(),
     voiceRecorder: null,
+    voiceNoteUrls: new Map(),
 };
 
 const el = (selector) => document.querySelector(selector);

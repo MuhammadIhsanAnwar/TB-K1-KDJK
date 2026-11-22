@@ -122,6 +122,7 @@ const VOICE_NOTE_MIME_TYPES = [
     'audio/mp4',
     'audio/ogg;codecs=opus',
 ];
+const CALL_RING_TIMEOUT = 30 * 1000;
 let toastTimer;
 let inviteCode = new URL(window.location.href).searchParams.get('room');
 let inviteProof = new URL(window.location.href).searchParams.get('proof');

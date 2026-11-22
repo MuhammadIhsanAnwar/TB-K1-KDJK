@@ -2233,6 +2233,7 @@ async function handleCallSignal(from, user, signal) {
         if (signal.type === 'call-busy' && call.status === 'calling') {
             endCall(`${call.peerName} sedang dalam panggilan lain.`);
         } else if (signal.type === 'call-reject' && call.status === 'calling') {
+            endCall(payload.reason === 'media'
 }
 
 function showToast(message, isError = false) {

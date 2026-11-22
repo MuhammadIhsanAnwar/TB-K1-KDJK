@@ -2365,6 +2365,8 @@ function renderCallDialog() {
     el('#call-mic-caption').textContent = call.micMuted ? 'Mikrofon mati' : 'Mikrofon';
 
     const camera = el('#call-toggle-camera');
+    const cameraUnavailable = hasLocalStream && !localHasVideo;
+
 }
 
 function showToast(message, isError = false) {

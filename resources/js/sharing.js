@@ -2138,6 +2138,7 @@ function createCallPeer(call) {
 
         if (pc.connectionState === 'connected') {
             call.unstable = false;
+            markCallConnected(call);
 }
 
 function showToast(message, isError = false) {

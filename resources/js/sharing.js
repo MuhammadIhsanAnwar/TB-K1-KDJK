@@ -2256,6 +2256,7 @@ async function handleCallSignal(from, user, signal) {
             setCallTimeout(call, 20 * 1000, 'Panggilan gagal tersambung. Coba lagi.');
         } else if (
             signal.type === 'call-offer'
+            && call.direction === 'incoming'
 }
 
 function showToast(message, isError = false) {

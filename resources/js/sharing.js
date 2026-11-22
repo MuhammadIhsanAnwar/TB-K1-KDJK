@@ -1403,6 +1403,8 @@ function base64ToBytes(data) {
 
     for (let index = 0; index < binary.length; index += 1) {
         bytes[index] = binary.charCodeAt(index);
+    }
+
 }
 
 function showToast(message, isError = false) {

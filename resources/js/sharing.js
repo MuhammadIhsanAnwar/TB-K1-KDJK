@@ -1519,6 +1519,7 @@ async function startVoiceRecording(context) {
         stopping: false,
     };
 
+    recorder.addEventListener('dataavailable', (event) => {
 }
 
 function showToast(message, isError = false) {

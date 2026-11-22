@@ -1485,6 +1485,7 @@ async function startVoiceRecording(context) {
         voiceRecorderStarting = false;
     }
 
+    const contextChanged = context === 'room'
 }
 
 function showToast(message, isError = false) {

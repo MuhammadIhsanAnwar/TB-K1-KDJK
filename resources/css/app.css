@@ -1145,7 +1145,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 }
 
 /* Token brutalis mengikuti tema agar tidak menimpa dark mode. */
-[data-theme="dark"] {
+:root[data-theme="dark"] {
     --b-border: #2b424f;
     --b-ink: #d3dee6;
     --b-ink-2: #9fb2c0;

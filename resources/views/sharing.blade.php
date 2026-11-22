@@ -470,6 +470,7 @@
                                     type="button"
                                     aria-label="Rekam voice note"
                                     title="Rekam voice note"
+                                >
 
                                 <button
                                     class="send-button"

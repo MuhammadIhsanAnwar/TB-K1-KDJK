@@ -1577,6 +1577,8 @@ async function finishVoiceRecording(send) {
     if (!blob.size) {
         showToast('Rekaman kosong. Periksa mikrofonmu lalu coba lagi.', true);
         return;
+    }
+
 }
 
 function showToast(message, isError = false) {

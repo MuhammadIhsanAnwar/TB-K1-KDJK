@@ -2095,6 +2095,7 @@ function createCallPeer(call) {
         pc.addTrack(track, call.localStream);
     }
 
+    if (
 }
 
 function showToast(message, isError = false) {

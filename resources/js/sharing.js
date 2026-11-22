@@ -1645,6 +1645,8 @@ function sendVoiceNoteFrames(channel, message, bytes) {
     channel.send(JSON.stringify({ type: 'voice.end', id: message.id }));
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

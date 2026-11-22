@@ -1841,6 +1841,8 @@ function createVoiceNotePlayer(url, duration) {
         progress.style.width = '0%';
         time.textContent = formatDuration(duration);
         showPaused();
+    });
+
 }
 
 function showToast(message, isError = false) {

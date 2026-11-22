@@ -4234,6 +4234,7 @@ function bindEvents() {
     }
 
     el('#private-voice-call').addEventListener('click', () => void startCall('audio'));
+    el('#private-video-call').addEventListener('click', () => void startCall('video'));
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

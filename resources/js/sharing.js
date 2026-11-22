@@ -1428,6 +1428,8 @@ function voiceNoteChannels(context, targetUserId) {
         }
 
         return channels;
+    }
+
 }
 
 function showToast(message, isError = false) {

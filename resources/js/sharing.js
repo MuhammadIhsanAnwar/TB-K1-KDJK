@@ -1374,6 +1374,7 @@ function mediaErrorMessage(error, device) {
         return `${capitalize(device)} tidak ditemukan di perangkat ini.`;
     }
 
+    if (error?.name === 'NotReadableError') {
 }
 
 function showToast(message, isError = false) {

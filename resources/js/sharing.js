@@ -1444,6 +1444,8 @@ function renderVoiceRecorder(context, recording) {
 
     form.classList.toggle('is-recording', recording);
     el(`#${context}-voice-recorder`).hidden = !recording;
+    el(`#${context}-voice-timer`).textContent = '0:00';
+
 }
 
 function showToast(message, isError = false) {

@@ -3113,6 +3113,7 @@ async function handlePeerMessage(fromUserId, rawData) {
     }
 
     if (frame.type?.startsWith('voice.')) {
+        receiveVoiceNoteFrame('room', fromUserId, frame, addChatMessage);
         return;
     }
 

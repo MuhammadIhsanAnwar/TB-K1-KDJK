@@ -868,3 +868,5 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 /* Tombol panggilan di chat pribadi */
 .private-chat-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .call-start-button { gap: 6px; }
+.call-start-button svg { width: 14px; height: 14px; }
+

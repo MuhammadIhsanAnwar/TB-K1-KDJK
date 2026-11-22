@@ -1822,6 +1822,7 @@ function createVoiceNotePlayer(url, duration) {
 
     audio.addEventListener('play', () => {
         button.innerHTML = PAUSE_ICON;
+        button.setAttribute('aria-label', 'Jeda voice note');
 }
 
 function showToast(message, isError = false) {

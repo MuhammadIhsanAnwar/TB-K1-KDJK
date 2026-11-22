@@ -396,6 +396,7 @@
                                     >
                                         Tutup chat
                                     </button>
+                                </div>
                             </div>
 
                             <div

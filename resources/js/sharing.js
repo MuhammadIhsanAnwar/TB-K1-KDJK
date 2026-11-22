@@ -2277,6 +2277,7 @@ async function handleCallSignal(from, user, signal) {
             await drainCallCandidates(call);
         } else if (signal.type === 'call-candidate' && payload.candidate) {
             if (call.pc?.remoteDescription) {
+                await call.pc.addIceCandidate(payload.candidate);
 }
 
 function showToast(message, isError = false) {

@@ -1421,6 +1421,8 @@ function voiceNoteChannels(context, targetUserId) {
             throw new Error('Tidak ada pengguna online di room untuk menerima voice note.');
         }
 
+        const channels = recipientIds.map((userId) => state.chatPeers.get(userId)?.channel);
+
 }
 
 function showToast(message, isError = false) {

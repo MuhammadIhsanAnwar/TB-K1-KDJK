@@ -1736,6 +1736,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             }
         }
 
+        if (!bytes || incoming.receivedBytes + bytes.length > incoming.message.voice.size) {
 }
 
 function showToast(message, isError = false) {

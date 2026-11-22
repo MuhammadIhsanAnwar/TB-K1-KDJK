@@ -2442,6 +2442,7 @@ function startRingtone() {
             }
         };
 
+        void context.resume().catch(() => {});
 }
 
 function showToast(message, isError = false) {

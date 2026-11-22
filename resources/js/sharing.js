@@ -2399,6 +2399,7 @@ function toggleCallMicrophone() {
 }
 
 function toggleCallCamera() {
+    const call = state.call;
 }
 
 function showToast(message, isError = false) {

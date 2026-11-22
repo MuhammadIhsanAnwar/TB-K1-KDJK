@@ -1509,6 +1509,7 @@ async function startVoiceRecording(context) {
     }
 
     const session = {
+        context,
 }
 
 function showToast(message, isError = false) {

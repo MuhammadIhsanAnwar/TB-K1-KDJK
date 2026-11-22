@@ -1405,6 +1405,7 @@ function base64ToBytes(data) {
         bytes[index] = binary.charCodeAt(index);
     }
 
+    return bytes;
 }
 
 function showToast(message, isError = false) {

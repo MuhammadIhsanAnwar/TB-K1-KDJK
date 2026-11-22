@@ -1363,6 +1363,7 @@ function ensureMediaSupport() {
     }
 }
 
+function mediaErrorMessage(error, device) {
 }
 
 function showToast(message, isError = false) {

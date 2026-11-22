@@ -1540,6 +1540,8 @@ async function startVoiceRecording(context) {
 }
 
 async function finishVoiceRecording(send) {
+    const session = state.voiceRecorder;
+
 }
 
 function showToast(message, isError = false) {

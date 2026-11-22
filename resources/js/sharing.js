@@ -1949,6 +1949,8 @@ function setCallTimeout(call, delay, message) {
 async function startCall(kind) {
     const user = state.selectedPrivateUser;
 
+    if (!user || state.call) return;
+
 }
 
 function showToast(message, isError = false) {

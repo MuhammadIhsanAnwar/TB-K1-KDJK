@@ -1931,6 +1931,8 @@ async function getCallMedia(kind) {
         }
 
         const stream = await navigator.mediaDevices.getUserMedia({ audio });
+        showToast('Kamera tidak tersedia. Panggilan berjalan dengan suara saja.', true);
+
 }
 
 function showToast(message, isError = false) {

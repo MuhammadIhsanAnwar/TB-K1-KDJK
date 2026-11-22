@@ -2212,6 +2212,7 @@ async function handleCallSignal(from, user, signal) {
         });
 
         state.call = call;
+        renderCallButtons();
 }
 
 function showToast(message, isError = false) {

@@ -1980,6 +1980,7 @@ async function startCall(kind) {
         return;
     }
 
+    call.status = 'calling';
 }
 
 function showToast(message, isError = false) {

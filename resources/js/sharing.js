@@ -1392,6 +1392,8 @@ function bytesToBase64(bytes) {
 
     for (let offset = 0; offset < bytes.length; offset += 0x8000) {
         binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
+    }
+
 }
 
 function showToast(message, isError = false) {

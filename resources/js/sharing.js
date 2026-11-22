@@ -1854,6 +1854,7 @@ function createVoiceNotePlayer(url, duration) {
         }
 
         activeVoiceAudio = audio;
+        audio.play().catch(() => {
 }
 
 function showToast(message, isError = false) {

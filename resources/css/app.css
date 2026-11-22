@@ -876,3 +876,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-dialog[open] { display: flex; flex-direction: column; }
 .call-dialog::backdrop { background: #0b1a26c7; }
 .call-stage { position: relative; flex: 1; min-height: 300px; display: grid; place-items: center; overflow: hidden; background: #0f2333; }
+.call-remote-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }

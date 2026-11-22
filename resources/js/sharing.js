@@ -1567,6 +1567,7 @@ async function finishVoiceRecording(send) {
 
     if (duration < MIN_VOICE_NOTE_SECONDS) {
         showToast('Voice note terlalu pendek, minimal 1 detik.', true);
+        return;
 }
 
 function showToast(message, isError = false) {

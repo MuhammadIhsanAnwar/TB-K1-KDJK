@@ -851,3 +851,5 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .voice-recorder-time { color: #173247; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .voice-recorder-hint { flex: 1; min-width: 0; overflow: hidden; color: #718696; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .voice-recorder .button { flex: 0 0 auto; }
+@keyframes voice-pulse { 50% { opacity: .3; } }
+

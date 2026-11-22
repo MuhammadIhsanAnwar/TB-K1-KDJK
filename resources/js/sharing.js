@@ -2302,6 +2302,8 @@ function callStatusText(call) {
     if (call.status === 'connecting') return 'Menghubungkan…';
     if (call.unstable) return 'Koneksi tidak stabil, mencoba menyambung…';
 
+    const parts = [formatDuration((Date.now() - call.connectedAt) / 1000)];
+
 }
 
 function showToast(message, isError = false) {

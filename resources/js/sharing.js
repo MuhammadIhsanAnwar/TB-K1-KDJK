@@ -1968,6 +1968,7 @@ async function startCall(kind) {
     state.call = call;
     renderCallButtons();
 
+    try {
 }
 
 function showToast(message, isError = false) {

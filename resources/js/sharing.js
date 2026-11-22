@@ -2190,6 +2190,8 @@ async function handleCallSignal(from, user, signal) {
     const payload = signal.payload ?? {};
     const callId = payload.callId;
 
+    if (typeof callId !== 'string' || !/^[0-9a-f-]{36}$/i.test(callId)) return;
+
 }
 
 function showToast(message, isError = false) {

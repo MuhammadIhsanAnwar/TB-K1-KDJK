@@ -1554,6 +1554,7 @@ async function finishVoiceRecording(send) {
 
     if (session.recorder.state !== 'inactive') {
         await new Promise((resolve) => {
+            session.recorder.addEventListener('stop', resolve, { once: true });
 }
 
 function showToast(message, isError = false) {

@@ -1655,6 +1655,7 @@ function storeOwnPrivateMessage(message, userId) {
 
         renderPrivateMessage(message);
         savePrivateMessages();
+        return;
 }
 
 function showToast(message, isError = false) {

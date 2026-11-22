@@ -2152,6 +2152,7 @@ function createCallPeer(call) {
 }
 
 function attachRemoteStream(call) {
+    const audio = el('#call-remote-audio');
 }
 
 function showToast(message, isError = false) {

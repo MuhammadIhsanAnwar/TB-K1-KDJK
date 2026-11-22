@@ -4240,6 +4240,7 @@ function bindEvents() {
     el('#call-hangup').addEventListener('click', hangUpCall);
     el('#call-toggle-mic').addEventListener('click', toggleCallMicrophone);
     el('#call-toggle-camera').addEventListener('click', toggleCallCamera);
+    el('#call-dialog').addEventListener('cancel', (event) => event.preventDefault());
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

@@ -1956,6 +1956,7 @@ async function startCall(kind) {
         return;
     }
 
+    const call = createCallState({
 }
 
 function showToast(message, isError = false) {

@@ -571,6 +571,7 @@
         </div>
     </dialog>
 
+    <dialog id="call-dialog" class="call-dialog" aria-labelledby="call-peer-name">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

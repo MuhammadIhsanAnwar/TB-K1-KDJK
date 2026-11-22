@@ -2166,6 +2166,7 @@ function attachRemoteStream(call) {
     }
 }
 
+function markCallConnected(call) {
 }
 
 function showToast(message, isError = false) {

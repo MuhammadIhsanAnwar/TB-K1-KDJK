@@ -2056,6 +2056,7 @@ function hangUpCall() {
     endCall(call.connectedAt ? `Panggilan selesai${duration}.` : 'Panggilan dibatalkan.', true);
 }
 
+function endCall(message = null, notifyPeer = false, isError = false) {
 }
 
 function showToast(message, isError = false) {

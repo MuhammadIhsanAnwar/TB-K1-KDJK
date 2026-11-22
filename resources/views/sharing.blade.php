@@ -478,6 +478,7 @@
                                     <span class="voice-recorder-dot" aria-hidden="true"></span>
                                     <span id="private-voice-timer" class="voice-recorder-time">0:00</span>
                                     <span class="voice-recorder-hint">Merekam · maks. 2 menit</span>
+                                    <button id="private-voice-cancel" class="button button-quiet button-small" type="button">Batal</button>
 
                                 <button
                                     class="send-button"

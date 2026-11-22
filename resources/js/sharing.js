@@ -1681,6 +1681,7 @@ function isValidVoiceNoteMessage(message, fromUserId) {
         && typeof message.created_at === 'string'
         && message.kind === 'voice'
         && message.body === ''
+        && typeof voice?.mime_type === 'string'
 }
 
 function showToast(message, isError = false) {

@@ -1483,6 +1483,8 @@ async function startVoiceRecording(context) {
         return;
     } finally {
         voiceRecorderStarting = false;
+    }
+
 }
 
 function showToast(message, isError = false) {

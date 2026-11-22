@@ -2238,6 +2238,7 @@ async function handleCallSignal(from, user, signal) {
                 : `${call.peerName} menolak panggilan.`);
         } else if (signal.type === 'call-end') {
             endCall(call.status === 'ringing'
+                ? `Panggilan tak terjawab dari ${call.peerName}.`
 }
 
 function showToast(message, isError = false) {

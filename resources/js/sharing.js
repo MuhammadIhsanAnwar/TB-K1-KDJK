@@ -1755,6 +1755,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             return;
         }
 
+        const blob = new Blob(incoming.chunks, { type: incoming.message.voice.mime_type });
+
 }
 
 function showToast(message, isError = false) {

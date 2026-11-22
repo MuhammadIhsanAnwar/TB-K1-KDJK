@@ -3255,7 +3255,7 @@ function addChatMessage(message) {
     meta.append(name, time);
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
-    bubble.textContent = message.body;
+    renderMessageContent(bubble, message);
     row.append(meta, bubble);
     list.append(row);
     list.scrollTop = list.scrollHeight;

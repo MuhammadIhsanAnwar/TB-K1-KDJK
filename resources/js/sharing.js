@@ -2349,6 +2349,8 @@ function renderCallDialog() {
         void localVideo.play().catch(() => {});
     }
 
+    localVideo.hidden = !localHasVideo || call.cameraOff;
+
 }
 
 function showToast(message, isError = false) {

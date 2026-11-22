@@ -1356,6 +1356,7 @@ function capitalize(text) {
 }
 
 function ensureMediaSupport() {
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
 }
 
 function showToast(message, isError = false) {

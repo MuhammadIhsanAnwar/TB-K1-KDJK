@@ -1370,6 +1370,7 @@ function mediaErrorMessage(error, device) {
         return `Izin ${device} ditolak. Izinkan akses ${device} di pengaturan browser.`;
     }
 
+    if (['NotFoundError', 'OverconstrainedError'].includes(error?.name)) {
 }
 
 function showToast(message, isError = false) {

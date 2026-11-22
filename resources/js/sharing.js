@@ -1750,6 +1750,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
     if (frame.type === 'voice.end') {
         state.incomingVoiceNotes.delete(key);
 
+        if (incoming.receivedBytes !== incoming.message.voice.size) {
 }
 
 function showToast(message, isError = false) {

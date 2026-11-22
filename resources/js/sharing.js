@@ -1663,6 +1663,7 @@ function storeOwnPrivateMessage(message, userId) {
         const history = JSON.parse(localStorage.getItem(key) ?? '[]');
         const next = Array.isArray(history) ? history : [];
 
+        next.push(message);
 }
 
 function showToast(message, isError = false) {

@@ -1744,6 +1744,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 
         incoming.chunks.push(bytes);
         incoming.receivedBytes += bytes.length;
+        return;
 }
 
 function showToast(message, isError = false) {

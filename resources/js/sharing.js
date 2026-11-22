@@ -1461,6 +1461,7 @@ async function startVoiceRecording(context) {
     try {
         voiceNoteChannels(context, targetUserId);
     } catch (error) {
+        showToast(error.message, true);
 }
 
 function showToast(message, isError = false) {

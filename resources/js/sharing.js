@@ -1835,6 +1835,8 @@ function createVoiceNotePlayer(url, duration) {
 
         progress.style.width = `${total ? Math.min(100, (audio.currentTime / total) * 100) : 0}%`;
         time.textContent = formatDuration(audio.currentTime);
+    });
+
 }
 
 function showToast(message, isError = false) {

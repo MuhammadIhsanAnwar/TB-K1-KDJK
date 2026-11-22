@@ -1542,6 +1542,8 @@ async function startVoiceRecording(context) {
 async function finishVoiceRecording(send) {
     const session = state.voiceRecorder;
 
+    if (!session || session.stopping) return;
+
 }
 
 function showToast(message, isError = false) {

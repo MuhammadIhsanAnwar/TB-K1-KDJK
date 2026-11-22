@@ -1584,6 +1584,7 @@ async function finishVoiceRecording(send) {
         return;
     }
 
+    await sendVoiceNote(session, blob, duration);
 }
 
 function showToast(message, isError = false) {

@@ -2357,6 +2357,8 @@ function renderCallDialog() {
     el('#call-incoming-controls').hidden = !isIncomingRing;
     el('#call-active-controls').hidden = isIncomingRing;
 
+    const mic = el('#call-toggle-mic');
+
 }
 
 function showToast(message, isError = false) {

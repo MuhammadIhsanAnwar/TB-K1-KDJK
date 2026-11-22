@@ -1524,6 +1524,8 @@ async function startVoiceRecording(context) {
     });
 
     recorder.start();
+    state.voiceRecorder = session;
+
 }
 
 function showToast(message, isError = false) {

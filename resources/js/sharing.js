@@ -623,6 +623,7 @@ function bindPrivateChatChannel(userId, channel) {
             addPrivateMessage(frame.message, String(userId));
         }
 
+        if (frame.type?.startsWith('voice.')) {
         }
 
         if (frame.type?.startsWith('private.file.')) {

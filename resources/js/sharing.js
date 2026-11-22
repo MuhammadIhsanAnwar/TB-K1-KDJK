@@ -1731,6 +1731,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
         ) {
             try {
                 bytes = base64ToBytes(frame.data);
+            } catch {
 }
 
 function showToast(message, isError = false) {

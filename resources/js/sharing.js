@@ -1200,7 +1200,7 @@ async function handlePrivateSignal(message) {
 
     if (
         !signal
-        || signal.scope !== 'private-chat'
+        || !['private-chat', 'call'].includes(signal.scope)
         || !identity
         || identity.fingerprint !== state.privateNetworkFingerprint
         || signal.to !== String(state.user.id)

@@ -1813,6 +1813,7 @@ function createVoiceNotePlayer(url, duration) {
     const audio = new Audio(url);
     audio.preload = 'metadata';
 
+    const showPaused = () => {
 }
 
 function showToast(message, isError = false) {

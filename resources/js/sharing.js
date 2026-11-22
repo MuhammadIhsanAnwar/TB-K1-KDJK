@@ -2311,6 +2311,8 @@ function callStatusText(call) {
     return parts.join(' · ');
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

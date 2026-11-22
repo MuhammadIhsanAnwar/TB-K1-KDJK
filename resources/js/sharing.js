@@ -1830,6 +1830,7 @@ function createVoiceNotePlayer(url, duration) {
     audio.addEventListener('timeupdate', () => {
         // Rekaman WebM dari MediaRecorder sering tidak punya durasi, jadi pakai durasi rekaman sebagai cadangan.
         const total = Number.isFinite(audio.duration) && audio.duration > 0
+            ? audio.duration
 }
 
 function showToast(message, isError = false) {

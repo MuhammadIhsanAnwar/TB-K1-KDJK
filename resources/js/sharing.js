@@ -2024,6 +2024,8 @@ async function acceptIncomingCall() {
     } catch (error) {
         endCall(`Panggilan gagal tersambung: ${error.message}`, true, true);
         return;
+    }
+
 }
 
 function showToast(message, isError = false) {

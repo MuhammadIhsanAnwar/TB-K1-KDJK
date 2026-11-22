@@ -1711,6 +1711,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             || state.voiceNoteUrls.has(message.id)
         ) return;
 
+        state.incomingVoiceNotes.set(key, { message, chunks: [], receivedBytes: 0 });
 }
 
 function showToast(message, isError = false) {

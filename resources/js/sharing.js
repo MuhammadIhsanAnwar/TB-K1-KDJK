@@ -1516,6 +1516,7 @@ async function startVoiceRecording(context) {
         chunks: [],
         startedAt: performance.now(),
         timer: null,
+        stopping: false,
 }
 
 function showToast(message, isError = false) {

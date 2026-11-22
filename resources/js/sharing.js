@@ -1800,6 +1800,8 @@ function createVoiceNotePlayer(url, duration) {
     button.className = 'voice-play';
 
     const track = document.createElement('span');
+    track.className = 'voice-track';
+
 }
 
 function showToast(message, isError = false) {

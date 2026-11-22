@@ -2123,6 +2123,7 @@ function createCallPeer(call) {
             call.remoteStream.addTrack(event.track);
         }
 
+        for (const type of ['mute', 'unmute', 'ended']) {
 }
 
 function showToast(message, isError = false) {

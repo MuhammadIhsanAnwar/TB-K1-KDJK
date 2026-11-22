@@ -1587,6 +1587,8 @@ async function finishVoiceRecording(send) {
     await sendVoiceNote(session, blob, duration);
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

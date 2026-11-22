@@ -1548,6 +1548,7 @@ async function finishVoiceRecording(send) {
     window.clearInterval(session.timer);
 
     const duration = Math.min(
+        (performance.now() - session.startedAt) / 1000,
 }
 
 function showToast(message, isError = false) {

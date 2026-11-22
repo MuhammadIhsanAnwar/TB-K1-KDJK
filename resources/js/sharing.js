@@ -1820,6 +1820,7 @@ function createVoiceNotePlayer(url, duration) {
 
     showPaused();
 
+    audio.addEventListener('play', () => {
 }
 
 function showToast(message, isError = false) {

@@ -2022,6 +2022,7 @@ async function acceptIncomingCall() {
         createCallPeer(call);
         await sendCallSignal(call, 'call-accept');
     } catch (error) {
+        endCall(`Panggilan gagal tersambung: ${error.message}`, true, true);
 }
 
 function showToast(message, isError = false) {

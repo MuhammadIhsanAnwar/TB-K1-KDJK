@@ -1597,6 +1597,7 @@ async function sendVoiceNote(session, blob, duration) {
         return;
     }
 
+    const message = {
 }
 
 function showToast(message, isError = false) {

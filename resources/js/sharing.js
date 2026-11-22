@@ -2429,6 +2429,8 @@ function startRingtone() {
 
             for (const offset of [0, 0.4]) {
                 const oscillator = context.createOscillator();
+                const gain = context.createGain();
+
 }
 
 function showToast(message, isError = false) {

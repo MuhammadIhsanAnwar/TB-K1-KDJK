@@ -2451,6 +2451,8 @@ function startRingtone() {
 }
 
 function stopRingtone() {
+    if (!ringtone) return;
+
 }
 
 function showToast(message, isError = false) {

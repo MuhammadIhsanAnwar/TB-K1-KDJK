@@ -1588,6 +1588,8 @@ async function finishVoiceRecording(send) {
 }
 
 async function sendVoiceNote(session, blob, duration) {
+    let channels;
+
 }
 
 function showToast(message, isError = false) {

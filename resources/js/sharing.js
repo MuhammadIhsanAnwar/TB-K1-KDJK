@@ -1618,6 +1618,7 @@ async function sendVoiceNote(session, blob, duration) {
             sendVoiceNoteFrames(channel, message, bytes);
         }
     } catch (error) {
+        showToast(`Voice note gagal dikirim: ${error.message}`, true);
 }
 
 function showToast(message, isError = false) {

@@ -601,6 +601,7 @@
             </span>
         </div>
 
+        <div id="call-active-controls" class="call-controls">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

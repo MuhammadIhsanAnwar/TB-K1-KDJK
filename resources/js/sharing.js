@@ -1533,6 +1533,7 @@ async function startVoiceRecording(context) {
 
         if (elapsed >= MAX_VOICE_NOTE_SECONDS) {
             void finishVoiceRecording(true);
+        }
 }
 
 function showToast(message, isError = false) {

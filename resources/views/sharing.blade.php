@@ -604,6 +604,7 @@
         <div id="call-active-controls" class="call-controls">
             <span class="call-action">
                 <button id="call-toggle-mic" class="call-control" type="button" aria-pressed="false" aria-label="Matikan mikrofon">
+                    <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v3"/></svg>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

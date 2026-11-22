@@ -1907,6 +1907,7 @@ function sendCallSignal(call, type, payload = {}) {
     });
 }
 
+function callDeviceLabel(kind) {
 }
 
 function showToast(message, isError = false) {

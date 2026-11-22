@@ -2287,6 +2287,7 @@ async function handleCallSignal(from, user, signal) {
             renderCallDialog();
         }
     } catch (error) {
+        if (state.call === call) {
 }
 
 function showToast(message, isError = false) {

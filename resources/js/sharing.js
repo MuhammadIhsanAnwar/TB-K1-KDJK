@@ -4243,6 +4243,8 @@ function bindEvents() {
     el('#call-dialog').addEventListener('cancel', (event) => event.preventDefault());
     window.addEventListener('pagehide', () => {
         if (state.call) void sendCallSignal(state.call, 'call-end').catch(() => {});
+    });
+
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

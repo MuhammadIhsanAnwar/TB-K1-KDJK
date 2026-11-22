@@ -1440,6 +1440,8 @@ function voiceNoteChannels(context, targetUserId) {
 }
 
 function renderVoiceRecorder(context, recording) {
+    const form = el(context === 'room' ? '#chat-form' : '#private-chat-form');
+
 }
 
 function showToast(message, isError = false) {

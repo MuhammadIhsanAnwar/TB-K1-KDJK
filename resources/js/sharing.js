@@ -1864,6 +1864,7 @@ function createVoiceNotePlayer(url, duration) {
     return player;
 }
 
+function renderCallButtons() {
 }
 
 function showToast(message, isError = false) {

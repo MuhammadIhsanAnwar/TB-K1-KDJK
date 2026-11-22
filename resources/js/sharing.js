@@ -1609,6 +1609,8 @@ async function sendVoiceNote(session, blob, duration) {
             size: blob.size,
         },
         created_at: new Date().toISOString(),
+    };
+
 }
 
 function showToast(message, isError = false) {

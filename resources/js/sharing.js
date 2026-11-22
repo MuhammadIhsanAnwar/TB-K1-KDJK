@@ -1559,6 +1559,7 @@ async function finishVoiceRecording(send) {
         });
     }
 
+    stopMediaStream(session.stream);
 }
 
 function showToast(message, isError = false) {

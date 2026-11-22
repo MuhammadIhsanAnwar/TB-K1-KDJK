@@ -1539,6 +1539,8 @@ async function startVoiceRecording(context) {
     renderVoiceRecorder(context, true);
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

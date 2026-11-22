@@ -623,6 +623,8 @@ function bindPrivateChatChannel(userId, channel) {
             addPrivateMessage(frame.message, String(userId));
         }
 
+        }
+
         if (frame.type?.startsWith('private.file.')) {
             handlePrivateFileControl(String(userId), frame);
         }

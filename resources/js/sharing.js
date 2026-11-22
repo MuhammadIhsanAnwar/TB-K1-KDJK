@@ -2192,6 +2192,7 @@ async function handleCallSignal(from, user, signal) {
 
     if (typeof callId !== 'string' || !/^[0-9a-f-]{36}$/i.test(callId)) return;
 
+    if (signal.type === 'call-invite') {
 }
 
 function showToast(message, isError = false) {

@@ -2158,6 +2158,8 @@ function attachRemoteStream(call) {
     if (audio.srcObject !== call.remoteStream) {
         audio.srcObject = call.remoteStream;
         void audio.play().catch(() => {});
+    }
+
 }
 
 function showToast(message, isError = false) {

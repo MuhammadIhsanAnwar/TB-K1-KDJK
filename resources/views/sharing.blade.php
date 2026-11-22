@@ -607,6 +607,7 @@
                     <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v3"/></svg>
                     <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v3"/><path d="m3 3 18 18"/></svg>
                 </button>
+                <span id="call-mic-caption">Mikrofon</span>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

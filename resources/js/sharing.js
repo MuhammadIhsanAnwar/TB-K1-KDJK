@@ -2240,6 +2240,7 @@ async function handleCallSignal(from, user, signal) {
             endCall(call.status === 'ringing'
                 ? `Panggilan tak terjawab dari ${call.peerName}.`
                 : `${call.peerName} mengakhiri panggilan.`);
+        } else if (
 }
 
 function showToast(message, isError = false) {

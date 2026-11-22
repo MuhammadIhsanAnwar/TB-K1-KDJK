@@ -1928,6 +1928,8 @@ async function getCallMedia(kind) {
     } catch (error) {
         if (!['NotFoundError', 'OverconstrainedError', 'NotReadableError'].includes(error?.name)) {
             throw error;
+        }
+
 }
 
 function showToast(message, isError = false) {

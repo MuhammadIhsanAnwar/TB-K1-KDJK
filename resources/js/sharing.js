@@ -2151,6 +2151,7 @@ function createCallPeer(call) {
     return pc;
 }
 
+function attachRemoteStream(call) {
 }
 
 function showToast(message, isError = false) {

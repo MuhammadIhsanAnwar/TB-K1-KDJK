@@ -1959,6 +1959,7 @@ async function startCall(kind) {
     const call = createCallState({
         id: crypto.randomUUID(),
         kind,
+        direction: 'outgoing',
 }
 
 function showToast(message, isError = false) {

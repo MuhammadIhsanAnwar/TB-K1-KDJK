@@ -2230,6 +2230,7 @@ async function handleCallSignal(from, user, signal) {
     if (!call || call.id !== callId || call.peerId !== from) return;
 
     try {
+        if (signal.type === 'call-busy' && call.status === 'calling') {
 }
 
 function showToast(message, isError = false) {

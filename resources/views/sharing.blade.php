@@ -584,6 +584,8 @@
             <video id="call-local-video" class="call-local-video" autoplay playsinline muted hidden></video>
         </div>
 
+        <audio id="call-remote-audio" autoplay></audio>
+
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

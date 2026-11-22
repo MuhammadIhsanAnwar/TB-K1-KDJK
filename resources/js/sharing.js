@@ -1670,6 +1670,7 @@ function storeOwnPrivateMessage(message, userId) {
     }
 }
 
+function isValidVoiceNoteMessage(message, fromUserId) {
 }
 
 function showToast(message, isError = false) {

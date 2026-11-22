@@ -1552,6 +1552,7 @@ async function finishVoiceRecording(send) {
         MAX_VOICE_NOTE_SECONDS,
     );
 
+    if (session.recorder.state !== 'inactive') {
 }
 
 function showToast(message, isError = false) {

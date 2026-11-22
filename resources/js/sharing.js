@@ -1903,6 +1903,7 @@ function sendCallSignal(call, type, payload = {}) {
         scope: 'call',
         to: String(call.peerId),
         type,
+        payload: { ...payload, callId: call.id },
 }
 
 function showToast(message, isError = false) {

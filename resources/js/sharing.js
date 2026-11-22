@@ -1966,6 +1966,8 @@ async function startCall(kind) {
     });
 
     state.call = call;
+    renderCallButtons();
+
 }
 
 function showToast(message, isError = false) {

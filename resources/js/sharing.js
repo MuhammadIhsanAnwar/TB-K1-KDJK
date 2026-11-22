@@ -2053,6 +2053,7 @@ function hangUpCall() {
         ? ` · ${formatDuration((Date.now() - call.connectedAt) / 1000)}`
         : '';
 
+    endCall(call.connectedAt ? `Panggilan selesai${duration}.` : 'Panggilan dibatalkan.', true);
 }
 
 function showToast(message, isError = false) {

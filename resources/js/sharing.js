@@ -2311,6 +2311,7 @@ function callStatusText(call) {
     return parts.join(' · ');
 }
 
+function openCallDialog() {
 }
 
 function showToast(message, isError = false) {

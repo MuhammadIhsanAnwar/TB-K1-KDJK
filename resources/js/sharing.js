@@ -1840,6 +1840,7 @@ function createVoiceNotePlayer(url, duration) {
     audio.addEventListener('ended', () => {
         progress.style.width = '0%';
         time.textContent = formatDuration(duration);
+        showPaused();
 }
 
 function showToast(message, isError = false) {

@@ -1793,6 +1793,8 @@ function renderMessageContent(bubble, message) {
 
 function createVoiceNotePlayer(url, duration) {
     const player = document.createElement('div');
+    player.className = 'voice-player';
+
 }
 
 function showToast(message, isError = false) {

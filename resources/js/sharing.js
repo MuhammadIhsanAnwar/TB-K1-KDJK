@@ -2171,6 +2171,7 @@ function markCallConnected(call) {
 
     if (call.connectedAt) return;
 
+    call.status = 'active';
 }
 
 function showToast(message, isError = false) {

@@ -2274,6 +2274,7 @@ async function handleCallSignal(from, user, signal) {
             && !call.pc.remoteDescription
         ) {
             await call.pc.setRemoteDescription(payload.description);
+            await drainCallCandidates(call);
 }
 
 function showToast(message, isError = false) {

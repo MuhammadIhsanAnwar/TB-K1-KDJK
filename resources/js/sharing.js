@@ -2162,6 +2162,7 @@ function attachRemoteStream(call) {
 
     if (call.kind === 'video' && video.srcObject !== call.remoteStream) {
         video.srcObject = call.remoteStream;
+        void video.play().catch(() => {});
 }
 
 function showToast(message, isError = false) {

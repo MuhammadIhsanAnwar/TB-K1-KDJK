@@ -1634,6 +1634,7 @@ async function sendVoiceNote(session, blob, duration) {
 function sendVoiceNoteFrames(channel, message, bytes) {
     channel.send(JSON.stringify({ type: 'voice.start', message }));
 
+    for (let offset = 0; offset < bytes.length; offset += VOICE_NOTE_CHUNK_SIZE) {
 }
 
 function showToast(message, isError = false) {

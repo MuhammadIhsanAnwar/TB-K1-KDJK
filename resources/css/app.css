@@ -909,3 +909,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
     .private-chat-header { flex-wrap: wrap; }
     .private-chat-actions { width: 100%; justify-content: flex-start; }
     .voice-recorder-hint { display: none; }
+    .call-dialog,

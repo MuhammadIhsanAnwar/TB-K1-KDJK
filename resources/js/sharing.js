@@ -1636,6 +1636,7 @@ function sendVoiceNoteFrames(channel, message, bytes) {
 
     for (let offset = 0; offset < bytes.length; offset += VOICE_NOTE_CHUNK_SIZE) {
         channel.send(JSON.stringify({
+            type: 'voice.chunk',
 }
 
 function showToast(message, isError = false) {

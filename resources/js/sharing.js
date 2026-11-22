@@ -1478,6 +1478,7 @@ async function startVoiceRecording(context) {
         stream = await navigator.mediaDevices.getUserMedia({
             audio: { echoCancellation: true, noiseSuppression: true },
         });
+    } catch (error) {
 }
 
 function showToast(message, isError = false) {

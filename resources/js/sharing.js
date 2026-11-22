@@ -2330,6 +2330,7 @@ function renderCallDialog() {
     const localHasVideo = isVideo && (call.localStream?.getVideoTracks().length ?? 0) > 0;
     const remoteVideoTrack = call.remoteStream?.getVideoTracks()[0];
     const remoteShowsVideo = isVideo
+        && call.status === 'active'
 }
 
 function showToast(message, isError = false) {

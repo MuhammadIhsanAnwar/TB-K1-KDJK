@@ -2173,6 +2173,7 @@ function markCallConnected(call) {
 
     call.status = 'active';
     call.connectedAt = Date.now();
+    call.durationTimer = window.setInterval(() => {
 }
 
 function showToast(message, isError = false) {

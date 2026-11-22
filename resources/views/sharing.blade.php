@@ -588,6 +588,7 @@
 
         <div id="call-incoming-controls" class="call-controls" hidden>
             <span class="call-action">
+                <button id="call-decline" class="call-control is-danger" type="button" aria-label="Tolak panggilan">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

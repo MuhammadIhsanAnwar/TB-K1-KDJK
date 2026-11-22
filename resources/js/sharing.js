@@ -2097,6 +2097,7 @@ function createCallPeer(call) {
 
     if (
         call.kind === 'video'
+        && call.direction === 'outgoing'
 }
 
 function showToast(message, isError = false) {

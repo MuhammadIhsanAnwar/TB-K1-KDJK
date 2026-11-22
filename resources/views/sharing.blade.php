@@ -380,6 +380,7 @@
                                     </button>
 
                                     <button
+                                        id="private-video-call"
                             </div>
 
                             <div

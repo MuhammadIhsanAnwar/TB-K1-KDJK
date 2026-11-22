@@ -1475,6 +1475,7 @@ async function startVoiceRecording(context) {
 
     try {
         ensureMediaSupport();
+        stream = await navigator.mediaDevices.getUserMedia({
 }
 
 function showToast(message, isError = false) {

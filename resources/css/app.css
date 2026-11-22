@@ -890,3 +890,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-action { display: grid; justify-items: center; gap: 7px; color: #b9cad6; font-size: 11px; }
 .call-control { width: 54px; height: 54px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; color: #fff; background: #ffffff1f; transition: background .15s ease; }
 .call-control:hover:not(:disabled) { background: #ffffff33; }
+.call-control:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }

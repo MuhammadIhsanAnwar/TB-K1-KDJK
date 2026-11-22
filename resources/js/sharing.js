@@ -2443,6 +2443,7 @@ function startRingtone() {
         };
 
         void context.resume().catch(() => {});
+        playRing();
 }
 
 function showToast(message, isError = false) {

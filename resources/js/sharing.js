@@ -2003,6 +2003,7 @@ async function acceptIncomingCall() {
     call.status = 'connecting';
     renderCallDialog();
 
+    try {
 }
 
 function showToast(message, isError = false) {

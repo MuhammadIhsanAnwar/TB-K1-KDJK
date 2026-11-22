@@ -1650,6 +1650,7 @@ function storeOwnPrivateMessage(message, userId) {
         if (state.privateMessages.has(message.id)) return;
 
         state.privateMessages.add(message.id);
+        state.privateMessageHistory.push(message);
 }
 
 function showToast(message, isError = false) {

@@ -1930,6 +1930,7 @@ async function getCallMedia(kind) {
             throw error;
         }
 
+        const stream = await navigator.mediaDevices.getUserMedia({ audio });
 }
 
 function showToast(message, isError = false) {

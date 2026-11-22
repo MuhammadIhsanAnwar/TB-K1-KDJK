@@ -1434,6 +1434,8 @@ function voiceNoteChannels(context, targetUserId) {
 
     if (!targetUserId || channel?.readyState !== 'open') {
         throw new Error('Koneksi chat pribadi belum siap.');
+    }
+
 }
 
 function showToast(message, isError = false) {

@@ -2266,6 +2266,7 @@ async function handleCallSignal(from, user, signal) {
             const answer = await call.pc.createAnswer();
 
             await call.pc.setLocalDescription(answer);
+            await sendCallSignal(call, 'call-answer', { description: call.pc.localDescription });
 }
 
 function showToast(message, isError = false) {

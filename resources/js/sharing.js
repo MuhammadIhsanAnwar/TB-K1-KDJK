@@ -1414,6 +1414,7 @@ function voiceNoteChannels(context, targetUserId) {
             throw new Error('Kamu belum berada di room.');
         }
 
+        const recipientIds = [...state.onlineUsers.keys()]
 }
 
 function showToast(message, isError = false) {

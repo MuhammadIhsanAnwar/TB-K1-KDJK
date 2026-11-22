@@ -1784,6 +1784,7 @@ function renderMessageContent(bubble, message) {
         const note = document.createElement('span');
         note.className = 'voice-unavailable';
         note.textContent = `Voice note ${formatDuration(message.voice?.duration)} · tidak tersedia lagi setelah halaman dimuat ulang`;
+        bubble.append(note);
 }
 
 function showToast(message, isError = false) {

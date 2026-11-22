@@ -1821,6 +1821,7 @@ function createVoiceNotePlayer(url, duration) {
     showPaused();
 
     audio.addEventListener('play', () => {
+        button.innerHTML = PAUSE_ICON;
 }
 
 function showToast(message, isError = false) {

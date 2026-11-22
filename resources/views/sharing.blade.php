@@ -389,6 +389,7 @@
                                         <span>Video</span>
                                     </button>
 
+                                    <button
                             </div>
 
                             <div

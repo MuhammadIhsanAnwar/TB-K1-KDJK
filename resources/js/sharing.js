@@ -1579,6 +1579,7 @@ async function finishVoiceRecording(send) {
         return;
     }
 
+    if (blob.size > MAX_VOICE_NOTE_SIZE) {
 }
 
 function showToast(message, isError = false) {

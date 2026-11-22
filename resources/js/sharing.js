@@ -1375,6 +1375,7 @@ function mediaErrorMessage(error, device) {
     }
 
     if (error?.name === 'NotReadableError') {
+        return `${capitalize(device)} sedang dipakai aplikasi lain.`;
 }
 
 function showToast(message, isError = false) {

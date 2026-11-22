@@ -2308,6 +2308,7 @@ function callStatusText(call) {
         parts.push(`mikrofon ${call.peerName} mati`);
     }
 
+    return parts.join(' · ');
 }
 
 function showToast(message, isError = false) {

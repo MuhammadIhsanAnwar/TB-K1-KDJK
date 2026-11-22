@@ -2127,6 +2127,8 @@ function createCallPeer(call) {
             event.track.addEventListener(type, () => {
                 if (state.call === call) renderCallDialog();
             });
+        }
+
 }
 
 function showToast(message, isError = false) {

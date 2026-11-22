@@ -1875,6 +1875,7 @@ function createCallState({ id, kind, direction, status, peerId, peerName }) {
     return {
         id,
         kind,
+        direction,
 }
 
 function showToast(message, isError = false) {

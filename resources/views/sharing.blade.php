@@ -382,6 +382,7 @@
                                     <button
                                         id="private-video-call"
                                         class="button button-outline button-small call-start-button"
+                                        type="button"
                             </div>
 
                             <div

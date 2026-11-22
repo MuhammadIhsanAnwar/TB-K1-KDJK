@@ -1499,6 +1499,7 @@ async function startVoiceRecording(context) {
 
     try {
         recorder = new MediaRecorder(stream, {
+            ...(mimeType ? { mimeType } : {}),
 }
 
 function showToast(message, isError = false) {

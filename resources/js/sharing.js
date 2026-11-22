@@ -1591,6 +1591,7 @@ async function sendVoiceNote(session, blob, duration) {
     let channels;
 
     try {
+        channels = voiceNoteChannels(session.context, session.targetUserId);
 }
 
 function showToast(message, isError = false) {

@@ -882,3 +882,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-avatar { width: 84px; height: 84px; display: grid; place-items: center; margin-bottom: 10px; border-radius: 50%; color: #fff; background: #17658f; font-size: 32px; font-weight: 700; }
 .call-dialog.is-ringing .call-avatar { animation: call-ring 1.8s ease-out infinite; }
 .call-identity h2 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
+.call-identity p { margin: 0; color: #b9cad6; font-size: 13px; font-variant-numeric: tabular-nums; }

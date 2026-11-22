@@ -1390,6 +1390,7 @@ function stopMediaStream(stream) {
 function bytesToBase64(bytes) {
     let binary = '';
 
+    for (let offset = 0; offset < bytes.length; offset += 0x8000) {
 }
 
 function showToast(message, isError = false) {

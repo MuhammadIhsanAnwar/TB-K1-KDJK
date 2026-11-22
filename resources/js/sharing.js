@@ -4227,6 +4227,7 @@ function bindEvents() {
             el('#username-dialog').close();
         }
     });
+    for (const context of ['room', 'private']) {
     el('#close-qr').addEventListener('click', () => el('#qr-dialog').close());
     el('#leave-room').addEventListener('click', () => void leaveRoom());
     el('#qr-dialog').addEventListener('click', (event) => {

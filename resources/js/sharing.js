@@ -1845,6 +1845,7 @@ function createVoiceNotePlayer(url, duration) {
 
     button.addEventListener('click', () => {
         if (!audio.paused) {
+            audio.pause();
 }
 
 function showToast(message, isError = false) {

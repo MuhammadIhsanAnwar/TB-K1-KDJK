@@ -845,3 +845,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .voice-button svg { width: 17px; height: 17px; }
 .chat-form.is-recording > input,
 .chat-form.is-recording > .send-button,
+.chat-form.is-recording > .voice-button { display: none; }

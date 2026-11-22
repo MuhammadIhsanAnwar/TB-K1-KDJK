@@ -1797,6 +1797,8 @@ function createVoiceNotePlayer(url, duration) {
 
     const button = document.createElement('button');
     button.type = 'button';
+    button.className = 'voice-play';
+
 }
 
 function showToast(message, isError = false) {

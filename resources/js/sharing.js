@@ -1780,6 +1780,7 @@ function renderMessageContent(bubble, message) {
 
     const url = state.voiceNoteUrls.get(String(message.id));
 
+    if (!url) {
 }
 
 function showToast(message, isError = false) {

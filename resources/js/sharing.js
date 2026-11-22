@@ -2367,6 +2367,7 @@ function renderCallDialog() {
     const camera = el('#call-toggle-camera');
     const cameraUnavailable = hasLocalStream && !localHasVideo;
 
+    el('#call-camera-action').hidden = !isVideo;
 }
 
 function showToast(message, isError = false) {

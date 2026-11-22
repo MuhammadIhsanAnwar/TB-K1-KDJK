@@ -2180,6 +2180,7 @@ function markCallConnected(call) {
     }, 1000);
 }
 
+async function drainCallCandidates(call) {
 }
 
 function showToast(message, isError = false) {

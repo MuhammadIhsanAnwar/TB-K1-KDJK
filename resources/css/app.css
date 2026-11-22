@@ -875,3 +875,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-dialog:not(.is-video) { width: min(92vw, 380px); height: fit-content; }
 .call-dialog[open] { display: flex; flex-direction: column; }
 .call-dialog::backdrop { background: #0b1a26c7; }
+.call-stage { position: relative; flex: 1; min-height: 300px; display: grid; place-items: center; overflow: hidden; background: #0f2333; }

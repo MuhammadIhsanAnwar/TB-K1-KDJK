@@ -1993,6 +1993,8 @@ async function startCall(kind) {
     setCallTimeout(call, CALL_RING_TIMEOUT, `${user.name} tidak menjawab.`);
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

@@ -2314,6 +2314,8 @@ function callStatusText(call) {
 function openCallDialog() {
     const dialog = el('#call-dialog');
 
+    renderCallDialog();
+
 }
 
 function showToast(message, isError = false) {

@@ -2086,6 +2086,8 @@ function endCall(message = null, notifyPeer = false, isError = false) {
     if (message) showToast(message, isError);
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

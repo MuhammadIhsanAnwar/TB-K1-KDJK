@@ -610,6 +610,7 @@
                 <span id="call-mic-caption">Mikrofon</span>
             </span>
             <span id="call-camera-action" class="call-action">
+                <button id="call-toggle-camera" class="call-control" type="button" aria-pressed="false" aria-label="Matikan kamera">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

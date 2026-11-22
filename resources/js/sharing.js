@@ -2181,6 +2181,7 @@ function markCallConnected(call) {
 }
 
 async function drainCallCandidates(call) {
+    for (const candidate of call.pendingCandidates.splice(0)) {
 }
 
 function showToast(message, isError = false) {

@@ -2169,6 +2169,8 @@ function attachRemoteStream(call) {
 function markCallConnected(call) {
     window.clearTimeout(call.timeoutTimer);
 
+    if (call.connectedAt) return;
+
 }
 
 function showToast(message, isError = false) {

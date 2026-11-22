@@ -2342,6 +2342,8 @@ function renderCallDialog() {
 
     el('#call-remote-video').hidden = !remoteShowsVideo;
 
+    const localVideo = el('#call-local-video');
+
 }
 
 function showToast(message, isError = false) {

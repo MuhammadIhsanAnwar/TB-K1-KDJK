@@ -2293,6 +2293,7 @@ async function handleCallSignal(from, user, signal) {
     }
 }
 
+function callStatusText(call) {
 }
 
 function showToast(message, isError = false) {

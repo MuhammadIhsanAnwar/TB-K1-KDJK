@@ -1988,6 +1988,8 @@ async function startCall(kind) {
     } catch (error) {
         endCall(`Panggilan gagal dimulai: ${error.message}`, false, true);
         return;
+    }
+
 }
 
 function showToast(message, isError = false) {

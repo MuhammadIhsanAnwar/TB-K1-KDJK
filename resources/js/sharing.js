@@ -1999,6 +1999,7 @@ async function acceptIncomingCall() {
     if (!call || call.direction !== 'incoming' || call.status !== 'ringing') return;
 
     stopRingtone();
+    window.clearTimeout(call.timeoutTimer);
 }
 
 function showToast(message, isError = false) {

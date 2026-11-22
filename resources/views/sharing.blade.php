@@ -368,13 +368,7 @@
                                     </span>
                                 </div>
 
-                                <button
-                                    id="close-private-chat"
-                                    class="button button-outline button-small"
-                                    type="button"
-                                >
-                                    Tutup chat
-                                </button>
+                                <div class="private-chat-actions">
                             </div>
 
                             <div

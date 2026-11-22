@@ -2040,6 +2040,8 @@ function declineIncomingCall() {
 }
 
 function hangUpCall() {
+    const call = state.call;
+
 }
 
 function showToast(message, isError = false) {

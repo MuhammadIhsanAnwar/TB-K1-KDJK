@@ -1747,6 +1747,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
         return;
     }
 
+    if (frame.type === 'voice.end') {
 }
 
 function showToast(message, isError = false) {

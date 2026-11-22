@@ -477,6 +477,7 @@
                                 <div id="private-voice-recorder" class="voice-recorder" hidden>
                                     <span class="voice-recorder-dot" aria-hidden="true"></span>
                                     <span id="private-voice-timer" class="voice-recorder-time">0:00</span>
+                                    <span class="voice-recorder-hint">Merekam · maks. 2 menit</span>
 
                                 <button
                                     class="send-button"

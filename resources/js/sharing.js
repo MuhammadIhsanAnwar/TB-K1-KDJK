@@ -1692,6 +1692,7 @@ function isValidVoiceNoteMessage(message, fromUserId) {
         && voice.duration <= MAX_VOICE_NOTE_SECONDS + 1;
 }
 
+function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 }
 
 function showToast(message, isError = false) {

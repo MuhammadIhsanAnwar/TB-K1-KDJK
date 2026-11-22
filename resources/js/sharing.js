@@ -2098,6 +2098,7 @@ function createCallPeer(call) {
     if (
         call.kind === 'video'
         && call.direction === 'outgoing'
+        && !call.localStream.getVideoTracks().length
 }
 
 function showToast(message, isError = false) {

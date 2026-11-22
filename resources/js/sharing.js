@@ -1473,6 +1473,7 @@ async function startVoiceRecording(context) {
     voiceRecorderStarting = true;
     let stream;
 
+    try {
 }
 
 function showToast(message, isError = false) {

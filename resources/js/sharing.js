@@ -2392,6 +2392,8 @@ function toggleCallMicrophone() {
 
     for (const track of call.localStream.getAudioTracks()) {
         track.enabled = !call.micMuted;
+    }
+
 }
 
 function showToast(message, isError = false) {

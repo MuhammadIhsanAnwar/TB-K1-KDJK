@@ -1827,6 +1827,7 @@ function createVoiceNotePlayer(url, duration) {
 
     audio.addEventListener('pause', showPaused);
 
+    audio.addEventListener('timeupdate', () => {
 }
 
 function showToast(message, isError = false) {

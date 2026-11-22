@@ -2205,6 +2205,7 @@ async function handleCallSignal(from, user, signal) {
         const call = createCallState({
             id: callId,
             kind: payload.kind,
+            direction: 'incoming',
 }
 
 function showToast(message, isError = false) {

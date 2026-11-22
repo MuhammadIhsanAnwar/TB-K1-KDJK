@@ -1901,6 +1901,7 @@ function sendCallSignal(call, type, payload = {}) {
 
     return state.privateChannel.publish('signal', {
         scope: 'call',
+        to: String(call.peerId),
 }
 
 function showToast(message, isError = false) {

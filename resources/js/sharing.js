@@ -1513,6 +1513,7 @@ async function startVoiceRecording(context) {
         targetUserId,
         recorder,
         stream,
+        chunks: [],
 }
 
 function showToast(message, isError = false) {

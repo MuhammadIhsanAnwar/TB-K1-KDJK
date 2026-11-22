@@ -392,6 +392,7 @@
                                     <button
                                         id="close-private-chat"
                                         class="button button-outline button-small"
+                                        type="button"
                             </div>
 
                             <div

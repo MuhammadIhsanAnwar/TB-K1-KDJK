@@ -2259,6 +2259,7 @@ async function handleCallSignal(from, user, signal) {
             && call.direction === 'incoming'
             && call.pc
             && !call.pc.remoteDescription
+        ) {
 }
 
 function showToast(message, isError = false) {

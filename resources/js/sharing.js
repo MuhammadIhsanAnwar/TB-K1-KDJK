@@ -2213,6 +2213,7 @@ async function handleCallSignal(from, user, signal) {
 
         state.call = call;
         renderCallButtons();
+        openCallDialog();
 }
 
 function showToast(message, isError = false) {

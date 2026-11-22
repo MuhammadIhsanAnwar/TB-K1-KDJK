@@ -1851,6 +1851,8 @@ function createVoiceNotePlayer(url, duration) {
 
         if (activeVoiceAudio && activeVoiceAudio !== audio) {
             activeVoiceAudio.pause();
+        }
+
 }
 
 function showToast(message, isError = false) {

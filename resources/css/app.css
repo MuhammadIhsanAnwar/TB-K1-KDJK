@@ -898,3 +898,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .call-control[aria-pressed="true"] { color: #0f2333; background: #fff; }
 .call-control.is-danger { background: #c24132; }
 .call-control.is-danger:hover:not(:disabled) { background: #a5362a; }
+.call-control.is-accept { background: #23845c; }

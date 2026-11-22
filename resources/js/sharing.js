@@ -1649,6 +1649,7 @@ function storeOwnPrivateMessage(message, userId) {
     if (state.selectedPrivateUser?.id === String(userId)) {
         if (state.privateMessages.has(message.id)) return;
 
+        state.privateMessages.add(message.id);
 }
 
 function showToast(message, isError = false) {

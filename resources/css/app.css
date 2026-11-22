@@ -859,3 +859,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .voice-play svg { width: 13px; height: 13px; }
 .is-own .voice-play { color: #17658f; background: #fff; }
 .voice-track { position: relative; flex: 1; height: 4px; overflow: hidden; border-radius: 2px; background: #cddbe4; }
+.is-own .voice-track { background: #ffffff55; }

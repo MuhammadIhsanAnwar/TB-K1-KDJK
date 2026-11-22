@@ -1556,6 +1556,7 @@ async function finishVoiceRecording(send) {
         await new Promise((resolve) => {
             session.recorder.addEventListener('stop', resolve, { once: true });
             session.recorder.stop();
+        });
 }
 
 function showToast(message, isError = false) {

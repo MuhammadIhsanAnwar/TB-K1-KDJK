@@ -860,3 +860,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .is-own .voice-play { color: #17658f; background: #fff; }
 .voice-track { position: relative; flex: 1; height: 4px; overflow: hidden; border-radius: 2px; background: #cddbe4; }
 .is-own .voice-track { background: #ffffff55; }
+.voice-progress { position: absolute; inset: 0 auto 0 0; width: 0; background: #17658f; transition: width .2s linear; }

@@ -617,6 +617,7 @@
                 <span id="call-camera-caption">Kamera</span>
             </span>
             <span class="call-action">
+                <button id="call-hangup" class="call-control is-danger" type="button" aria-label="Akhiri panggilan">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

@@ -1345,6 +1345,7 @@ async function sendPrivateChat(event) {
     }
 }
 
+function formatDuration(totalSeconds) {
 }
 
 function showToast(message, isError = false) {

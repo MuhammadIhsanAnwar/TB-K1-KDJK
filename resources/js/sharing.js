@@ -1502,6 +1502,7 @@ async function startVoiceRecording(context) {
             ...(mimeType ? { mimeType } : {}),
             audioBitsPerSecond: 32000,
         });
+    } catch (error) {
 }
 
 function showToast(message, isError = false) {

@@ -2345,6 +2345,7 @@ function renderCallDialog() {
     const localVideo = el('#call-local-video');
 
     if (localHasVideo && localVideo.srcObject !== call.localStream) {
+        localVideo.srcObject = call.localStream;
 }
 
 function showToast(message, isError = false) {

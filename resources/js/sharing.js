@@ -1981,6 +1981,8 @@ async function startCall(kind) {
     }
 
     call.status = 'calling';
+    openCallDialog();
+
 }
 
 function showToast(message, isError = false) {

@@ -2428,6 +2428,7 @@ function startRingtone() {
             const now = context.currentTime;
 
             for (const offset of [0, 0.4]) {
+                const oscillator = context.createOscillator();
 }
 
 function showToast(message, isError = false) {

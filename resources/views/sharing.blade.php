@@ -476,6 +476,7 @@
 
                                 <div id="private-voice-recorder" class="voice-recorder" hidden>
                                     <span class="voice-recorder-dot" aria-hidden="true"></span>
+                                    <span id="private-voice-timer" class="voice-recorder-time">0:00</span>
 
                                 <button
                                     class="send-button"

@@ -1943,6 +1943,7 @@ function setCallTimeout(call, delay, message) {
         if (state.call === call && call.status !== 'active') {
             endCall(message, true, true);
         }
+    }, delay);
 }
 
 function showToast(message, isError = false) {

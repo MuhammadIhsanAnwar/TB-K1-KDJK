@@ -1920,6 +1920,7 @@ async function getCallMedia(kind) {
         return navigator.mediaDevices.getUserMedia({ audio });
     }
 
+    try {
 }
 
 function showToast(message, isError = false) {

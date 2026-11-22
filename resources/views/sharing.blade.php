@@ -623,6 +623,8 @@
                 Akhiri
             </span>
         </div>
+    </dialog>
+
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

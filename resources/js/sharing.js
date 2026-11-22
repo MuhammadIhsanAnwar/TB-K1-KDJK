@@ -1399,6 +1399,8 @@ function bytesToBase64(bytes) {
 
 function base64ToBytes(data) {
     const binary = atob(data);
+    const bytes = new Uint8Array(binary.length);
+
 }
 
 function showToast(message, isError = false) {

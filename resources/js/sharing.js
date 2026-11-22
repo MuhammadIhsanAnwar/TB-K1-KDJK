@@ -1881,6 +1881,7 @@ function createCallState({ id, kind, direction, status, peerId, peerName }) {
         peerName,
         pc: null,
         localStream: null,
+        remoteStream: null,
 }
 
 function showToast(message, isError = false) {

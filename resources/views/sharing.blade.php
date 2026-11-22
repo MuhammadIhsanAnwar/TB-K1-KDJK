@@ -260,6 +260,7 @@
                                             type="button"
                                             aria-label="Rekam voice note"
                                             title="Rekam voice note"
+                                        >
                                             class="send-button"
                                             type="submit"
                                             aria-label="Kirim pesan"

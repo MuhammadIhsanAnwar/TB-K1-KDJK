@@ -2027,6 +2027,7 @@ async function acceptIncomingCall() {
     }
 
     renderCallDialog();
+    setCallTimeout(call, 20 * 1000, 'Panggilan gagal tersambung. Coba lagi.');
 }
 
 function showToast(message, isError = false) {

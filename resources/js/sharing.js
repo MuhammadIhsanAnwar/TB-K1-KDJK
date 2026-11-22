@@ -2334,6 +2334,8 @@ function renderCallDialog() {
         && !call.remoteCameraOff
         && remoteVideoTrack?.readyState === 'live'
         && !remoteVideoTrack.muted;
+    const isIncomingRing = call.direction === 'incoming' && call.status === 'ringing';
+
 }
 
 function showToast(message, isError = false) {

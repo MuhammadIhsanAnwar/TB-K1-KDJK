@@ -2384,6 +2384,8 @@ function sendCallMediaState(call) {
 }
 
 function toggleCallMicrophone() {
+    const call = state.call;
+
 }
 
 function showToast(message, isError = false) {

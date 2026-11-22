@@ -6,13 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#ffffff">
     <title>NonovShare — berbagi file langsung</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
     <div id="page-loader" class="page-loader">
         <div class="loader-content">
-            <div class="loader-logo" aria-hidden="true">N</div>
-            <h2>NonovShare</h2>
+            <img class="loader-brand-img" src="{{ asset('images/logo-ikon.png') }}" width="84" height="84" alt="" aria-hidden="true" style="background:none;border:0;border-radius:0;padding:0;"
+>
+            <h2 class="audiowide-regular">NonovShare</h2>
             <p>Menyiapkan koneksi berbagi...</p>
             <div class="loader-progress">
                 <div class="loader-progress-bar"></div>
@@ -23,8 +27,8 @@
     <div class="page-shell">
         <header class="topbar">
             <a class="brand" href="/" aria-label="NonovShare - beranda">
-                <span class="brand-mark" aria-hidden="true">N</span>
-                <span>NonovShare</span>
+                <img class="brand-logo" width="43" height="43" src="{{ asset('images/logo-ikon.png') }}" alt="" aria-hidden="true">
+                <span class="audiowide-regular">NonovShare</span>
             </a>
 
             <div class="topbar-meta">

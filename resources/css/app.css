@@ -26,6 +26,16 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .page-shell { width: min(100% - 48px, 1440px); margin: 0 auto; }
 .topbar { height: 74px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #dce5eb; }
 .brand { display: inline-flex; align-items: center; gap: 11px; color: #173247; text-decoration: none; font-size: 21px; font-weight: 700; letter-spacing: -.035em; }
+.brand-logo { width: 43px; height: 43px; object-fit: contain; flex-shrink: 0; }
+
+.loader-logo { width: 72px; height: 72px; object-fit: contain; }
+
+.audiowide-regular {
+    font-family: "Audiowide", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: .01em;
+}
 .brand-mark { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 5px; color: white; background: #17658f; font-size: 15px; font-weight: 700; }
 .brand-dot { color: #17658f; }
 .topbar-meta { display: flex; align-items: center; gap: 14px; }
@@ -558,6 +568,16 @@ button:disabled { cursor: not-allowed; opacity: .55; }
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+}
+
+.loader-logo {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
 }
 
 .loader-content {

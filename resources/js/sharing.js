@@ -275,6 +275,8 @@ function handlePrivatePresence(member) {
 
         if (state.call?.peerId === userId) {
             endCall(`${leavingName ?? 'Pengguna'} terputus. Panggilan berakhir.`, false);
+        }
+
 
         if (state.selectedPrivateUser?.id === userId) {
             state.selectedPrivateUser = null;

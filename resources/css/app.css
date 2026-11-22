@@ -839,3 +839,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .voice-button svg,
 .call-start-button svg,
 .call-control svg,
+.voice-play svg { fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }

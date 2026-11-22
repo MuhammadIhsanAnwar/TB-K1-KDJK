@@ -1479,6 +1479,7 @@ async function startVoiceRecording(context) {
             audio: { echoCancellation: true, noiseSuppression: true },
         });
     } catch (error) {
+        showToast(mediaErrorMessage(error, 'mikrofon'), true);
 }
 
 function showToast(message, isError = false) {

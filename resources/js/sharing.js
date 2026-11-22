@@ -2306,6 +2306,8 @@ function callStatusText(call) {
 
     if (call.remoteMicMuted) {
         parts.push(`mikrofon ${call.peerName} mati`);
+    }
+
 }
 
 function showToast(message, isError = false) {

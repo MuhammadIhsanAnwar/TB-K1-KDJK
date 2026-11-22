@@ -1818,6 +1818,8 @@ function createVoiceNotePlayer(url, duration) {
         button.setAttribute('aria-label', 'Putar voice note');
     };
 
+    showPaused();
+
 }
 
 function showToast(message, isError = false) {

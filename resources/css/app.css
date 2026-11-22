@@ -866,3 +866,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .voice-unavailable { font-size: 11px; font-style: italic; opacity: .85; }
 
 /* Tombol panggilan di chat pribadi */
+.private-chat-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }

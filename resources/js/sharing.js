@@ -2364,6 +2364,7 @@ function renderCallDialog() {
     mic.setAttribute('aria-label', call.micMuted ? 'Nyalakan mikrofon' : 'Matikan mikrofon');
     el('#call-mic-caption').textContent = call.micMuted ? 'Mikrofon mati' : 'Mikrofon';
 
+    const camera = el('#call-toggle-camera');
 }
 
 function showToast(message, isError = false) {

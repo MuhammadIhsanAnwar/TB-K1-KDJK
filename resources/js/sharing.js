@@ -2304,6 +2304,7 @@ function callStatusText(call) {
 
     const parts = [formatDuration((Date.now() - call.connectedAt) / 1000)];
 
+    if (call.remoteMicMuted) {
 }
 
 function showToast(message, isError = false) {

@@ -609,6 +609,7 @@
                 </button>
                 <span id="call-mic-caption">Mikrofon</span>
             </span>
+            <span id="call-camera-action" class="call-action">
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

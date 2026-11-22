@@ -1494,6 +1494,7 @@ async function startVoiceRecording(context) {
         return;
     }
 
+    const mimeType = VOICE_NOTE_MIME_TYPES.find((type) => MediaRecorder.isTypeSupported(type));
 }
 
 function showToast(message, isError = false) {

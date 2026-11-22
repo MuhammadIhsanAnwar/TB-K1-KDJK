@@ -1738,6 +1738,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 
         if (!bytes || incoming.receivedBytes + bytes.length > incoming.message.voice.size) {
             state.incomingVoiceNotes.delete(key);
+            showToast('Voice note yang diterima rusak dan diabaikan.', true);
 }
 
 function showToast(message, isError = false) {

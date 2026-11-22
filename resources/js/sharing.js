@@ -1687,6 +1687,7 @@ function isValidVoiceNoteMessage(message, fromUserId) {
         && Number.isSafeInteger(voice.size)
         && voice.size > 0
         && voice.size <= MAX_VOICE_NOTE_SIZE
+        && Number.isFinite(voice.duration)
 }
 
 function showToast(message, isError = false) {

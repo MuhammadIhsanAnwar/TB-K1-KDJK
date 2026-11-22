@@ -2186,6 +2186,7 @@ async function drainCallCandidates(call) {
     }
 }
 
+async function handleCallSignal(from, user, signal) {
 }
 
 function showToast(message, isError = false) {

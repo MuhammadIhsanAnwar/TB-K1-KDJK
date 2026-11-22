@@ -1703,6 +1703,8 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
         const key = `${prefix}${message.id}`;
         const inProgress = [...state.incomingVoiceNotes.keys()]
             .filter((pendingKey) => pendingKey.startsWith(prefix))
+            .length;
+
 }
 
 function showToast(message, isError = false) {

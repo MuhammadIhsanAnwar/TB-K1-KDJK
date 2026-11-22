@@ -2198,6 +2198,7 @@ async function handleCallSignal(from, user, signal) {
         if (state.call) {
             if (state.call.id !== callId) {
                 void sendCallSignal({ id: callId, peerId: from }, 'call-busy').catch(() => {});
+            }
 }
 
 function showToast(message, isError = false) {

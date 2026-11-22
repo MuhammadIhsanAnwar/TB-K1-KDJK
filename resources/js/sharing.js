@@ -2246,6 +2246,8 @@ async function handleCallSignal(from, user, signal) {
             && call.status === 'calling'
         ) {
             call.status = 'connecting';
+            renderCallDialog();
+
 }
 
 function showToast(message, isError = false) {

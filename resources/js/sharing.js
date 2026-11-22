@@ -105,6 +105,7 @@ const state = {
     voiceRecorder: null,
     voiceNoteUrls: new Map(),
     incomingVoiceNotes: new Map(),
+    call: null,
 };
 
 const el = (selector) => document.querySelector(selector);

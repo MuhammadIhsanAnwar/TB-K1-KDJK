@@ -914,3 +914,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
     .call-local-video { width: 32%; aspect-ratio: 3 / 4; }
 }
 
+@media (prefers-reduced-motion: reduce) {

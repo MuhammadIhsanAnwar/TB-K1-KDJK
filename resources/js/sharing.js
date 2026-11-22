@@ -2218,6 +2218,7 @@ async function handleCallSignal(from, user, signal) {
         navigator.vibrate?.([400, 200, 400]);
 
         call.timeoutTimer = window.setTimeout(() => {
+            if (state.call === call && call.status === 'ringing') {
 }
 
 function showToast(message, isError = false) {

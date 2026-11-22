@@ -1357,6 +1357,7 @@ function capitalize(text) {
 
 function ensureMediaSupport() {
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+        const error = new Error('Mikrofon dan kamera hanya bisa dipakai lewat HTTPS atau localhost.');
 }
 
 function showToast(message, isError = false) {

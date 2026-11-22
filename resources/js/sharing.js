@@ -2083,6 +2083,7 @@ function endCall(message = null, notifyPeer = false, isError = false) {
 
     renderCallButtons();
 
+    if (message) showToast(message, isError);
 }
 
 function showToast(message, isError = false) {

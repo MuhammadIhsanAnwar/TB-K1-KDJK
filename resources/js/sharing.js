@@ -502,7 +502,7 @@ function renderPrivateMessage(message) {
 
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
-    bubble.textContent = message.body;
+    renderMessageContent(bubble, message);
 
     row.append(meta, bubble);
     list.append(row);

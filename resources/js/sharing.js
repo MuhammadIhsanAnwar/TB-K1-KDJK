@@ -2219,6 +2219,7 @@ async function handleCallSignal(from, user, signal) {
 
         call.timeoutTimer = window.setTimeout(() => {
             if (state.call === call && call.status === 'ringing') {
+                endCall(`Panggilan tak terjawab dari ${call.peerName}.`);
 }
 
 function showToast(message, isError = false) {

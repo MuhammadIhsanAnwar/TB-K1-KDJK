@@ -2402,6 +2402,8 @@ function toggleCallCamera() {
     const call = state.call;
     const videoTracks = call?.localStream?.getVideoTracks() ?? [];
 
+    if (!videoTracks.length) return;
+
 }
 
 function showToast(message, isError = false) {

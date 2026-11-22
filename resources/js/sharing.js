@@ -1865,6 +1865,8 @@ function createVoiceNotePlayer(url, duration) {
 }
 
 function renderCallButtons() {
+    const available = Boolean(state.selectedPrivateUser) && !state.call;
+
 }
 
 function showToast(message, isError = false) {

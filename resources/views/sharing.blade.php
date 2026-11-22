@@ -614,6 +614,7 @@
                     <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m22 8-6 4 6 4V8Z"/></svg>
                     <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m22 8-6 4 6 4V8Z"/><path d="m2 2 20 20"/></svg>
                 </button>
+                <span id="call-camera-caption">Kamera</span>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

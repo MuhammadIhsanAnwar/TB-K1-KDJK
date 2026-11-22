@@ -846,3 +846,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 .chat-form.is-recording > input,
 .chat-form.is-recording > .send-button,
 .chat-form.is-recording > .voice-button { display: none; }
+.voice-recorder { flex: 1; min-width: 0; min-height: 36px; display: flex; align-items: center; gap: 9px; padding: 0 4px 0 12px; border: 1px solid #ecd3d0; border-radius: 4px; background: #fdf6f5; }

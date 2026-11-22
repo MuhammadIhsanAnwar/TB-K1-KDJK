@@ -394,6 +394,7 @@
                                         class="button button-outline button-small"
                                         type="button"
                                     >
+                                        Tutup chat
                             </div>
 
                             <div

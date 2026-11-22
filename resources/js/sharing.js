@@ -1613,6 +1613,7 @@ async function sendVoiceNote(session, blob, duration) {
 
     const bytes = new Uint8Array(await blob.arrayBuffer());
 
+    try {
 }
 
 function showToast(message, isError = false) {

@@ -1783,6 +1783,7 @@ function renderMessageContent(bubble, message) {
     if (!url) {
         const note = document.createElement('span');
         note.className = 'voice-unavailable';
+        note.textContent = `Voice note ${formatDuration(message.voice?.duration)} · tidak tersedia lagi setelah halaman dimuat ulang`;
 }
 
 function showToast(message, isError = false) {

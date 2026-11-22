@@ -907,3 +907,4 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 
 @media (max-width: 760px) {
     .private-chat-header { flex-wrap: wrap; }
+    .private-chat-actions { width: 100%; justify-content: flex-start; }

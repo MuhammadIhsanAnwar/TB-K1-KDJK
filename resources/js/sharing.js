@@ -1861,6 +1861,7 @@ function createVoiceNotePlayer(url, duration) {
 
     player.append(button, track, time);
 
+    return player;
 }
 
 function showToast(message, isError = false) {

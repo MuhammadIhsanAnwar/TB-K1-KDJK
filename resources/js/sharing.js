@@ -2241,6 +2241,7 @@ async function handleCallSignal(from, user, signal) {
                 ? `Panggilan tak terjawab dari ${call.peerName}.`
                 : `${call.peerName} mengakhiri panggilan.`);
         } else if (
+            signal.type === 'call-accept'
 }
 
 function showToast(message, isError = false) {

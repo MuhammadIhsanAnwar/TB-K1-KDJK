@@ -3977,6 +3977,7 @@ async function leaveRoom() {
     const room = state.room;
     if (!room) return;
 
+    if (state.voiceRecorder?.context === 'room') {
     for (const transferId of [...state.peers.keys()]) closePeer(transferId);
     for (const userId of [...state.chatPeers.keys()]) closeChatPeer(userId);
     const channel = state.channel;

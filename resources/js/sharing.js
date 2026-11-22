@@ -2333,6 +2333,7 @@ function renderCallDialog() {
         && call.status === 'active'
         && !call.remoteCameraOff
         && remoteVideoTrack?.readyState === 'live'
+        && !remoteVideoTrack.muted;
 }
 
 function showToast(message, isError = false) {

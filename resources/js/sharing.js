@@ -1752,6 +1752,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
 
         if (incoming.receivedBytes !== incoming.message.voice.size) {
             showToast('Voice note yang diterima tidak lengkap.', true);
+            return;
 }
 
 function showToast(message, isError = false) {

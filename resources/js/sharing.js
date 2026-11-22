@@ -2299,6 +2299,7 @@ function callStatusText(call) {
     if (call.status === 'preparing') return 'Menyiapkan perangkat…';
     if (call.status === 'calling') return `${kindLabel} · Memanggil…`;
     if (call.status === 'ringing') return `${kindLabel} masuk`;
+    if (call.status === 'connecting') return 'Menghubungkan…';
 }
 
 function showToast(message, isError = false) {

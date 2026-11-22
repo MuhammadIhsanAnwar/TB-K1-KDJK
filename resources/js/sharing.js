@@ -2007,6 +2007,7 @@ async function acceptIncomingCall() {
         call.localStream = await getCallMedia(call.kind);
     } catch (error) {
         if (state.call === call) {
+            void sendCallSignal(call, 'call-reject', { reason: 'media' }).catch(() => {});
 }
 
 function showToast(message, isError = false) {

@@ -2359,6 +2359,7 @@ function renderCallDialog() {
 
     const mic = el('#call-toggle-mic');
 
+    mic.disabled = !hasLocalStream;
 }
 
 function showToast(message, isError = false) {

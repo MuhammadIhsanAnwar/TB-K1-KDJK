@@ -1742,6 +1742,7 @@ function receiveVoiceNoteFrame(context, fromUserId, frame, deliver) {
             return;
         }
 
+        incoming.chunks.push(bytes);
 }
 
 function showToast(message, isError = false) {

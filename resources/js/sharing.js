@@ -1987,6 +1987,7 @@ async function startCall(kind) {
         await sendCallSignal(call, 'call-invite', { kind });
     } catch (error) {
         endCall(`Panggilan gagal dimulai: ${error.message}`, false, true);
+        return;
 }
 
 function showToast(message, isError = false) {

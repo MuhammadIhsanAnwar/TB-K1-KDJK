@@ -1660,6 +1660,7 @@ function storeOwnPrivateMessage(message, userId) {
 
     try {
         const key = privateConversationKey(userId);
+        const history = JSON.parse(localStorage.getItem(key) ?? '[]');
 }
 
 function showToast(message, isError = false) {

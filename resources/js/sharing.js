@@ -1853,6 +1853,7 @@ function createVoiceNotePlayer(url, duration) {
             activeVoiceAudio.pause();
         }
 
+        activeVoiceAudio = audio;
 }
 
 function showToast(message, isError = false) {

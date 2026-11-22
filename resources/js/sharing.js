@@ -1408,6 +1408,7 @@ function base64ToBytes(data) {
     return bytes;
 }
 
+function voiceNoteChannels(context, targetUserId) {
 }
 
 function showToast(message, isError = false) {

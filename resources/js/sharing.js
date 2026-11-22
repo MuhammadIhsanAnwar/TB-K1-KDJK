@@ -1471,6 +1471,8 @@ async function startVoiceRecording(context) {
     }
 
     voiceRecorderStarting = true;
+    let stream;
+
 }
 
 function showToast(message, isError = false) {

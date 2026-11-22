@@ -2360,6 +2360,7 @@ function renderCallDialog() {
     const mic = el('#call-toggle-mic');
 
     mic.disabled = !hasLocalStream;
+    mic.setAttribute('aria-pressed', String(call.micMuted));
 }
 
 function showToast(message, isError = false) {

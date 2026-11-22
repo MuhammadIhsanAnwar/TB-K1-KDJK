@@ -2419,6 +2419,8 @@ function startRingtone() {
 
     const AudioContextClass = window.AudioContext ?? window.webkitAudioContext;
 
+    if (!AudioContextClass) return;
+
 }
 
 function showToast(message, isError = false) {

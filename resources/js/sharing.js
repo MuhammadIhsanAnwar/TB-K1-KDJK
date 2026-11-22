@@ -2332,6 +2332,7 @@ function renderCallDialog() {
     const remoteShowsVideo = isVideo
         && call.status === 'active'
         && !call.remoteCameraOff
+        && remoteVideoTrack?.readyState === 'live'
 }
 
 function showToast(message, isError = false) {

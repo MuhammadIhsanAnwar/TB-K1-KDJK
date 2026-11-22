@@ -2030,6 +2030,7 @@ async function acceptIncomingCall() {
     setCallTimeout(call, 20 * 1000, 'Panggilan gagal tersambung. Coba lagi.');
 }
 
+function declineIncomingCall() {
 }
 
 function showToast(message, isError = false) {

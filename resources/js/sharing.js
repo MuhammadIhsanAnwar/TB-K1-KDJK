@@ -2030,6 +2030,8 @@ async function acceptIncomingCall() {
     setCallTimeout(call, 20 * 1000, 'Panggilan gagal tersambung. Coba lagi.');
 }
 
+}
+
 function showToast(message, isError = false) {
     const toast = el('#toast');
     toast.textContent = message;

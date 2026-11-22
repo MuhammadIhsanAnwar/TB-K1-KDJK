@@ -2156,6 +2156,7 @@ function attachRemoteStream(call) {
     const video = el('#call-remote-video');
 
     if (audio.srcObject !== call.remoteStream) {
+        audio.srcObject = call.remoteStream;
 }
 
 function showToast(message, isError = false) {

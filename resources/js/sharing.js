@@ -2100,6 +2100,7 @@ function createCallPeer(call) {
         && call.direction === 'outgoing'
         && !call.localStream.getVideoTracks().length
     ) {
+        pc.addTransceiver('video', { direction: 'recvonly' });
 }
 
 function showToast(message, isError = false) {

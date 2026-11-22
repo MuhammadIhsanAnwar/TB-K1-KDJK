@@ -1773,6 +1773,7 @@ function discardIncomingVoiceNotes(context, userId) {
 function renderMessageContent(bubble, message) {
     if (message.kind !== 'voice') {
         bubble.textContent = message.body;
+        return;
 }
 
 function showToast(message, isError = false) {

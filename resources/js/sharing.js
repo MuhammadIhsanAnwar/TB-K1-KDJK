@@ -1806,6 +1806,7 @@ function createVoiceNotePlayer(url, duration) {
     progress.className = 'voice-progress';
     track.append(progress);
 
+    const time = document.createElement('span');
 }
 
 function showToast(message, isError = false) {

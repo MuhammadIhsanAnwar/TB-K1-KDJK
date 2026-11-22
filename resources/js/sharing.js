@@ -1631,6 +1631,7 @@ async function sendVoiceNote(session, blob, duration) {
     }
 }
 
+function sendVoiceNoteFrames(channel, message, bytes) {
 }
 
 function showToast(message, isError = false) {

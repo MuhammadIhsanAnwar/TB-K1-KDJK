@@ -2202,6 +2202,7 @@ async function handleCallSignal(from, user, signal) {
             return;
         }
 
+        const call = createCallState({
 }
 
 function showToast(message, isError = false) {

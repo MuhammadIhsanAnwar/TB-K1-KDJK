@@ -2298,6 +2298,7 @@ function callStatusText(call) {
 
     if (call.status === 'preparing') return 'Menyiapkan perangkat…';
     if (call.status === 'calling') return `${kindLabel} · Memanggil…`;
+    if (call.status === 'ringing') return `${kindLabel} masuk`;
 }
 
 function showToast(message, isError = false) {

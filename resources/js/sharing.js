@@ -2177,6 +2177,7 @@ function markCallConnected(call) {
         if (state.call === call) {
             el('#call-status').textContent = callStatusText(call);
         }
+    }, 1000);
 }
 
 function showToast(message, isError = false) {

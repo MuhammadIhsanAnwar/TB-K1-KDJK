@@ -2223,6 +2223,8 @@ async function handleCallSignal(from, user, signal) {
             }
         }, CALL_RING_TIMEOUT + 5000);
         return;
+    }
+
 }
 
 function showToast(message, isError = false) {

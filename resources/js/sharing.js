@@ -2370,6 +2370,7 @@ function renderCallDialog() {
     el('#call-camera-action').hidden = !isVideo;
     camera.disabled = !localHasVideo;
     camera.setAttribute('aria-pressed', String(call.cameraOff || cameraUnavailable));
+    camera.setAttribute('aria-label', call.cameraOff ? 'Nyalakan kamera' : 'Matikan kamera');
 }
 
 function showToast(message, isError = false) {

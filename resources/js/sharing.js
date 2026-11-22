@@ -2807,6 +2807,7 @@ function showPublicRoomView() {
 
     if (privatePanel) privatePanel.hidden = true;
 
+    if (state.voiceRecorder?.context === 'private') {
     const hasRoom = Boolean(state.room);
 
     if (activeRoom) activeRoom.hidden = !hasRoom;

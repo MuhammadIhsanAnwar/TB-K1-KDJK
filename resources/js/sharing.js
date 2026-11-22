@@ -2294,6 +2294,8 @@ async function handleCallSignal(from, user, signal) {
 }
 
 function callStatusText(call) {
+    const kindLabel = call.kind === 'video' ? 'Video call' : 'Panggilan suara';
+
 }
 
 function showToast(message, isError = false) {

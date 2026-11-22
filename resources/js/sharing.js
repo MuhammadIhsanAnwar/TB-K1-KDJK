@@ -2378,6 +2378,7 @@ function renderCallDialog() {
 
 function sendCallMediaState(call) {
     void sendCallSignal(call, 'call-media', {
+        micMuted: call.micMuted,
 }
 
 function showToast(message, isError = false) {

@@ -2175,6 +2175,7 @@ function markCallConnected(call) {
     call.connectedAt = Date.now();
     call.durationTimer = window.setInterval(() => {
         if (state.call === call) {
+            el('#call-status').textContent = callStatusText(call);
 }
 
 function showToast(message, isError = false) {

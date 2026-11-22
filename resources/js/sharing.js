@@ -1770,6 +1770,7 @@ function discardIncomingVoiceNotes(context, userId) {
     }
 }
 
+function renderMessageContent(bubble, message) {
 }
 
 function showToast(message, isError = false) {

@@ -1963,6 +1963,8 @@ async function startCall(kind) {
         status: 'preparing',
         peerId: user.id,
         peerName: user.name,
+    });
+
 }
 
 function showToast(message, isError = false) {

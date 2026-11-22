@@ -1998,6 +1998,7 @@ async function acceptIncomingCall() {
 
     if (!call || call.direction !== 'incoming' || call.status !== 'ringing') return;
 
+    stopRingtone();
 }
 
 function showToast(message, isError = false) {
